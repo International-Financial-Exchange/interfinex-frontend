@@ -1,12 +1,10 @@
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING } from "../../utils";
 
 export const Card = styled.div`
-    background-color: ${({ theme }) => theme.colors.invert};
+    border-radius: ${PIXEL_SIZING.tiny};
     border: 1px solid ${({ theme }) => theme.colors.highlight};
-    padding: ${({ padding }) => padding ? PIXEL_SIZING.medium : ''};
-    box-shadow: ${({ theme }) => theme.colors.boxShadow};
+    padding: ${PIXEL_SIZING.small};
+    display: grid;
     width: fit-content;
-    height: fit-content;
-    border-radius: ${PIXEL_SIZING.miniscule};
 `

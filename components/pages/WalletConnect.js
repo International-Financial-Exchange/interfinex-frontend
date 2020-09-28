@@ -1,12 +1,13 @@
 import ReactDOM from "react-dom";
 import Text from "../core/Text";
-import { PIXEL_SIZING, useDocument } from "../../utils";
+import { PIXEL_SIZING, useDocument, CONTAINER_SIZING } from "../../utils";
 import { Card } from "../core/Card";
 import styled from "styled-components";
 import { useContext } from "react";
 import { EthersContext } from "../../context/Ethers";
 import { useRouter } from "next/router";
 import { Cross } from "../core/Cross";
+import { ethers } from "ethers";
 
 const WalletOptionCard = styled(Card)`
     transition: all 0.1s ease-out;
@@ -29,7 +30,7 @@ const WalletOption = ({ label, icon, onClick }) => {
         >
             <img
                 src={icon}
-                style={{ height: 200 }}
+                style={{ height: CONTAINER_SIZING.tiny }}
             />
 
             <Text primary style={{ marginTop: PIXEL_SIZING.medium }}>{ label }</Text>
@@ -62,10 +63,11 @@ export const WalletConnect = () => {
                                 label={"Metamask"}
                                 icon={"/metamask-logo.png"}
                                 onClick={() => {
-                                    window.ethereum.enable().then(() => {
-                                        const provider = new ethers.providers.Web3Provider(window.ethereum);
-                                        setProvider(provider);
-                                        setSigner(provider.getSigner());
+                                    window.ethereum.enable().then(async () => {                
+                                        const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+                                        setProvider(newProvider);
+                                        setSigner(newProvider.getSigner());
+                                        router.back();
                                     });
                                 }}
                             />

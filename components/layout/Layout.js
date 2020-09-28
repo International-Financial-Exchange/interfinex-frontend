@@ -1,7 +1,8 @@
 import styled from "styled-components";
 
-export default styled.div`
-    max-width: 1250px;
+export const Layout = styled.div`
+    width: 1250px;
     justify-self: center;
+    position: relative;
     color: ${props => props.theme.colors.textPrimary}
 `
