@@ -114,12 +114,3 @@ export const shade = (col, light)=> {
 
     return color(r, g, b);
 }
-
-export const IMEB_TOKEN = {
-    address:"0x0000000000b3F879cb30FE243b4Dfee438691c04",
-    chainId: 1,
-    name: "Intermex Bills",
-    symbol:"IMEB",
-    decimals: 18,
-    logoURI: "https://1inch.exchange/assets/tokens/0x0000000000b3f879cb30fe243b4dfee438691c04.png",
-};

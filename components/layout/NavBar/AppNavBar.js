@@ -23,6 +23,7 @@ import { Input } from "../../core/Input";
 import { InputAndLabel } from "../../core/InputAndLabel";
 import { getDisplayName } from "next/dist/next-server/lib/utils";
 import _ from "lodash";
+import { AccountContext } from "../../../context/Account";
 
 const TabOption = styled(Text)`
     padding: ${PIXEL_SIZING.small};
@@ -435,7 +436,8 @@ const PairSelect = () => {
 
 export const AppNavBar = props => {
     const router = useRouter();
-    const { provider, signer, setProvider, setSigner } = useContext(EthersContext);
+    const { setProvider } = useContext(EthersContext);
+    const { signer, setSigner } = useContext(AccountContext);
     const [signerAddress, setSignerAddress] = useState();
     const [signerTokenBalance, setSignerTokenBalance] = useState();
     const [showAccountDropdown, setShowAccountDropdown] = useState();
@@ -479,6 +481,7 @@ export const AppNavBar = props => {
                                     {ethers.utils.formatEther(signerTokenBalance || 0)} ETH
                                 </Text>
                             </AccountQuickInfoCard>
+                            
                             <AccountQuickInfoCard padding>
                                 <Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1 }}>
                                     {
@@ -502,7 +505,7 @@ export const AppNavBar = props => {
                                                             setProvider(null);
                                                             setSigner(null);
                                                         }
-                                                }
+                                                    }
                                                 ].map(({ label, onClick }) =>
                                                     <DropdownItem onClick={onClick}>
                                                         <Text>

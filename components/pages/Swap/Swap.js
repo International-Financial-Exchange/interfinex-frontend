@@ -1,6 +1,6 @@
 import { TradePortal } from "./TradePortal"
 import { Layout } from "../../layout/Layout";
-import { PIXEL_SIZING, CONTAINER_SIZING, IMEB_TOKEN } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { useContext, useEffect, useState } from "react";
@@ -18,17 +18,26 @@ import { CreateMarket } from "./CreateMarket";
 
 export const Swap = () => {
     const { contracts: { factoryContract }} = useContext(EthersContext);
-    const { token0, token1, assetToken, baseToken } = useContext(TokenPairContext);
+    const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
     const [marketExists, setMarketExists] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     // Check if swap market exists
     useEffect(() => {
-        factoryContract.pair_to_exchange(token0.address, token1.address, { gasLimit: 100000 }).then(exchange => {
-            setMarketExists(exchange !== ethers.constants.AddressZero);
-            setIsLoading(false);
-        });
-    }, [factoryContract]);
+        if (token0 && token1 && imebToken) {
+            Promise.all([
+                [token0, token1],
+                [token0, imebToken],
+                [token1, imebToken],
+            ].map(async pair => {
+                const exchange = await factoryContract.pair_to_exchange(pair[0].address, pair[1].address, { gasLimit: 100000 })
+                return exchange !== ethers.constants.AddressZero;
+            })).then(exchangesExist => {
+                setMarketExists(exchangesExist.every(v => v));
+                setIsLoading(false);
+            });
+        }
+    }, [factoryContract, token0, token1]);
 
     return (
         <Layout>
@@ -42,7 +51,8 @@ export const Swap = () => {
                             transform: "translate(-50%, -50%)" 
                         }}
                     />
-                    : marketExists ?
+                : 
+                    marketExists ?
                         <div style={{ marginTop: PIXEL_SIZING.medium, display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.large }}>
                             <div style={{ display: "grid", rowGap: PIXEL_SIZING.large }} >
                                 <TradeInfoChart/>

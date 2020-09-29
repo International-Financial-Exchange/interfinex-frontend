@@ -8,6 +8,7 @@ import { EthersContext } from "../../context/Ethers";
 import { useRouter } from "next/router";
 import { Cross } from "../core/Cross";
 import { ethers } from "ethers";
+import { AccountContext } from "../../context/Account";
 
 const WalletOptionCard = styled(Card)`
     transition: all 0.1s ease-out;
@@ -41,7 +42,8 @@ const WalletOption = ({ label, icon, onClick }) => {
 export const WalletConnect = () => {
     const document = useDocument(); 
     const router = useRouter();
-    const { setSigner, setProvider } = useContext(EthersContext);
+    const { setSigner } = useContext(AccountContext);
+    const { setProvider } = useContext(EthersContext);
 
     return (
         !document ?
