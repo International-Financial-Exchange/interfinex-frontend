@@ -127,17 +127,6 @@ export const PairQuickInfoCard = styled(Card)`
     }
 `;
 
-const PairSelectContainer = styled(ModalCard)`    
-    box-shadow: ${({ theme }) => theme.colors.primaryBoxShadow};
-    animation: ${dropinAnimation} 0.05s ease-out forwards;
-`;
-
-const TokenSelectItem = styled.div`
-    &:hover {
-        background-color: ${({ theme }) => theme.colors.highlight};
-    }
-`;
-
 const AddCustomToken = ({ onSubmit: propsOnSubmit = _.noop, isOpen, titleText, onClose }) => {
     const [contractAddress, setContractAddress] = useState("");
     const [name, setName] = useState("");

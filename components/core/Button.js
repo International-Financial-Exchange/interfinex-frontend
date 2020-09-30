@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { PIXEL_SIZING } from "../../utils";
+import { BarSpinner } from "./Spinner";
 
 export default styled.div`
     border-radius: 4px;
@@ -28,7 +29,7 @@ export default styled.div`
     }
 `;
 
-export const TextButton = styled.div`
+const StyledTextButton = styled.div`
     color: ${({ theme }) => theme.colors.primary};
     width: fit-content;
     display: grid;
@@ -46,3 +47,15 @@ export const TextButton = styled.div`
         transform: scale(0.95);
     }
 `;
+
+export const TextButton = props => {
+    return (
+        <div style={props.style}>
+            {
+                props.isLoading ?
+                    <BarSpinner/>
+                    : <StyledTextButton {...props}/>
+            }
+        </div>
+    );
+}

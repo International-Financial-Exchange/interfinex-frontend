@@ -52,7 +52,7 @@ export const TokenPairProvider = ({ children }) => {
                 if (assetToken) {
                     setAssetToken({
                         ...assetToken,
-                        contract: new ethers.Contract(assetToken.address, erc20ContractAbi, provider),
+                        contract: new ethers.Contract(assetToken.address, erc20ContractAbi, provider.getSigner()),
                     });
                 } else if (
                     assetTokenAddress && 
@@ -63,7 +63,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: assetTokenName,
                         symbol: assetTokenSymbol,
                         address: assetTokenAddress,
-                        contract: new ethers.Contract(assetTokenAddress, erc20ContractAbi, provider),
+                        contract: new ethers.Contract(assetTokenAddress, erc20ContractAbi, provider.getSigner()),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
@@ -71,7 +71,7 @@ export const TokenPairProvider = ({ children }) => {
                 const assetTokenDefault = tokens[1];
                 setAssetToken({
                     ...assetTokenDefault,
-                    contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, provider),
+                    contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, provider.getSigner()),
                 });
             }
     
@@ -80,7 +80,7 @@ export const TokenPairProvider = ({ children }) => {
                 if (baseToken) {
                     setBaseToken({
                         ...baseToken,
-                        contract: new ethers.Contract(baseToken.address, erc20ContractAbi, provider),
+                        contract: new ethers.Contract(baseToken.address, erc20ContractAbi, provider.getSigner()),
                     });
                 } else if (
                     baseTokenAddress && 
@@ -91,7 +91,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: baseTokenName,
                         symbol: baseTokenSymbol,
                         address: baseTokenAddress,
-                        contract: new ethers.Contract(baseTokenAddress, erc20ContractAbi, provider),
+                        contract: new ethers.Contract(baseTokenAddress, erc20ContractAbi, provider.getSigner()),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
@@ -99,7 +99,7 @@ export const TokenPairProvider = ({ children }) => {
                 const baseTokenDefault = tokens[0];
                 setBaseToken({
                     ...baseTokenDefault,
-                    contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, provider),
+                    contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, provider.getSigner()),
                 });
             }
         }

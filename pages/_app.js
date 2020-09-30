@@ -6,25 +6,28 @@ import NavBar from '../components/layout/NavBar/NavBar';
 import { EthersProvider } from '../context/Ethers';
 import { TokenPairProvider } from '../context/TokenPair';
 import { AccountProvider } from '../context/Account';
+import { NotificationsProvider } from '../context/Notifications';
 
 export default ({ Component, pageProps }) => {
     return (
         <Theme>
-            <EthersProvider>
-                <TokenPairProvider>
-                    <AccountProvider>
-                        <Head>
-                            <title>Intermex</title>
-                            <link rel="icon" href="/favicon.ico" />
-                        </Head>
+            <NotificationsProvider>
+                <EthersProvider>
+                    <TokenPairProvider>
+                        <AccountProvider>
+                            <Head>
+                                <title>Intermex</title>
+                                <link rel="icon" href="/favicon.ico" />
+                            </Head>
 
-                        <div style={{ display: "grid", width: "100%", height: "100%" }} id={"root"}>
-                            <NavBar/>
-                            <Component {...pageProps}/>
-                        </div>
-                    </AccountProvider>
-                </TokenPairProvider>
-            </EthersProvider>
+                            <div style={{ display: "grid", width: "100%", height: "100%" }} id={"root"}>
+                                <NavBar/>
+                                <Component {...pageProps}/>
+                            </div>
+                        </AccountProvider>
+                    </TokenPairProvider>
+                </EthersProvider>
+            </NotificationsProvider>
         </Theme>
     );
 };

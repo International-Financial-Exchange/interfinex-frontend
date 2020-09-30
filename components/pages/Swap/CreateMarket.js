@@ -7,6 +7,7 @@ import { useContext, useState, useCallback } from "react"
 import { TokenPairContext } from "../../../context/TokenPair"
 import { AccountContext } from "../../../context/Account"
 import { EthersContext } from "../../../context/Ethers"
+import ethers from "ethers";
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
@@ -18,15 +19,22 @@ export const CreateMarket = () => {
     const [imebTokenAmount, setImebTokenAmount] = useState();
 
     const onSubmit = async () => {
+        await token0.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
+        await token1.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
+        await imebToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
+
         // create the market
-        console.log(token0.address, token1.address)
-        const tx = await factoryContract.create_exchange(token0.address, token1.address);
-        console.log("res", tx);
-        // const exchangeAddress = await factoryContract.pair_to_exchange(token0.address, token1.address);
-        // exchange = await Exchange.at(exchangeAddress);
-        // deposit 90% liquidity into market
-        // deposit 5% liquidity into the asset/imeb market
-        // deposit 5$ into the base/imeb market
+        const [token0Amount, token1Amount] = assetToken.address === token0.address 
+            ? [assetTokenAmount, baseTokenAmount] 
+            : [baseTokenAmount, assetTokenAmount];
+            
+        const tx = await factoryContract.create_exchange(
+            token0.address, 
+            token1.address,
+            ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
+            ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
+            ethers.utils.parseUnits(imebTokenAmount.toString(), imebToken.decimals).toString(),
+        );
     };
 
     return (
