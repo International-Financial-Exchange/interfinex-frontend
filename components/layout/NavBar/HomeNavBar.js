@@ -1,6 +1,6 @@
 import Text from "../../core/Text";
 import Link from "next/link";
-import Button from "../../core/Button";
+import { Button } from "../../core/Button";
 import Span from "../../core/Span";
 import { PIXEL_SIZING } from "../../../utils";
 
@@ -25,7 +25,7 @@ export default props => {
             </div>
 
             <div>
-                <Link href={"/app/dashboard"}>
+                <Link href={"/app/swap"}>
                     <Button>
                         Go to App
                     </Button>

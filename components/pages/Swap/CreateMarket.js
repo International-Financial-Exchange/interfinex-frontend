@@ -1,18 +1,20 @@
 import { Card } from "../../core/Card"
 import { CONTAINER_SIZING, PIXEL_SIZING, } from "../../../utils"
 import Text from "../../core/Text"
-import Button, { TextButton } from "../../core/Button"
+import { TextButton, Button } from "../../core/Button"
 import { TokenAmountInput } from "../../core/TokenAmountInput"
 import { useContext, useState, useCallback } from "react"
 import { TokenPairContext } from "../../../context/TokenPair"
 import { AccountContext } from "../../../context/Account"
 import { EthersContext } from "../../../context/Ethers"
 import ethers from "ethers";
+import { NotificationsContext } from "../../../context/Notifications"
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, imebTokenBalance } = useContext(AccountContext);
     const { contracts: { factoryContract }} = useContext(EthersContext);
+    const { addTransactionNotification } = useContext(NotificationsContext);
 
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
@@ -28,13 +30,16 @@ export const CreateMarket = () => {
             ? [assetTokenAmount, baseTokenAmount] 
             : [baseTokenAmount, assetTokenAmount];
             
-        const tx = await factoryContract.create_exchange(
-            token0.address, 
-            token1.address,
-            ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
-            ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
-            ethers.utils.parseUnits(imebTokenAmount.toString(), imebToken.decimals).toString(),
-        );
+        addTransactionNotification({
+            content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+            transactionPromise: factoryContract.create_exchange(
+                token0.address, 
+                token1.address,
+                ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
+                ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
+                ethers.utils.parseUnits(imebTokenAmount.toString(), imebToken.decimals).toString(),
+            ),
+        });
     };
 
     return (

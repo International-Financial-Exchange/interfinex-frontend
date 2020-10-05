@@ -5,7 +5,7 @@ import { PIXEL_SIZING, CONTAINER_SIZING } from "../../../utils";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
-import Button, { TextButton } from "../../core/Button";
+import { TextButton, Button } from "../../core/Button";
 import { SwapContext } from "./Swap";
 import { AccountContext } from "../../../context/Account";
 import ethers from "ethers";

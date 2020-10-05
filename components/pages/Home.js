@@ -3,7 +3,7 @@ import { Layout } from '../layout/Layout'
 import { ThemeContext } from 'styled-components'
 import { useContext } from 'react';
 import Text from "../core/Text";
-import Button from '../core/Button';
+import { Button } from '../core/Button';
 import { PIXEL_SIZING } from '../../utils';
 import Link from 'next/link';
 
@@ -29,7 +29,7 @@ export default function Home() {
                         The International Mercantile Exchange
                     </Text>
 
-                    <Link href={"/app/dashboard"}>
+                    <Link href={"/app/swap"}>
                         <Button style={{ width: "80%", marginTop: PIXEL_SIZING.large, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}>
                             Start Investing
                         </Button>

@@ -1,11 +1,11 @@
 import Text from "../../core/Text"
 import { CONTAINER_SIZING, PIXEL_SIZING, parseTokenAmount } from "../../../utils";
 import styled, { ThemeContext } from "styled-components";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { ContentAndArrow } from "../../core/ContentAndArrow";
 import { TokenPairContext } from "../../../context/TokenPair";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
-import Button, { TextButton } from "../../core/Button";
+import { TextButton, Button } from "../../core/Button";
 import { Input } from "../../core/Input";
 import { InputAndLabel } from "../../core/InputAndLabel";
 import { TokenSelectMenu } from "../../layout/NavBar/AppNavBar";
@@ -79,9 +79,9 @@ export const TradePortal = () => {
                 (() => {
                     switch (selectedTab) {
                         case "BUY":
-                            return <TradeTab isBuy/>;
+                            return <TradeTab isBuy key={false}/>;
                         case "SELL":
-                            return <TradeTab/>;
+                            return <TradeTab key={true}/>;
                         default:
                             return <PoolTab/>
                     }
@@ -155,7 +155,7 @@ const PoolTab = () => {
                             setAssetTokenAmount(e.target.value);
                             setBaseTokenAmount(e.target.value / price);
                         }}
-                        value={assetTokenAmount?.toFixed(4)}
+                        value={assetTokenAmount}
                         token={assetToken}
                     />
 
@@ -164,7 +164,7 @@ const PoolTab = () => {
                             setBaseTokenAmount(e.target.value);
                             setAssetTokenAmount(e.target.value * price);
                         }}
-                        value={baseTokenAmount?.toFixed(4)}
+                        value={baseTokenAmount}
                         token={baseToken}
                     />
                 </div>
@@ -288,13 +288,26 @@ const SlippageSelect = ({ onChange, value }) => {
     );
 };
 
+const calculateSwapRate = (inputAmount, inputBalance, outputBalance, isBuy = true) => 
+    isBuy ?
+        parseFloat(inputAmount) * parseFloat(outputBalance) / (parseFloat(inputBalance) + parseFloat(inputAmount))
+        : parseFloat(inputAmount) * parseFloat(outputBalance) / (parseFloat(inputBalance) - parseFloat(inputAmount))
+
 const TradeTab = ({ isBuy }) => {
-    const { assetToken, baseToken, setAssetToken, setBaseToken } = useContext(TokenPairContext);
+    const { assetToken, baseToken, setAssetToken, setBaseToken, token0 } = useContext(TokenPairContext);
+    const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
+    const { exchangeContract, price, exchangeAssetTokenBalance, exchangeBaseTokenBalance, exchangeHasAllowance, approveExchange } = useContext(SwapContext);
     const [showTokenSelectMenu, setShowTokenSelectMenu] = useState(false);
+    const { addTransactionNotification } = useContext(NotificationsContext);
     const [tokenSelectType, setTokenSelectType] = useState("");
     const [showAdvanced, setShowAdvanced] = useState(false);
+    const [assetTokenAmount, setAssetTokenAmount] = useState();
+    const [slippageValue, setSlippageValue] = useState(0.1);
     const theme = useContext(ThemeContext);
-    
+
+    console.log("asset", exchangeAssetTokenBalance);
+    console.log("base", exchangeBaseTokenBalance);
+
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu 
@@ -312,7 +325,14 @@ const TradeTab = ({ isBuy }) => {
                 <InputAndLabel>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center" }}>
                         <Text>Amount to {isBuy ? "Buy" : "Sell"}</Text>
-                        <TextButton text style={{ marginRight: PIXEL_SIZING.tiny }}>Max</TextButton>
+                        <TextButton
+                            style={{ marginRight: PIXEL_SIZING.tiny }}
+                            onClick={() => {
+                                setAssetTokenAmount(isBuy ? assetTokenBalance : baseTokenBalance);
+                            }}
+                        >
+                            Max
+                        </TextButton>
                     </div>
 
                     <div style={{ position: "relative", height: "fit-content" }}>
@@ -332,7 +352,9 @@ const TradeTab = ({ isBuy }) => {
                         <Input
                             type={"number"}
                             style={{ paddingRight: PIXEL_SIZING.huge }}
+                            onChange={e => setAssetTokenAmount(e.target.value)}
                             ref={input => input && input.focus()}
+                            value={assetTokenAmount}
                             placeholder={"0.0"}
                         />
                     </div>
@@ -366,14 +388,45 @@ const TradeTab = ({ isBuy }) => {
                     </div>
                 </ContentAndArrow>
 
-                <Button style={{ width: "100%", height: PIXEL_SIZING.larger }}>
+                <Button 
+                    style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    onClick={async () => {
+                        const [buy, sell] = baseToken.address === token0.address ?
+                            [exchangeContract.swapBaseToAsset, exchangeContract.swapAssetToBase]
+                            : [exchangeContract.swapAssetToBase, exchangeContract.swapBaseToAsset];
+                        const swap = isBuy ? buy : sell;
+                            
+                        const baseTokenAmount = calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy);
+                        const receiveAmount = isBuy ? assetTokenAmount : baseTokenAmount; 
+                        const receiveToken = isBuy ? assetToken : baseToken;
+                        const sendToken = isBuy ? baseToken : assetToken;
+                        const sendAmount = isBuy ? baseTokenAmount : assetTokenAmount;
+                        const slippagePercentage = slippageValue / 100;
+
+                        if (!exchangeHasAllowance)
+                            await approveExchange();
+
+                        addTransactionNotification({
+                            content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
+                            transactionPromise: swap(
+                                parseTokenAmount(sendAmount * (1 - slippagePercentage), sendToken), 
+                                address,
+                                parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                                parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                                0
+                            ),
+                        });
+                    }}    
+                >
                     <Text primary style={{ color: "white", fontSize: 15 }}>
                         {isBuy ? "Buy" : "Sell"} {assetToken.name}
                     </Text>
                 </Button>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.miniscule }}>
-                    <Text secondary>{isBuy ? "Cost" : "Receive"}: 100093.23 USDT</Text>
+                    <Text secondary>
+                        {isBuy ? "Cost" : "Receive"}: {(calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy) || 0).toFixed(4)} {baseToken.symbol}
+                    </Text>
                     <TextButton onClick={() => setShowAdvanced(!showAdvanced)}>
                         {showAdvanced ? "Hide" : "Show"} Advanced
                     </TextButton>
@@ -381,14 +434,15 @@ const TradeTab = ({ isBuy }) => {
 
                 {
                     showAdvanced &&
-                        <>
-                            <InputAndLabel>
-                                <Text>Max Slippage</Text>
-                                <div>
-                                    <SlippageSelect/>
-                                </div>
-                            </InputAndLabel>
-                        </>
+                        <InputAndLabel>
+                            <Text>Max Slippage</Text>
+                            <div>
+                                <SlippageSelect 
+                                    value={slippageValue}
+                                    onChange={value => setSlippageValue(value)}
+                                />
+                            </div>
+                        </InputAndLabel>
                 }
             </div>
     );

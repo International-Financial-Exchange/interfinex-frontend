@@ -1,6 +1,6 @@
 import Text from "../../core/Text";
 import Link from "next/link";
-import Button from "../../core/Button";
+import { Button } from "../../core/Button";
 import Span from "../../core/Span";
 import { PIXEL_SIZING, CONTAINER_SIZING, dropinAnimation } from "../../../utils";
 import styled from "styled-components";
@@ -450,9 +450,9 @@ export const AppNavBar = props => {
                     selected={router.pathname.split("/app/")[1]}
                     onChange={selected => router.push(`/app/${selected}`)}
                     items={[
-                        { label: "Dashboard", value: "dashboard" }, 
+                        // { label: "Dashboard", value: "dashboard" }, 
                         { label: "Swap", value: "swap" }, 
-                        { label: "Options", value: "options" },
+                        // { label: "Options", value: "options" },
                     ]}
                 />
             </div>

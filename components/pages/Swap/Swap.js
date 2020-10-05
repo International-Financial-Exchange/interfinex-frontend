@@ -12,7 +12,7 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 import { Spinner } from "../../core/Spinner";
 import { Card } from "../../core/Card";
 import { Input } from "../../core/Input";
-import Button, { TextButton } from "../../core/Button";
+import { TextButton, Button } from "../../core/Button";
 import { TokenAmountInput } from "../../core/TokenAmountInput";
 import { CreateMarket } from "./CreateMarket";
 import { YourLiquidity } from "./YourLiquidity";
@@ -65,6 +65,7 @@ export const Swap = () => {
                 const marketExists = exchanges.every(dd => dd !== ethers.constants.AddressZero);
                 setMarketExists(marketExists);
 
+                console.log("aaaaa", marketExists && signer && address)
                 if (marketExists && signer && address) {
                     Promise.all([
                         assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
@@ -93,13 +94,14 @@ export const Swap = () => {
                         liquidityTokenBalance: accountLiquidityTokenBalance,
                     }));
 
+                    console.log("hellooooo");
                     Promise.all([
                         assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                         baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                         liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                     ]).then(allowances => {
                         console.log("exchange allowances", allowances)
-                        console.log(allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')))));
+                        console.log("allowance", allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')))));
                         setExchangeHasAllowance(
                             allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
                         );
@@ -110,8 +112,6 @@ export const Swap = () => {
             });
         }
     }, [factoryContract, token0, token1, signer, address]);
-
-    console.log(exchangeHasAllowance);
 
     useEffect(() => {
         if (exchangeContract) {
@@ -136,8 +136,6 @@ export const Swap = () => {
             });
         }
     }, [exchangeContract, account?.liquidityTokenBalance]);
-
-    console.log(liquidityToken)
 
     return (
         <Layout>

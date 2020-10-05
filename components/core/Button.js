@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { PIXEL_SIZING } from "../../utils";
 import { BarSpinner } from "./Spinner";
 
-export default styled.div`
+const ButtonContainer = styled.div`
     border-radius: 4px;
     padding: ${PIXEL_SIZING.small} ${PIXEL_SIZING.large};
     background-color: ${({ secondary, theme, negative }) => secondary ?
@@ -28,6 +28,14 @@ export default styled.div`
         transform: scale(0.95);
     }
 `;
+
+export const Button = ({ children, requiresWallet, ...props }) => {
+    return (
+        <ButtonContainer {...props}>
+            {children}
+        </ButtonContainer>
+    );
+}
 
 const StyledTextButton = styled.div`
     color: ${({ theme }) => theme.colors.primary};

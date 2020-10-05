@@ -18,8 +18,9 @@ export const NotificationsContext = createContext();
 
 export const NotificationsProvider = ({ children }) => {
     const [notifications, setNotifications] = useState([]);
+    const [layoutNotifications, setLayoutNotifications] = useState([]);
 
-    const addNotification = ({ content, type, timeout = 1000 * 300 }) => {
+    const addNotification = ({ content, type, timeout = 1000 * 7 }) => {
         const id = uniqueId("notification");
         setNotifications(existing => 
             existing.concat({ 
@@ -36,7 +37,6 @@ export const NotificationsProvider = ({ children }) => {
     const addTransactionNotification = useCallback(async ({ content, transactionPromise }) => {
         try {
             const tx = await transactionPromise;
-            console.log("resolved", tx);
             addNotification({
                 type: NOTIFICATION_TYPES.success,
                 content: <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
@@ -54,8 +54,37 @@ export const NotificationsProvider = ({ children }) => {
                 </div>,
             });
         } catch {
+            addNotification({
+                type: NOTIFICATION_TYPES.error,
+                content: <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
+                    <Text bold>
+                        Failed to Send Transaction
+                    </Text>
 
+                    <Text secondary>
+                        {content}
+                    </Text>
+                </div>,
+            });
         }
+    }, []);
+
+    const addLayoutNotification = useCallback(({ content, type }) => {
+        const id = uniqueId("layout-notification");
+        const deleteNotification = () => setLayoutNotifications(existing => existing.filter(({ id: _id }) => _id !== id));
+        setLayoutNotifications(existing => 
+            existing.concat({ 
+                id,
+                content: <LayoutNotification 
+                    content={content} 
+                    type={type} 
+                    timestamp={Date.now()} 
+                    deleteNotification={deleteNotification}
+                />, 
+            })
+        );
+
+        return deleteNotification;
     }, []);
     
     return (
@@ -63,6 +92,8 @@ export const NotificationsProvider = ({ children }) => {
             value={{
                 addNotification,
                 addTransactionNotification,
+                addLayoutNotification,
+                layoutNotifications,
             }}
         >
             { children }
@@ -78,6 +109,62 @@ export const NotificationsProvider = ({ children }) => {
                 }
             </div>
         </NotificationsContext.Provider>
+    );
+};
+
+const LayoutNotificationContainer = styled.div`
+    padding: ${PIXEL_SIZING.small};
+    transition: all 0.1s ease-out;
+
+    background-color: ${({ typeColor, }) => shade(typeColor, 0.85)};
+    border: 1px solid ${({ typeColor }) => typeColor};
+    border-radius: ${PIXEL_SIZING.miniscule};
+    color: ${({ theme }) => theme.colors.textPrimary};
+    position: relative;
+
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: ${PIXEL_SIZING.small};
+    overflow: hidden;
+    margin-top: ${PIXEL_SIZING.medium};
+
+    &:hover {
+        transform: scale(1.02);
+    }
+`;
+
+const LayoutNotification = ({ content, type, timestamp, deleteNotification, }) => {
+    const theme = useContext(ThemeContext);
+
+    return (
+        <LayoutNotificationContainer 
+            typeColor={
+                type === NOTIFICATION_TYPES.success ? 
+                    theme.colors.positive
+                    : type === NOTIFICATION_TYPES.error ?
+                        theme.colors.negative
+                        : type === NOTIFICATION_TYPES.info ?
+                            theme.colors.highlight
+                            : type === NOTIFICATION_TYPES.warn ?
+                                theme.colors.warn
+                                : theme.colors.primary
+            }
+        >
+            <img
+                src={"/warn.png"}
+                style={{ height: PIXEL_SIZING.medium }}
+            />
+
+            <Text bold>{ content }</Text>
+
+            <div>
+                <TextButton onClick={deleteNotification}>
+                    Dismiss
+                </TextButton>
+            </div>
+        </LayoutNotificationContainer>
     );
 };
 
