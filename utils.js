@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { keyframes } from "styled-components";
+import { ethers } from "ethers";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -114,3 +115,5 @@ export const shade = (col, light)=> {
 
     return color(r, g, b);
 }
+
+export const parseTokenAmount = (amount, token) => ethers.utils.parseUnits(amount.toString(), token.decimals).toString();

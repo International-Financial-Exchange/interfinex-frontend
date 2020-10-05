@@ -1,5 +1,5 @@
 import Text from "../../core/Text"
-import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils";
+import { CONTAINER_SIZING, PIXEL_SIZING, parseTokenAmount } from "../../../utils";
 import styled, { ThemeContext } from "styled-components";
 import { useState, useContext } from "react";
 import { ContentAndArrow } from "../../core/ContentAndArrow";
@@ -9,6 +9,11 @@ import Button, { TextButton } from "../../core/Button";
 import { Input } from "../../core/Input";
 import { InputAndLabel } from "../../core/InputAndLabel";
 import { TokenSelectMenu } from "../../layout/NavBar/AppNavBar";
+import { TokenAmountInput } from "../../core/TokenAmountInput";
+import { AccountContext } from "../../../context/Account";
+import { SwapContext } from "./Swap";
+import { NotificationsContext } from "../../../context/Notifications";
+import ethers from "ethers";
 
 const Container = styled.div`
     border-radius: ${PIXEL_SIZING.tiny};
@@ -88,9 +93,25 @@ export const TradePortal = () => {
 };
 
 const PoolTab = () => {
-    const { assetToken, baseToken, setAssetToken, setBaseToken } = useContext(TokenPairContext);
+    const { assetToken, baseToken, setAssetToken, setBaseToken, token0, token1 } = useContext(TokenPairContext);
+    const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
+    const { 
+        exchangeContract, 
+        price,
+        exchangeHasAllowance,
+        approveExchange,
+        exchangeBaseTokenBalance,
+        exchangeAssetTokenBalance,
+        liquidityToken,
+        account,
+    } = useContext(SwapContext);
+    const { addTransactionNotification } = useContext(NotificationsContext);
     const [showTokenSelectMenu, setShowTokenSelectMenu] = useState(false);
     const [tokenSelectType, setTokenSelectType] = useState("");
+    const [assetTokenAmount, setAssetTokenAmount] = useState();
+    const [baseTokenAmount, setBaseTokenAmount] = useState();
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [slippageValue, setSlippageValue] = useState(0.1);
     const theme = useContext(ThemeContext);
 
     return (
@@ -107,97 +128,131 @@ const PoolTab = () => {
             />
         :
             <div style={{ padding: PIXEL_SIZING.medium, display: "grid", rowGap: PIXEL_SIZING.small }}>
-                <InputAndLabel>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center" }}>
-                        <Text>Amount to Pool</Text>
-                        <TextButton text style={{ marginRight: PIXEL_SIZING.tiny }}>Max Deposit</TextButton>
-                        <TextButton text>Max Withdraw</TextButton>
-                    </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center" }}>
+                    <Text>Amount to Pool</Text>
+                    <TextButton
+                        style={{ marginRight: PIXEL_SIZING.tiny }}
+                        onClick={() => {
+                            setBaseTokenAmount(parseFloat(baseTokenBalance));
+                            setAssetTokenAmount((price * parseFloat(baseTokenBalance)));
+                        }}
+                    >
+                        Max Deposit
+                    </TextButton>
+                    <TextButton
+                        onClick={() => {
+                            setBaseTokenAmount(parseFloat(account.depositedBaseTokenAmount));
+                            setAssetTokenAmount(parseFloat(account.depositedAssetTokenAmount));
+                        }}
+                    >
+                        Max Withdraw
+                    </TextButton>
+                </div>
 
-                    <div>
-                        <div style={{ position: "relative", height: "fit-content" }}>
-                            <TokenAndLogo 
-                                token={assetToken}
-                                onClick={() => {
-                                    setShowTokenSelectMenu(true);
-                                    setTokenSelectType("ASSET");
-                                }}
-                                style={{ 
-                                    position: "absolute", 
-                                    right: PIXEL_SIZING.small, 
-                                    top: "50%", 
-                                    transform: "translateY(-50%)", 
-                                    fontWeight: "bold", 
-                                    color: theme.colors.primary,
-                                }}
-                            >
-                                <TextButton>
-                                    {assetToken.symbol}
-                                </TextButton>
-                            </TokenAndLogo>
+                <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
+                    <TokenAmountInput
+                        onChange={e => {
+                            setAssetTokenAmount(e.target.value);
+                            setBaseTokenAmount(e.target.value / price);
+                        }}
+                        value={assetTokenAmount?.toFixed(4)}
+                        token={assetToken}
+                    />
 
-                            <Input
-                                type={"number"}
-                                style={{ paddingRight: PIXEL_SIZING.huge }}
-                                ref={input => input && input.focus()}
-                                placeholder={"0.0"}
-                            />
-                        </div>
+                    <TokenAmountInput
+                        onChange={e => {
+                            setBaseTokenAmount(e.target.value);
+                            setAssetTokenAmount(e.target.value * price);
+                        }}
+                        value={baseTokenAmount?.toFixed(4)}
+                        token={baseToken}
+                    />
+                </div>
 
-                        <div style={{ position: "relative", height: "fit-content", marginTop: PIXEL_SIZING.small }}>
-                            <TokenAndLogo 
-                                token={baseToken}
-                                onClick={() => {
-                                    setShowTokenSelectMenu(true);
-                                    setTokenSelectType("BASE");
-                                }}
-                                style={{ 
-                                    position: "absolute", 
-                                    right: PIXEL_SIZING.small, 
-                                    top: "50%", 
-                                    transform: "translateY(-50%)", 
-                                    fontWeight: "bold", 
-                                    color: theme.colors.primary,
-                                }}
-                            >
-                                <TextButton>
-                                    {baseToken.symbol}
-                                </TextButton>
-                            </TokenAndLogo>
+                <Button 
+                    style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    onClick={async () => {
+                        const [token0Amount, token1Amount] = baseToken.address === token0.address ?
+                            [baseTokenAmount, assetTokenAmount]
+                            : [assetTokenAmount, baseTokenAmount];
 
-                            <Input
-                                type={"number"}
-                                style={{ paddingRight: PIXEL_SIZING.huge }}
-                                placeholder={"0.0"}
-                            />
-                        </div>
-                    </div>
+                        if (!exchangeHasAllowance)
+                            await approveExchange();
+                            
+                        const slippagePercentage = slippageValue / 100;
+                        addTransactionNotification({
+                            content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
+                            transactionPromise: exchangeContract.mint_liquidity(
+                                parseTokenAmount(token0Amount, token0),
+                                parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
+                                parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
+                                address,
+                                0
+                            )
+                        });
+                    }}
+                >
+                    <Text primary style={{ color: "white", fontSize: 15 }}>
+                        Deposit Liquidity
+                    </Text>
+                </Button>
 
-                    <Button style={{ width: "100%", height: PIXEL_SIZING.larger }}>
-                        <Text primary style={{ color: "white", fontSize: 15 }}>
-                            Deposit Liquidity
-                        </Text>
-                    </Button>
+                <Button 
+                    secondary 
+                    style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    onClick={async () => {
+                        const token0Amount = baseToken.address === token0.address ? baseTokenAmount : assetTokenAmount;
+                        
+                        if (!exchangeHasAllowance)
+                            await approveExchange();
 
-                    <Button secondary style={{ width: "100%", height: PIXEL_SIZING.larger }}>
-                        <Text primary style={{ color: "white", fontSize: 15 }}>
-                            Withdraw Liquidity
-                        </Text>
-                    </Button>
+                        const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                        addTransactionNotification({
+                            content: `Withdraw ${assetTokenAmount.toFixed(4)} ${assetToken.symbol} and ${baseTokenAmount.toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                            transactionPromise: exchangeContract.burn_liquidity(
+                                parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                                0
+                            )
+                        });
+                    }}
+                >
+                    <Text primary style={{ color: "white", fontSize: 15 }}>
+                        Withdraw Liquidity
+                    </Text>
+                </Button>
 
-                    <div>
-                        <Text secondary>1 {assetToken.symbol} = 1123.213 {baseToken.symbol}</Text>
-                    </div>
-                </InputAndLabel>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.miniscule }}>
+                    <Text secondary>1 {assetToken.symbol} = {(1 / price).toFixed(4)} {baseToken.symbol}</Text>
+
+                    <TextButton onClick={() => setShowAdvanced(!showAdvanced)}>
+                        {showAdvanced ? "Hide" : "Show"} Advanced
+                    </TextButton>
+                </div>
+
+                {
+                    showAdvanced &&
+                        <InputAndLabel>
+                            <Text>Max Slippage</Text>
+                            <div>
+                                <SlippageSelect 
+                                    value={slippageValue}
+                                    onChange={value => setSlippageValue(value)}
+                                />
+                            </div>
+                        </InputAndLabel>
+                }
             </div>
     );
 };
 
 const SlippageOption = styled.div`
     background-color: ${({ theme }) => theme.colors.invert};
-    border: 2px solid ${({ theme }) => theme.colors.highlight};
+    border: 2px solid ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.highlight};
     border-radius: ${PIXEL_SIZING.miniscule};
-    padding: ${PIXEL_SIZING.small};
+    height: ${CONTAINER_SIZING.microscopic};
+    display: grid;
+    align-content: center;
+    justify-content: center;
     transition: all 0.08s ease-out;
 
     &:hover {
@@ -207,15 +262,28 @@ const SlippageOption = styled.div`
 `;
 
 const SlippageSelect = ({ onChange, value }) => {
+    const OPTIONS = [0.1, 0.75, 3];
+
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(0px, 1fr))", justifyItems: "center", columnGap: PIXEL_SIZING.small }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", justifyItems: "center", columnGap: PIXEL_SIZING.small }}>
             {
-                [0.1, 0.5, 1, 5].map(option => 
-                    <SlippageOption style={{ width: "100%", textAlign: "center" }}>
-                        {option}%
+                OPTIONS.map(option => 
+                    <SlippageOption 
+                        style={{ width: "100%", textAlign: "center" }}
+                        selected={value === option}
+                        onClick={() => onChange(option)}
+                    >
+                        <div style={{ height: "fit-content" }}>{option}%</div>
                     </SlippageOption>
                 )
             }
+
+            <Input
+                style={{ width: CONTAINER_SIZING.miniscule }}
+                onChange={e => onChange(e.target.value)}
+                selected={!OPTIONS.includes(value)}
+                placeholder={value + "%"}
+            />
         </div>
     );
 };

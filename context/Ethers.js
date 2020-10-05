@@ -49,8 +49,6 @@ export const EthersProvider = ({ children }) => {
         );
     }, [networkInfo, signer]);
 
-    console.log("ethers", LocalDividendERC20Contract.abi)
-
     useEffect(() => { 
         provider?.getNetwork().then(network => setNetworkInfo(network));
     }, [provider]);

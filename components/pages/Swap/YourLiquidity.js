@@ -61,7 +61,7 @@ export const YourLiquidity = () => {
             <Card style={{ height: "fit-content", width: "100%", padding: PIXEL_SIZING.medium }}>
                 <div style={{ display: "grid", rowGap: PIXEL_SIZING.medium }}>
                     <div style={{ display: "grid", rowGap: PIXEL_SIZING.small, }}>
-                        <Text bold>Active Deposits</Text>
+                        <Text bold>Deposited Liquidity</Text>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
                             <TokenAndLogo token={assetToken}/>
                             {
