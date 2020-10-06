@@ -38,6 +38,7 @@ export const CreateMarket = () => {
                 ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
                 ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
                 ethers.utils.parseUnits(imebTokenAmount.toString(), imebToken.decimals).toString(),
+                { gasLimit: 3_000_000 }
             ),
         });
     };

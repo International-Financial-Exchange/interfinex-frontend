@@ -116,8 +116,6 @@ const PoolTab = () => {
     const [isDepositLoading, setIsDepositLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
-    console.log("is", isWithdrawLoading);
-
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu
@@ -195,7 +193,8 @@ const PoolTab = () => {
                                     parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
                                     parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
                                     address,
-                                    0
+                                    0,
+                                    { gasLimit: 450_000 }
                                 )
                             });
                         } finally {
@@ -224,7 +223,8 @@ const PoolTab = () => {
                                 content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                 transactionPromise: exchangeContract.burn_liquidity(
                                     parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
-                                    0
+                                    0,
+                                    { gasLimit: 350_000 }
                                 )
                             });
                         } finally {
@@ -321,9 +321,6 @@ const TradeTab = ({ isBuy }) => {
     const [slippageValue, setSlippageValue] = useState(0.1);
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
-
-    console.log("asset", assetTokenAmount > assetTokenBalance);
-    console.log("assetTokenAmount", assetTokenAmount, assetTokenBalance);
 
     return (
         showTokenSelectMenu ?
@@ -441,7 +438,8 @@ const TradeTab = ({ isBuy }) => {
                                     address,
                                     parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
                                     parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
-                                    0
+                                    0,
+                                    { gasLimit: 450_000 },
                                 ),
                             });
                         } finally {

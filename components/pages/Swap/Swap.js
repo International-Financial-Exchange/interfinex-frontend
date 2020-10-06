@@ -53,19 +53,18 @@ export const Swap = () => {
     // Check if swap market exists
     useEffect(() => {
         if (token0 && token1 && imebToken) {
+            // Check that all required market pairs exist
             Promise.all(
-                [
-                    [token0, token1],
-                    [token0, imebToken],
-                    [token1, imebToken],
-                ].map(pair => 
+                (token0.address !== imebToken.address && token1.address !== imebToken.address ?
+                    [[token0, token1], [token0, imebToken], [token1, imebToken],]
+                    : [[token0, token1]])
+                .map(pair => 
                     factoryContract.pair_to_exchange(pair[0].address, pair[1].address, { gasLimit: 100000 })
                 )
             ).then(async exchanges => {
-                const marketExists = exchanges.every(dd => dd !== ethers.constants.AddressZero);
+                const marketExists = exchanges.every(address => address !== ethers.constants.AddressZero);
                 setMarketExists(marketExists);
 
-                console.log("aaaaa", marketExists && signer && address)
                 if (marketExists && signer && address) {
                     Promise.all([
                         assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
@@ -94,14 +93,11 @@ export const Swap = () => {
                         liquidityTokenBalance: accountLiquidityTokenBalance,
                     }));
 
-                    console.log("hellooooo");
                     Promise.all([
                         assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                         baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                         liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                     ]).then(allowances => {
-                        console.log("exchange allowances", allowances)
-                        console.log("allowance", allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')))));
                         setExchangeHasAllowance(
                             allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
                         );

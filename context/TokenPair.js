@@ -149,14 +149,31 @@ export const TokenPairProvider = ({ children }) => {
     const _setAssetToken = (token, isCustomToken) => _setToken(token, isCustomToken, "ASSET");
     const _setBaseToken = (token, isCustomToken) => _setToken(token, isCustomToken, "BASE");
 
+    const [token0, token1] = useMemo(() => {
+        if (assetToken) {
+            // Always make the imeb token the token1
+            if (assetToken.address === IMEB_TOKEN.address)
+                return [baseToken, assetToken];
+            else if (baseToken.address === IMEB_TOKEN.address)
+                return [assetToken, baseToken];
+    
+            // Set the tokens based on which address is larger
+            return assetToken.address > baseToken.address ? 
+                [assetToken, baseToken] 
+                : [baseToken, assetToken];
+        }
+
+        return [];
+    }, [assetToken, baseToken]);
+
     return (
         <TokenPairContext.Provider 
             value={{ 
                 imebToken: IMEB_TOKEN,
                 assetToken, 
                 baseToken, 
-                token0: assetToken?.address > baseToken?.address ? assetToken : baseToken,
-                token1: assetToken?.address > baseToken?.address ? baseToken : assetToken,
+                token0,
+                token1,
                 tokens, 
                 setAssetToken: _setAssetToken, 
                 setBaseToken: _setBaseToken 
