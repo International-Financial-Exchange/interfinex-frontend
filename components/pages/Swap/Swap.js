@@ -25,7 +25,6 @@ export const Swap = () => {
     const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
     const { signer, address } = useContext(AccountContext);
     const [marketExists, setMarketExists] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
     const [exchangeContract, setExchangeContract] = useState();
     const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState();
     const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
@@ -107,8 +106,6 @@ export const Swap = () => {
                         );
                     });
                 }
-
-                setIsLoading(false);
             });
         }
     }, [factoryContract, token0, token1, signer, address]);
@@ -154,44 +151,34 @@ export const Swap = () => {
                 }}
             >
                 {
-                    isLoading ? 
-                        <Spinner
+                    marketExists ?
+                        <div style={{ marginTop: PIXEL_SIZING.medium, display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.large }}>
+                            <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
+                                <TradeInfoChart/>
+                                <HistoricalTrades/>
+                            </div>
+                            
+                            <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
+                                <TradePortal/>
+                                <YourLiquidity/>
+                            </div>
+                        </div>
+                    :
+                        <div 
                             style={{ 
-                                position: "absolute", 
-                                left: "50%", 
-                                top: 300, 
-                                transform: "translate(-50%, -50%)" 
+                                marginTop: PIXEL_SIZING.larger, 
+                                display: "grid",
+                                justifyItems: "center",
+                                rowGap: PIXEL_SIZING.medium,
                             }}
-                        />
-                    : 
-                        marketExists ?
-                            <div style={{ marginTop: PIXEL_SIZING.medium, display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.large }}>
-                                <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
-                                    <TradeInfoChart/>
-                                    <HistoricalTrades/>
-                                </div>
-                                
-                                <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
-                                    <TradePortal/>
-                                    <YourLiquidity/>
-                                </div>
+                        >
+                            <div style={{ textAlign: "center", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
+                                <Text secondary>This swap market does not exist yet.</Text>
+                                <Text secondary>Deposit liquidity to create it.</Text>
                             </div>
-                        :
-                            <div 
-                                style={{ 
-                                    marginTop: PIXEL_SIZING.larger, 
-                                    display: "grid",
-                                    justifyItems: "center",
-                                    rowGap: PIXEL_SIZING.medium,
-                                }}
-                            >
-                                <div style={{ textAlign: "center", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
-                                    <Text secondary>This swap market does not exist yet.</Text>
-                                    <Text secondary>Deposit liquidity to create it.</Text>
-                                </div>
 
-                                <CreateMarket/>
-                            </div>
+                            <CreateMarket/>
+                        </div>
                 }
             </SwapContext.Provider>
         </Layout>
