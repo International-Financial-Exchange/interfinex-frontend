@@ -112,7 +112,11 @@ const PoolTab = () => {
     const [baseTokenAmount, setBaseTokenAmount] = useState();
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [slippageValue, setSlippageValue] = useState(0.1);
+    const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
+    const [isDepositLoading, setIsDepositLoading] = useState(false);
     const theme = useContext(ThemeContext);
+
+    console.log("is", isWithdrawLoading);
 
     return (
         showTokenSelectMenu ?
@@ -171,25 +175,32 @@ const PoolTab = () => {
 
                 <Button 
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    requiresWallet
+                    isLoading={isDepositLoading}
                     onClick={async () => {
-                        const [token0Amount, token1Amount] = baseToken.address === token0.address ?
-                            [baseTokenAmount, assetTokenAmount]
-                            : [assetTokenAmount, baseTokenAmount];
-
-                        if (!exchangeHasAllowance)
-                            await approveExchange();
-                            
-                        const slippagePercentage = slippageValue / 100;
-                        addTransactionNotification({
-                            content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
-                            transactionPromise: exchangeContract.mint_liquidity(
-                                parseTokenAmount(token0Amount, token0),
-                                parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
-                                parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
-                                address,
-                                0
-                            )
-                        });
+                        setIsDepositLoading(true);
+                        try {
+                            const [token0Amount, token1Amount] = baseToken.address === token0.address ?
+                                [baseTokenAmount, assetTokenAmount]
+                                : [assetTokenAmount, baseTokenAmount];
+    
+                            if (!exchangeHasAllowance)
+                                await approveExchange();
+                                
+                            const slippagePercentage = slippageValue / 100;
+                            await addTransactionNotification({
+                                content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
+                                transactionPromise: exchangeContract.mint_liquidity(
+                                    parseTokenAmount(token0Amount, token0),
+                                    parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
+                                    parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
+                                    address,
+                                    0
+                                )
+                            });
+                        } finally {
+                            setIsDepositLoading(false);
+                        }
                     }}
                 >
                     <Text primary style={{ color: "white", fontSize: 15 }}>
@@ -199,21 +210,26 @@ const PoolTab = () => {
 
                 <Button 
                     secondary 
+                    requiresWallet
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    isLoading={isWithdrawLoading}
                     onClick={async () => {
-                        const token0Amount = baseToken.address === token0.address ? baseTokenAmount : assetTokenAmount;
-                        
-                        if (!exchangeHasAllowance)
-                            await approveExchange();
-
-                        const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
-                        addTransactionNotification({
-                            content: `Withdraw ${assetTokenAmount.toFixed(4)} ${assetToken.symbol} and ${baseTokenAmount.toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
-                            transactionPromise: exchangeContract.burn_liquidity(
-                                parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
-                                0
-                            )
-                        });
+                        setIsWithdrawLoading(true);
+                        try {
+                            if (!exchangeHasAllowance)
+                                await approveExchange();
+    
+                            const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                            await addTransactionNotification({
+                                content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                                transactionPromise: exchangeContract.burn_liquidity(
+                                    parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                                    0
+                                )
+                            });
+                        } finally {
+                            setIsWithdrawLoading(false);
+                        }
                     }}
                 >
                     <Text primary style={{ color: "white", fontSize: 15 }}>
@@ -303,10 +319,11 @@ const TradeTab = ({ isBuy }) => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [slippageValue, setSlippageValue] = useState(0.1);
+    const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
-    console.log("asset", exchangeAssetTokenBalance);
-    console.log("base", exchangeBaseTokenBalance);
+    console.log("asset", assetTokenAmount > assetTokenBalance);
+    console.log("assetTokenAmount", assetTokenAmount, assetTokenBalance);
 
     return (
         showTokenSelectMenu ?
@@ -328,7 +345,10 @@ const TradeTab = ({ isBuy }) => {
                         <TextButton
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             onClick={() => {
-                                setAssetTokenAmount(isBuy ? assetTokenBalance : baseTokenBalance);
+                                setAssetTokenAmount(isBuy ? 
+                                    calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy) 
+                                    : assetTokenBalance
+                                );
                             }}
                         >
                             Max
@@ -352,6 +372,10 @@ const TradeTab = ({ isBuy }) => {
                         <Input
                             type={"number"}
                             style={{ paddingRight: PIXEL_SIZING.huge }}
+                            isError={isBuy ?
+                                parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
+                                : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
+                            }
                             onChange={e => setAssetTokenAmount(e.target.value)}
                             ref={input => input && input.focus()}
                             value={assetTokenAmount}
@@ -390,32 +414,39 @@ const TradeTab = ({ isBuy }) => {
 
                 <Button 
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
+                    requiresWallet
+                    isLoading={isLoading}
                     onClick={async () => {
-                        const [buy, sell] = baseToken.address === token0.address ?
-                            [exchangeContract.swapBaseToAsset, exchangeContract.swapAssetToBase]
-                            : [exchangeContract.swapAssetToBase, exchangeContract.swapBaseToAsset];
-                        const swap = isBuy ? buy : sell;
-                            
-                        const baseTokenAmount = calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy);
-                        const receiveAmount = isBuy ? assetTokenAmount : baseTokenAmount; 
-                        const receiveToken = isBuy ? assetToken : baseToken;
-                        const sendToken = isBuy ? baseToken : assetToken;
-                        const sendAmount = isBuy ? baseTokenAmount : assetTokenAmount;
-                        const slippagePercentage = slippageValue / 100;
-
-                        if (!exchangeHasAllowance)
-                            await approveExchange();
-
-                        addTransactionNotification({
-                            content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
-                            transactionPromise: swap(
-                                parseTokenAmount(sendAmount * (1 - slippagePercentage), sendToken), 
-                                address,
-                                parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                                parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
-                                0
-                            ),
-                        });
+                        setIsLoading(true);
+                        try {
+                            const [buy, sell] = baseToken.address === token0.address ?
+                                [exchangeContract.swapBaseToAsset, exchangeContract.swapAssetToBase]
+                                : [exchangeContract.swapAssetToBase, exchangeContract.swapBaseToAsset];
+                            const swap = isBuy ? buy : sell;
+                                
+                            const baseTokenAmount = calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy);
+                            const receiveAmount = isBuy ? assetTokenAmount : baseTokenAmount; 
+                            const receiveToken = isBuy ? assetToken : baseToken;
+                            const sendToken = isBuy ? baseToken : assetToken;
+                            const sendAmount = isBuy ? baseTokenAmount : assetTokenAmount;
+                            const slippagePercentage = slippageValue / 100;
+    
+                            if (!exchangeHasAllowance)
+                                await approveExchange();
+    
+                            await addTransactionNotification({
+                                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
+                                transactionPromise: swap(
+                                    parseTokenAmount(sendAmount * (1 - slippagePercentage), sendToken), 
+                                    address,
+                                    parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                                    parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                                    0
+                                ),
+                            });
+                        } finally {
+                            setIsLoading(false);
+                        }
                     }}    
                 >
                     <Text primary style={{ color: "white", fontSize: 15 }}>

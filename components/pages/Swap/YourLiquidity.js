@@ -94,6 +94,7 @@ export const YourLiquidity = () => {
 
                         <TextButton 
                             style={{ justifySelf: "right" }}
+                            requiresWallet
                             onClick={async () => {
                                 setIsClaimEarningsLoading(true);
                                 const transactionPromise = liquidityToken.claimDividends({ gasLimit: 1000000 });
