@@ -157,7 +157,7 @@ export const TokenPairProvider = ({ children }) => {
             else if (baseToken.address === IMEB_TOKEN.address)
                 return [assetToken, baseToken];
     
-            // Set the tokens based on which address is larger
+            // token0 should always be the larger address
             return assetToken.address > baseToken.address ? 
                 [assetToken, baseToken] 
                 : [baseToken, assetToken];

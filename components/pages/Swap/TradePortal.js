@@ -352,33 +352,19 @@ const TradeTab = ({ isBuy }) => {
                         </TextButton>
                     </div>
 
-                    <div style={{ position: "relative", height: "fit-content" }}>
-                        <TextButton 
-                            style={{ 
-                                position: "absolute", 
-                                right: PIXEL_SIZING.small, 
-                                top: "50%", 
-                                transform: "translateY(-50%)", 
-                                fontWeight: "bold", 
-                                color: theme.colors.primary,
-                            }}
-                        >
-                            {assetToken.symbol}
-                        </TextButton>
-
-                        <Input
-                            type={"number"}
-                            style={{ paddingRight: PIXEL_SIZING.huge }}
-                            isError={isBuy ?
-                                parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
-                                : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
-                            }
-                            onChange={e => setAssetTokenAmount(e.target.value)}
-                            ref={input => input && input.focus()}
-                            value={assetTokenAmount}
-                            placeholder={"0.0"}
-                        />
-                    </div>
+                    <TokenAmountInput
+                        token={assetToken}
+                        type={"number"}
+                        isError={isBuy ?
+                            parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
+                            : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
+                        }
+                        errorMessage={"Insufficient balance"}
+                        onChange={e => setAssetTokenAmount(e.target.value)}
+                        ref={input => input && input.focus()}
+                        value={assetTokenAmount}
+                        placeholder={"0.0"}
+                    />
                 </InputAndLabel>
 
                 <ContentAndArrow 
@@ -413,6 +399,10 @@ const TradeTab = ({ isBuy }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
+                    isDisabled={isBuy ?
+                        parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
+                        : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
+                    }
                     onClick={async () => {
                         setIsLoading(true);
                         try {
@@ -432,7 +422,7 @@ const TradeTab = ({ isBuy }) => {
                                 await approveExchange();
     
                             await addTransactionNotification({
-                                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
+                                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
                                 transactionPromise: swap(
                                     parseTokenAmount(sendAmount * (1 - slippagePercentage), sendToken), 
                                     address,

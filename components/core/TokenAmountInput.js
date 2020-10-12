@@ -4,8 +4,9 @@ import { PIXEL_SIZING } from "../../utils";
 import { TokenAndLogo } from "./TokenAndLogo";
 import { TextButton } from "./Button";
 import { Input } from "./Input";
+import Text from "./Text";
 
-export const TokenAmountInput = ({ token, style, ...props }) => {
+export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
     const theme = useContext(ThemeContext);
 
     return (
@@ -34,6 +35,15 @@ export const TokenAmountInput = ({ token, style, ...props }) => {
                     {...props}
                 />
             </div>
+
+            {
+                props.isError &&    
+                    <div style={{ marginTop: PIXEL_SIZING.microscopic }}>
+                        <Text style={{ color: theme.colors.negative }}>
+                            { errorMessage }
+                        </Text>
+                    </div>
+            }
         </div>
     );
 }

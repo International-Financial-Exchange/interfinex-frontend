@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { keyframes } from "styled-components";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -117,3 +117,20 @@ export const shade = (col, light)=> {
 }
 
 export const parseTokenAmount = (amount, token) => ethers.utils.parseUnits(amount.toString(), token.decimals).toString();
+export const humanizeTokenAmount = (amount, token) => parseFloat(ethers.utils.formatUnits(amount.toString(), token.decimals));
+
+export const MULTIPLIER = BigNumber.from(parseTokenAmount(1, 18));
+
+export const getRequest = (endpoint, params = {}, isJSON = true) => {
+    const urlParams = Object.entries(params).reduce(
+        (paramsStr, [key, value]) => value ? paramsStr.concat(`&${key}=${value}`) : paramsStr, 
+        ""
+    );
+
+    const url = `http://localhost:8080${endpoint}?${urlParams}`;
+
+    if (isJSON) 
+        return fetch(url).then(res => res.json());
+
+    return fetch(url);
+}

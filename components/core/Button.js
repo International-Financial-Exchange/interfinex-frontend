@@ -66,8 +66,8 @@ export const Button = ({ children, isLoading = false, requiresWallet, ...props }
             ref={buttonRef} 
             onMouseOver={() => setIsHovered(true)} 
             onMouseLeave={() => setIsHovered(false)}
-            onClick={requiresWallet && !signer ? () => {} : props.onClick}
-            isDisabled={requiresWallet && !signer}
+            onClick={(requiresWallet && !signer) || props.isDisabled ? () => {} : props.onClick}
+            isDisabled={props.isDisabled || requiresWallet && !signer}
         >
             {
                 isLoading ?

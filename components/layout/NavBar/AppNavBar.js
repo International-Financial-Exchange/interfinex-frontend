@@ -491,7 +491,8 @@ export const AppNavBar = props => {
                                                     { 
                                                         label: "Disconnect Wallet", 
                                                         onClick: () => {
-                                                            setProvider(null);
+                                                            const defaultProvider = new ethers.providers.getDefaultProvider("http://localhost:7545");
+                                                            setProvider(defaultProvider);
                                                             setSigner(null);
                                                         }
                                                     }
