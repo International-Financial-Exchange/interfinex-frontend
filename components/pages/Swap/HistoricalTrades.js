@@ -84,6 +84,9 @@ export const HistoricalTrades = () => {
     useEffect(() => {
         // fetch trades
         if (exchangeContract) {
+            setIsHistoricalTradesLoading(true);
+            setIsYourTradesLoading(true);
+
             getHistoricalTrades({ 
                 limit: 10, 
                 exchangeContract: exchangeContract.address, 
@@ -152,22 +155,25 @@ export const HistoricalTrades = () => {
                     </TradeHeaderContainer>
 
                     {
-                        isLoading &&
-                                <Spinner
-                                    style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
-                                />
+                        isLoading ?
+                            <Spinner
+                                style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+                            />
+                        :
+                            !trades || trades.length === 0 ?
+                                <Text secondary className={"center-absolute"}>No trades to show</Text>
+                                : trades.map(({ price, volume, timestamp, user, txId, isBuy }) => 
+                                    <TradeRowContainer isBuy={isBuy}>
+                                        <div>{price.toFixed(6)}</div>
+                                        <div>{volume.toFixed(6)}</div>
+                                        <div>{ new Date(timestamp).toLocaleString()}</div>
+                                        <div>{user}</div>
+                                        <div>{txId}</div>
+                                    </TradeRowContainer>
+                                )
                     }
 
                     {
-                        trades?.map(({ price, volume, timestamp, user, txId, isBuy }) => 
-                            <TradeRowContainer isBuy={isBuy}>
-                                <div>{price.toFixed(6)}</div>
-                                <div>{volume.toFixed(6)}</div>
-                                <div>{ new Date(timestamp).toLocaleString()}</div>
-                                <div>{user}</div>
-                                <div>{txId}</div>
-                            </TradeRowContainer>
-                        )
                     }
                 </div>
             </Container>
