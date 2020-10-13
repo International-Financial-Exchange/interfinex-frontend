@@ -107,19 +107,21 @@ export const HistoricalTrades = () => {
     const trades = useMemo(() => {
         const trades = selectedTab === TABS.historicalTrades ? historicalTrades : yourTrades;
 
-        return trades?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
-            const isInverted = baseToken.address !== token0.address;
+        return trades
+            ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
+                const isInverted = baseToken.address !== token0.address;
 
-            const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [humanizeTokenAmount(baseTokenAmount, baseToken), humanizeTokenAmount(assetTokenAmount, assetToken)];
-            return {
-                price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
-                volume: isInverted ? humanizedAssetTokenAmount : humanizedBaseTokenAmount,
-                timestamp: timestamp,
-                user,
-                txId,
-                isBuy: isInverted ? !isBuy : isBuy,
-            }
-        });
+                const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [humanizeTokenAmount(baseTokenAmount, baseToken), humanizeTokenAmount(assetTokenAmount, assetToken)];
+                return {
+                    price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
+                    volume: isInverted ? humanizedAssetTokenAmount : humanizedBaseTokenAmount,
+                    timestamp: timestamp,
+                    user,
+                    txId,
+                    isBuy: isInverted ? !isBuy : isBuy,
+                }
+            })
+            ?.sort((a, b) => b.timestamp - a.timestamp);
     }, [historicalTrades, yourTrades, selectedTab]);
 
     const isLoading = (selectedTab === TABS.historicalTrades && isHistoricalTradesLoading) 
@@ -164,7 +166,7 @@ export const HistoricalTrades = () => {
                                     <TradeRowContainer isBuy={isBuy}>
                                         <div>{price.toFixed(6)}</div>
                                         <div>{volume.toFixed(6)}</div>
-                                        <div>{ new Date(timestamp).toLocaleString()}</div>
+                                        <div>{ new Date(timestamp).toLocaleTimeString()}</div>
                                         <div>{user}</div>
                                         <div>{txId}</div>
                                     </TradeRowContainer>

@@ -25,7 +25,6 @@ export const TradeInfoChart = () => {
     useEffect(() => {
         if (assetToken && baseToken) {
             CANDLES_TO_FETCH.map(({ timeframe, range, name }) => {
-                console.log(timeframe);
                 getCandles({ 
                     timeframe,
                     from: Date.now() - range,
@@ -35,7 +34,7 @@ export const TradeInfoChart = () => {
                     baseTokenAddress: baseToken.address,
                 }).then(candles => setCandles(old => ({
                     ...old,
-                    [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close })),
+                    [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(4) })),
                 })));
             })
         }

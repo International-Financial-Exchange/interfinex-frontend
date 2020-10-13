@@ -75,9 +75,8 @@ export const Chart = ({
     const theme = useContext(ThemeContext);
     const chartRef = useRef({});
 
-
     useEffect(() => {
-        if(chart) chart.destroy();
+        if (chart) chart.destroy();
 
         const chartCtx = document.getElementById("chart-container").getContext("2d");
         chart = new ChartJS(chartCtx, {
@@ -157,7 +156,7 @@ export const Chart = ({
                 </div>
             </TitleContainer>
 
-            <div style={{ position: "relative", }}>
+            <div style={{ position: "relative", height: "100%" }}>
                 <div style={{ position: "absolute", left: PIXEL_SIZING.larger, top: 0 }}>
                     <Text primary secondary style={{ fontWeight: "bold" }}>
                         {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
