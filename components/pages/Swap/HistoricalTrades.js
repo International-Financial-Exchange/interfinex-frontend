@@ -10,6 +10,7 @@ import { AccountContext } from "../../../context/Account";
 import { Spinner } from "../../core/Spinner";
 import { BigNumber as BN } from "ethers";
 import { TokenPairContext } from "../../../context/TokenPair";
+import InfiniteScroll from "react-infinite-scroller";
 
 const Container = styled.div`
     width: 100%;
@@ -69,40 +70,51 @@ const TradeHeaderContainer = styled(TradeRowContainer)`
     }
 `;
 
+const useHistoricalTrades = query => {
+    const [trades, setTrades] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [gotAllTrades, setGotAllTrades] = useState(false);
+    const [oldestTradeTimestamp, setOldestTradeTimestamp] = useState();
+
+
+    const getMoreTrades = async () => {
+        if (isLoading || !query.exchangeContract || gotAllTrades) return;
+        
+        setIsLoading(true);
+        try {
+            console.log("fetch", { 
+                ...query,
+                limit: 10,
+                to: oldestTradeTimestamp,
+                from: 0,  })
+            const trades = await getHistoricalTrades({ 
+                ...query,
+                limit: 10,
+                to: oldestTradeTimestamp,
+                from: 0,  
+            });
+            console.log(trades);
+            
+            setTrades(existing => existing.concat(trades));
+            setOldestTradeTimestamp(trades.last()?.timestamp)
+            if (trades.length === 0) setGotAllTrades(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return [trades, getMoreTrades, isLoading, gotAllTrades];
+};
+
 export const HistoricalTrades = () => {
     const TABS = { historicalTrades: "HISTORICAL", yourTrades: "YOUR_TRADES" };
     
     const { exchangeContract, } = useContext(SwapContext);
     const { baseToken, assetToken, token0, token1 } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
-    const [historicalTrades, setHistoricalTrades] = useState();
-    const [yourTrades, setYourTrades] = useState();
-    const [isYourTradesLoading, setIsYourTradesLoading] = useState(true);
-    const [isHistoricalTradesLoading, setIsHistoricalTradesLoading] = useState(true);
+    const [historicalTrades, getMoreHistoricalTrades, isHistoricalTradesLoading, gotAllHistoricalTrades] = useHistoricalTrades({ exchangeContract: exchangeContract?.address });
+    const [yourTrades, getMoreYourTrades, isYourTradesLoading, gotAllYourTrades] = useHistoricalTrades({ exchangeContract: exchangeContract?.address, user: address });
     const [selectedTab, setSelectedTab] = useState(TABS.historicalTrades);
-
-    useEffect(() => {
-        // fetch trades
-        if (exchangeContract) {
-            setIsHistoricalTradesLoading(true);
-            setIsYourTradesLoading(true);
-
-            getHistoricalTrades({ 
-                limit: 10, 
-                exchangeContract: exchangeContract.address, 
-            })
-                .then(trades => setHistoricalTrades(trades))
-                .finally(() => setIsHistoricalTradesLoading(false));
-
-            getHistoricalTrades({
-                limit: 10,
-                exchangeContract: exchangeContract.address, 
-                user: address,
-            })
-                .then(trades => setYourTrades(trades))
-                .finally(() => setIsYourTradesLoading(false));
-        }
-    }, [exchangeContract?.address]);
 
     const trades = useMemo(() => {
         const trades = selectedTab === TABS.historicalTrades ? historicalTrades : yourTrades;
@@ -110,7 +122,6 @@ export const HistoricalTrades = () => {
         return trades
             ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
                 const isInverted = baseToken.address !== token0.address;
-
                 const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [humanizeTokenAmount(baseTokenAmount, baseToken), humanizeTokenAmount(assetTokenAmount, assetToken)];
                 return {
                     price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
@@ -127,7 +138,6 @@ export const HistoricalTrades = () => {
     const isLoading = (selectedTab === TABS.historicalTrades && isHistoricalTradesLoading) 
         || (selectedTab === TABS.yourTrades && isYourTradesLoading);
 
-    // TODO: Add in scroll to load with InfiniteScroll
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.medium }}>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small }}>
@@ -147,23 +157,28 @@ export const HistoricalTrades = () => {
             </div>
 
             <Container>
-                <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, }}>
-                    <TradeHeaderContainer>
-                        <Text secondary>Price</Text>
-                        <Text secondary>Volume ({ baseToken.symbol })</Text>
-                        <Text secondary>Timestamp</Text>
-                        <Text secondary>User</Text>
-                        <Text secondary>Tx. ID</Text>
-                    </TradeHeaderContainer>
+                <InfiniteScroll
+                    loadMore={() => {
+                        getMoreHistoricalTrades();
+                        getMoreYourTrades();
+                    }}
+                    hasMore={selectedTab === TABS.historicalTrades ? !gotAllHistoricalTrades : !gotAllYourTrades}
+                    useWindow={false}
+                >
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, }}>
+                        <TradeHeaderContainer>
+                            <Text secondary>Price</Text>
+                            <Text secondary>Volume ({ baseToken.symbol })</Text>
+                            <Text secondary>Timestamp</Text>
+                            <Text secondary>User</Text>
+                            <Text secondary>Tx. ID</Text>
+                        </TradeHeaderContainer>
 
-                    {
-                        isLoading ?
-                            <Spinner className={"center-absolute"}/>
-                        :
-                            !trades || trades.length === 0 ?
+                        {
+                            (!trades || trades.length === 0) && !isLoading ?
                                 <Text secondary className={"center-absolute"}>No trades to show</Text>
                                 : trades.map(({ price, volume, timestamp, user, txId, isBuy }) => 
-                                    <TradeRowContainer isBuy={isBuy}>
+                                    <TradeRowContainer isBuy={isBuy} key={txId}>
                                         <div>{price.toFixed(6)}</div>
                                         <div>{volume.toFixed(6)}</div>
                                         <div>{ new Date(timestamp).toLocaleTimeString()}</div>
@@ -171,8 +186,14 @@ export const HistoricalTrades = () => {
                                         <div>{txId}</div>
                                     </TradeRowContainer>
                                 )
-                    }
-                </div>
+                        }
+
+                        {
+                            isYourTradesLoading && isHistoricalTradesLoading &&
+                                <Spinner style={{ marginTop: PIXEL_SIZING.medium, marginBottom: PIXEL_SIZING.medium, marginLeft: "50%", transform: "translateX(-12px)" }}/>
+                        }
+                    </div>
+                </InfiniteScroll>
             </Container>
         </div>
     );
