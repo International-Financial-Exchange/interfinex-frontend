@@ -1,6 +1,6 @@
 import { TradePortal } from "./TradePortal"
 import { Layout } from "../../layout/Layout";
-import { PIXEL_SIZING, CONTAINER_SIZING } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { useContext, useEffect, useState, createContext, useCallback } from "react";
@@ -115,8 +115,8 @@ export const Swap = () => {
                 assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
                 baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
             ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-                const exchangeAssetTokenBalance = ethers.utils.formatUnits(assetTokenBalance, assetToken.decmials);
-                const exchangeBaseTokenBalance = ethers.utils.formatUnits(baseTokenBalance, baseToken.decmials);
+                const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
+                const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
 
                 setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
                 setExchangeBaseTokenBalance(exchangeBaseTokenBalance);

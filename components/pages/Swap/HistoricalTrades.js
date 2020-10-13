@@ -36,7 +36,7 @@ const Table = styled.table`
     }
 `;
 
-const TradeRowContainer = styled.tr`
+const TradeRowContainer = styled.div`
     background-color: ${({ theme, isBuy }) => shade(isBuy ? theme.colors.positive : theme.colors.negative, 0.9)};
     border-radius: ${PIXEL_SIZING.microscopic};
     display: grid;
@@ -156,9 +156,7 @@ export const HistoricalTrades = () => {
 
                     {
                         isLoading ?
-                            <Spinner
-                                style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
-                            />
+                            <Spinner className={"center-absolute"}/>
                         :
                             !trades || trades.length === 0 ?
                                 <Text secondary className={"center-absolute"}>No trades to show</Text>
@@ -171,9 +169,6 @@ export const HistoricalTrades = () => {
                                         <div>{txId}</div>
                                     </TradeRowContainer>
                                 )
-                    }
-
-                    {
                     }
                 </div>
             </Container>

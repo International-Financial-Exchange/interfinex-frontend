@@ -133,4 +133,13 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
         return fetch(url).then(res => res.json());
 
     return fetch(url);
-}
+};
+
+export const TIMEFRAMES = {
+    ["1m"]: 1000 * 60,
+    ["15m"]: 1000 * 60 * 15,
+    ["4h"]: 1000 * 60 * 60 * 4,
+    ["1d"]: 1000 * 60 * 60 * 24,
+};
+
+

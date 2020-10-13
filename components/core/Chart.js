@@ -11,6 +11,8 @@ const Container = styled.div`
     border-radius: ${PIXEL_SIZING.miniscule};
     height: ${CONTAINER_SIZING.medium};
     width: 100%;
+    display: grid;
+    grid-rows: auto 1fr;
 `;
 
 const TitleContainer = styled.div`
@@ -19,6 +21,7 @@ const TitleContainer = styled.div`
     grid-template-columns: 1fr auto;
 `;
 
+let chart;
 export const Chart = ({ 
     options = [
         { 
@@ -60,22 +63,31 @@ export const Chart = ({
         },
     ]
 }) => {
-    const [selectedOption, setSelectedOption] = useState(options[0]);
-    const [selectedDuration, setSelectedDuration] = useState(Object.keys(options.first().data).first());
+    const [selectedOptionIndex, setSelectedOptionIndex] = useState(0);
+    const [selectedDuration, setSelectedDuration] = useState();
+    const selectedOption = options[selectedOptionIndex];
+
+    useEffect(() => {
+        if (!selectedDuration && options.first()?.data) 
+            setSelectedDuration(Object.keys(options.first().data).first());
+    }, [selectedOption.data]);
+
     const theme = useContext(ThemeContext);
     const chartRef = useRef({});
 
 
     useEffect(() => {
-        const chartCtx = chartRef.current.getContext("2d");
-        new ChartJS(chartCtx, {
+        if(chart) chart.destroy();
+
+        const chartCtx = document.getElementById("chart-container").getContext("2d");
+        chart = new ChartJS(chartCtx, {
             type: 'line',
 			data: {
 				datasets: [{
                     fill: false,
                     pointRadius: 0,
                     borderColor: theme.colors.primary,
-					data: selectedOption.data[selectedDuration],
+					data: selectedOption.data[selectedDuration ?? Object.keys(options.first().data).first()],
 				}],
             },
             
@@ -89,7 +101,12 @@ export const Chart = ({
                     }
                 },
                 responsive: true,
+                animation: {
+                    duration: 0
+                },
                 legend: { display: false },
+                maintainAspectRatio: false,
+                responsiveAnimationDuration: 0,
 				scales: {
 					xAxes: [{
                         type: "time",
@@ -108,17 +125,17 @@ export const Chart = ({
 				}
 			}
 		});
-    }, [selectedOption, selectedDuration]);
+    }, [selectedOption, selectedDuration, options]);
 
     return (
         <Container>
             <TitleContainer>
                 <div style={{ display: "flex" }}>
                     {
-                        options.map(option => 
+                        options.map((option, index) => 
                             <TextOption 
-                                selected={selectedOption.value === option.value}
-                                onClick={() => setSelectedOption(option)}
+                                selected={selectedOptionIndex === index}
+                                onClick={() => setSelectedOptionIndex(index)}
                             >
                                 {option.label}
                             </TextOption>
@@ -140,7 +157,7 @@ export const Chart = ({
                 </div>
             </TitleContainer>
 
-            <div style={{ marginTop: PIXEL_SIZING.medium, position: "relative" }}>
+            <div style={{ position: "relative", }}>
                 <div style={{ position: "absolute", left: PIXEL_SIZING.larger, top: 0 }}>
                     <Text primary secondary style={{ fontWeight: "bold" }}>
                         {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
@@ -148,7 +165,6 @@ export const Chart = ({
                 </div>
 
                 <canvas
-                    style={{ height: 270, width: "100%" }}
                     id="chart-container"
                     ref={chartRef}
                 />
