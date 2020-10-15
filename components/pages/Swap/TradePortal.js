@@ -1,5 +1,5 @@
 import Text from "../../core/Text"
-import { CONTAINER_SIZING, PIXEL_SIZING, parseTokenAmount } from "../../../utils";
+import { CONTAINER_SIZING, PIXEL_SIZING, parseTokenAmount, FEE_RATE } from "../../../utils";
 import styled, { ThemeContext } from "styled-components";
 import { useState, useContext, useEffect } from "react";
 import { ContentAndArrow } from "../../core/ContentAndArrow";
@@ -304,10 +304,17 @@ const SlippageSelect = ({ onChange, value }) => {
     );
 };
 
-const calculateSwapRate = (inputAmount, inputBalance, outputBalance, isBuy = true) => 
-    isBuy ?
-        parseFloat(inputAmount) * parseFloat(outputBalance) / (parseFloat(inputBalance) + parseFloat(inputAmount))
-        : parseFloat(inputAmount) * parseFloat(outputBalance) / (parseFloat(inputBalance) - parseFloat(inputAmount))
+// I am paying 5 tokens, how much will i receive for them?
+const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, feeRate) => {
+    const fee = parseFloat(inputAmount) * feeRate;
+    return ((parseFloat(inputAmount) - fee) * parseFloat(outputBalance)) / (parseFloat(inputBalance) + parseFloat(inputAmount))
+}
+
+// I want 10 tokens, how much do i have to pay for them?
+const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate) => {
+    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) / (parseFloat(outputBalance) - parseFloat(outputAmount));
+    return amount >= 0 ? amount + amount * feeRate : Infinity;
+}
 
 const TradeTab = ({ isBuy }) => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0 } = useContext(TokenPairContext);
@@ -343,7 +350,7 @@ const TradeTab = ({ isBuy }) => {
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             onClick={() => {
                                 setAssetTokenAmount(isBuy ? 
-                                    calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy) 
+                                    outputToInputAmount(assetTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                     : assetTokenBalance
                                 );
                             }}
@@ -355,9 +362,9 @@ const TradeTab = ({ isBuy }) => {
                     <TokenAmountInput
                         token={assetToken}
                         type={"number"}
-                        isError={isBuy ?
-                            parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
-                            : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
+                        isError={assetTokenAmount && (isBuy ?
+                            parseFloat(baseTokenBalance) < outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
+                            : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount))
                         }
                         errorMessage={"Insufficient balance"}
                         onChange={e => setAssetTokenAmount(e.target.value)}
@@ -399,36 +406,40 @@ const TradeTab = ({ isBuy }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={isBuy ?
-                        parseFloat(assetTokenAmount) > calculateSwapRate(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, isBuy)
-                        : parseFloat(assetTokenAmount) > parseFloat(assetTokenBalance)
+                    isDisabled={assetTokenAmount && (isBuy ?
+                        parseFloat(baseTokenBalance) < outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
+                        : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount))
                     }
                     onClick={async () => {
                         setIsLoading(true);
-                        try {
-                            const [buy, sell] = baseToken.address === token0.address ?
-                                [exchangeContract.swapBaseToAsset, exchangeContract.swapAssetToBase]
-                                : [exchangeContract.swapAssetToBase, exchangeContract.swapBaseToAsset];
-                            const swap = isBuy ? buy : sell;
-                                
-                            const baseTokenAmount = calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy);
-                            const receiveAmount = isBuy ? assetTokenAmount : baseTokenAmount; 
-                            const receiveToken = isBuy ? assetToken : baseToken;
-                            const sendToken = isBuy ? baseToken : assetToken;
-                            const sendAmount = isBuy ? baseTokenAmount : assetTokenAmount;
+                        try {   
                             const slippagePercentage = slippageValue / 100;
+                            const sendToken = isBuy ?
+                                baseToken
+                                : assetToken;
+                            const receiveToken = isBuy ?
+                                assetToken
+                                : baseToken;
+                            const sendAmount = isBuy ? 
+                                outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                : assetTokenAmount;
+                            const receiveAmount = isBuy ? 
+                                assetTokenAmount 
+                                : inputToOutputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
     
                             if (!exchangeHasAllowance)
                                 await approveExchange();
     
                             await addTransactionNotification({
                                 content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
-                                transactionPromise: swap(
-                                    parseTokenAmount(sendAmount * (1 - slippagePercentage), sendToken), 
+                                transactionPromise: exchangeContract.swap(
+                                    sendToken.address,
+                                    parseTokenAmount(sendAmount, sendToken), 
                                     address,
                                     parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
                                     parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
                                     0,
+                                    ethers.constants.AddressZero, 
                                     { gasLimit: 450_000 },
                                 ),
                             });
@@ -444,7 +455,11 @@ const TradeTab = ({ isBuy }) => {
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.miniscule }}>
                     <Text secondary>
-                        {isBuy ? "Cost" : "Receive"}: {(calculateSwapRate(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, !isBuy) || 0).toFixed(4)} {baseToken.symbol}
+                        {isBuy ? "Cost" : "Receive"}: {
+                            isBuy ?
+                                outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE).toFixed(4)
+                                : inputToOutputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE).toFixed(4)
+                        } {baseToken.symbol}
                     </Text>
                     <TextButton onClick={() => setShowAdvanced(!showAdvanced)}>
                         {showAdvanced ? "Hide" : "Show"} Advanced

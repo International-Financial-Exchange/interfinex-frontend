@@ -76,24 +76,17 @@ const useHistoricalTrades = query => {
     const [gotAllTrades, setGotAllTrades] = useState(false);
     const [oldestTradeTimestamp, setOldestTradeTimestamp] = useState();
 
-
     const getMoreTrades = async () => {
         if (isLoading || !query.exchangeContract || gotAllTrades) return;
         
         setIsLoading(true);
         try {
-            console.log("fetch", { 
-                ...query,
-                limit: 10,
-                to: oldestTradeTimestamp,
-                from: 0,  })
             const trades = await getHistoricalTrades({ 
                 ...query,
                 limit: 10,
                 to: oldestTradeTimestamp,
                 from: 0,  
             });
-            console.log(trades);
             
             setTrades(existing => existing.concat(trades));
             setOldestTradeTimestamp(trades.last()?.timestamp)

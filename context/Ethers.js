@@ -1,17 +1,10 @@
 import { ethers, } from "ethers";
 import { createContext, useState, useEffect, useMemo, } from "react";
-import FactoryContract from "../public/contracts/Factory.json";
 
+import FactoryContract from "../public/contracts/Factory.json";
 import ExchangeContract from "../public/contracts/Exchange.json";
 import ERC20Contract from "../public/contracts/ERC20.json";
 import DividendERC20Contract from "../public/contracts/DividendERC20.json";
-
-import LocalExchangeContract from "../public/local-net/Exchange.json";
-import LocalFactoryContract from "../public/local-net/Factory.json";
-import LocalERC20Contract from "../public/local-net/ERC20.json";
-import LocalDividendERC20Contract from "../public/local-net/DividendERC20.json";
-
-import LocalImebToken from "../public/local-net/IMEBToken.json";
 import ImebToken from "../public/contracts/IMEBToken.json";
 
 export const EthersContext = createContext();
@@ -30,22 +23,13 @@ export const EthersProvider = ({ children }) => {
     // be instantiated as a contract in the code with the relevant address.
     const [factoryContract,  imebTokenContract, erc20ContractAbi, exchangeContractAbi, dividendErc20ContractAbi] = useMemo(() => {
         return (
-            networkInfo?.chainId === 1 ?
-                [
-                    new ethers.Contract(FactoryContract.address, FactoryContract.abi, signer),
-                    new ethers.Contract(ImebToken.address, DividendERC20Contract.abi, signer),
-                    ERC20Contract.abi,
-                    ExchangeContract.abi,
-                    DividendERC20Contract.abi,
-                ]
-            : 
-                [
-                    new ethers.Contract(LocalFactoryContract.address, LocalFactoryContract.abi, signer),
-                    new ethers.Contract(LocalImebToken.address, DividendERC20Contract.abi, signer),
-                    LocalERC20Contract.abi,
-                    LocalExchangeContract.abi,
-                    LocalDividendERC20Contract.abi,
-                ]
+            [
+                new ethers.Contract(FactoryContract.address, FactoryContract.abi, signer),
+                new ethers.Contract(ImebToken.address, DividendERC20Contract.abi, signer),
+                ERC20Contract.abi,
+                ExchangeContract.abi,
+                DividendERC20Contract.abi,
+            ]
         );
     }, [networkInfo, signer]);
 

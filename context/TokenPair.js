@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 const { createContext, useState, useEffect, useContext, useMemo } = require("react");
 import { tokens as InchTokens } from "../public/1InchTokenList.json";
-import { tokens as LocalTokens } from "../public/local-net/local-tokens.json";
+import { tokens as LocalTokens } from "../public/contracts/local-tokens.json";
 import { EthersContext } from "./Ethers";
 import { ethers } from "ethers";
 export const TokenPairContext = createContext();
@@ -150,14 +150,14 @@ export const TokenPairProvider = ({ children }) => {
     const _setBaseToken = (token, isCustomToken) => _setToken(token, isCustomToken, "BASE");
 
     const [token0, token1] = useMemo(() => {
-        if (assetToken) {
+        if (assetToken && baseToken) {
             // Always make the imeb token the token1
             if (assetToken.address === IMEB_TOKEN.address)
                 return [baseToken, assetToken];
             else if (baseToken.address === IMEB_TOKEN.address)
                 return [assetToken, baseToken];
     
-            // token0 should always be the larger address
+            // token0 should always be the larger address (if it's not IMEB token)
             return assetToken.address > baseToken.address ? 
                 [assetToken, baseToken] 
                 : [baseToken, assetToken];
