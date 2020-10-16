@@ -12,7 +12,7 @@ const Container = styled.div`
     height: ${CONTAINER_SIZING.medium};
     width: 100%;
     display: grid;
-    grid-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
 `;
 
 const TitleContainer = styled.div`
@@ -155,14 +155,15 @@ export const Chart = ({
                     }
                 </div>
             </TitleContainer>
+            
+            
+            <div style={{ marginLeft: PIXEL_SIZING.larger }}>
+                <Text primary secondary style={{ fontWeight: "bold" }}>
+                    {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
+                </Text>
+            </div>
 
-            <div style={{ position: "relative", height: "100%" }}>
-                <div style={{ position: "absolute", left: PIXEL_SIZING.larger, top: 0 }}>
-                    <Text primary secondary style={{ fontWeight: "bold" }}>
-                        {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
-                    </Text>
-                </div>
-
+            <div style={{ position: "relative", height: "100%", width: "100%" }}>
                 <canvas
                     id="chart-container"
                     ref={chartRef}
