@@ -307,13 +307,13 @@ const SlippageSelect = ({ onChange, value }) => {
 // I am paying 5 tokens, how much will i receive for them?
 const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, feeRate) => {
     const fee = parseFloat(inputAmount) * feeRate;
-    return ((parseFloat(inputAmount) - fee) * parseFloat(outputBalance)) / (parseFloat(inputBalance) + parseFloat(inputAmount))
+    return ((parseFloat(inputAmount) - fee) * parseFloat(outputBalance)) / (parseFloat(inputBalance) + parseFloat(inputAmount) - fee)
 }
 
 // I want 10 tokens, how much do i have to pay for them?
 const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate) => {
-    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) / (parseFloat(outputBalance) - parseFloat(outputAmount));
-    return amount >= 0 ? amount + amount * feeRate : Infinity;
+    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) / ((parseFloat(outputBalance) - parseFloat(outputAmount)) * (1 - feeRate));
+    return amount >= 0 ? amount : Infinity;
 }
 
 const TradeTab = ({ isBuy }) => {
@@ -328,6 +328,9 @@ const TradeTab = ({ isBuy }) => {
     const [slippageValue, setSlippageValue] = useState(0.1);
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
+
+    console.log("balance", baseTokenBalance);
+    console.log("max buy", parseFloat(baseTokenBalance) * parseFloat(exchangeAssetTokenBalance) / (parseFloat(exchangeBaseTokenBalance) + parseFloat(baseTokenBalance)))
 
     return (
         showTokenSelectMenu ?
@@ -350,7 +353,7 @@ const TradeTab = ({ isBuy }) => {
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             onClick={() => {
                                 setAssetTokenAmount(isBuy ? 
-                                    outputToInputAmount(assetTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                    inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                     : assetTokenBalance
                                 );
                             }}
