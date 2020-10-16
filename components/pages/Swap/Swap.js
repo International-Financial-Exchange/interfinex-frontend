@@ -115,8 +115,10 @@ export const Swap = () => {
                 assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
                 baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
             ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
+                console.log(assetTokenBalance.toString(), baseTokenBalance.toString());
                 const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
                 const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
+                console.log(exchangeAssetTokenBalance, exchangeBaseTokenBalance)
 
                 setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
                 setExchangeBaseTokenBalance(exchangeBaseTokenBalance);

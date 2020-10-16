@@ -171,7 +171,11 @@ export const HistoricalTrades = () => {
                             (!trades || trades.length === 0) && !isLoading ?
                                 <Text secondary className={"center-absolute"}>No trades to show</Text>
                                 : trades.map(({ price, volume, timestamp, user, txId, isBuy }) => 
-                                    <TradeRowContainer isBuy={isBuy} key={txId}>
+                                    <TradeRowContainer 
+                                        isBuy={isBuy} 
+                                        key={txId} 
+                                        onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
+                                    >
                                         <div>{price.toFixed(6)}</div>
                                         <div>{volume.toFixed(6)}</div>
                                         <div>{ new Date(timestamp).toLocaleTimeString()}</div>

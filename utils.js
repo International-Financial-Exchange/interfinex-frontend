@@ -143,4 +143,4 @@ export const TIMEFRAMES = {
 };
 
 
-export const FEE_RATE = 0.09 / 100;
+export const FEE_RATE = 0.003;

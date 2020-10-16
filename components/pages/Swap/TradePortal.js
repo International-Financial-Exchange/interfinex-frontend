@@ -425,13 +425,23 @@ const TradeTab = ({ isBuy }) => {
                                 : assetTokenAmount;
                             const receiveAmount = isBuy ? 
                                 assetTokenAmount 
-                                : inputToOutputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
+                                : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
     
                             if (!exchangeHasAllowance)
                                 await approveExchange();
     
+                            console.log(
+                                sendToken.address,
+                                parseTokenAmount(sendAmount, sendToken), 
+                                address,
+                                parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                                parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                                0,
+                                ethers.constants.AddressZero
+                            );
+
                             await addTransactionNotification({
-                                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${baseTokenAmount.toFixed(4)} ${baseToken.symbol}`,
+                                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                                 transactionPromise: exchangeContract.swap(
                                     sendToken.address,
                                     parseTokenAmount(sendAmount, sendToken), 
@@ -458,7 +468,7 @@ const TradeTab = ({ isBuy }) => {
                         {isBuy ? "Cost" : "Receive"}: {
                             isBuy ?
                                 outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE).toFixed(4)
-                                : inputToOutputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE).toFixed(4)
+                                : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE).toFixed(4)
                         } {baseToken.symbol}
                     </Text>
                     <TextButton onClick={() => setShowAdvanced(!showAdvanced)}>
