@@ -4,6 +4,7 @@ import { BarSpinner, Spinner } from "./Spinner";
 import { useContext, useRef, useState } from "react";
 import { AccountContext } from "../../context/Account";
 import Text from "./Text";
+import { EthersContext } from "../../context/Ethers";
 
 const ButtonContainer = styled.div`
     border-radius: 4px;
@@ -56,7 +57,7 @@ const InfoBubble = ({ children, parentRef, ...props }) => {
 }
 
 export const Button = ({ children, isLoading = false, requiresWallet, ...props }) => {
-    const { signer } = useContext(AccountContext);
+    const { signer } = useContext(EthersContext);
     const buttonRef = useRef();
     const [isHovered, setIsHovered] = useState(false);
 
@@ -107,7 +108,7 @@ const StyledTextButton = styled.div`
 `;
 
 export const TextButton = ({ requiresWallet, ...props }) => {
-    const { signer } = useContext(AccountContext) ?? {};
+    const { signer } = useContext(EthersContext) ?? {};
 
     return (
         <div style={props.style}>

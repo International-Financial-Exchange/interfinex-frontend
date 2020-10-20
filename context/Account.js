@@ -8,10 +8,9 @@ import Text from "../components/core/Text";
 export const AccountContext = createContext();
 
 export const AccountProvider = ({ children }) => {
-    const { provider, contracts: { erc20ContractAbi } } = useContext(EthersContext);
+    const { signer, provider, contracts: { erc20ContractAbi } } = useContext(EthersContext);
     const { baseToken, assetToken, imebToken } = useContext(TokenPairContext);
     const { addLayoutNotification } = useContext(NotificationsContext);
-    const [signer, setSigner] = useState();
     const [address, setAddress] = useState();
     const [baseTokenBalance, setBaseTokenBalance] = useState();
     const [assetTokenBalance, setAssetTokenBalance] = useState();
@@ -28,21 +27,27 @@ export const AccountProvider = ({ children }) => {
             setDeleteWalletWarning(() => deleteWalletWarning)
         } else {
             if (deleteWalletWarning) deleteWalletWarning();
-            signer.getAddress().then(address => setAddress(address));
+            // console.log(signer);
+            signer?.getAddress().then(address => setAddress(address));
         }
     }, [signer]);
 
     useEffect(() => {
         if (address) {
+            console.log(address);
+            console.log(baseToken, assetToken, imebToken)
             baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                console.log("base", baseToken)
                 setBaseTokenBalance(ethers.utils.formatUnits(balance, baseToken.decmials))
             });
 
             assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                console.log("asset", assetToken)
                 setAssetTokenBalance(ethers.utils.formatUnits(balance, assetToken.decmials))
             });
 
             imebToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                console.log("imeb", imebToken)
                 setImebTokenBalance(ethers.utils.formatUnits(balance, imebToken.decmials))
             });
         }
@@ -55,8 +60,6 @@ export const AccountProvider = ({ children }) => {
                 assetTokenBalance,
                 imebTokenBalance,
                 address,
-                signer,
-                setSigner,
             }}
         >
             { children }

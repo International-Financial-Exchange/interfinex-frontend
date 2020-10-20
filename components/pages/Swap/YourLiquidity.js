@@ -29,7 +29,7 @@ export const YourLiquidity = () => {
     const { addTransactionNotification } = useContext(NotificationsContext);
 
     useEffect(() => {
-        if (liquidityToken) {
+        if (liquidityToken && address) {
             setIsLoading(true);
             Promise.all([
                 liquidityToken.balanceOf(address, { gasLimit: 100000 }).then(rawBalance => {

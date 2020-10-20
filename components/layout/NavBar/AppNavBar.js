@@ -24,6 +24,7 @@ import { InputAndLabel } from "../../core/InputAndLabel";
 import { getDisplayName } from "next/dist/next-server/lib/utils";
 import _ from "lodash";
 import { AccountContext } from "../../../context/Account";
+import { ETH_NODE_URL } from "../../../ENV";
 
 const TabOption = styled(Text)`
     padding: ${PIXEL_SIZING.small};
@@ -426,7 +427,7 @@ const PairSelect = () => {
 export const AppNavBar = props => {
     const router = useRouter();
     const { setProvider } = useContext(EthersContext);
-    const { signer, setSigner } = useContext(AccountContext);
+    const { signer, setSigner } = useContext(EthersContext);
     const [signerAddress, setSignerAddress] = useState();
     const [signerTokenBalance, setSignerTokenBalance] = useState();
     const [showAccountDropdown, setShowAccountDropdown] = useState();
@@ -434,8 +435,8 @@ export const AppNavBar = props => {
 
     useEffect(() => {
         if (signer) {
-            signer.getAddress().then(address => setSignerAddress(address));
-            signer.getBalance().then(balance => setSignerTokenBalance(balance))
+            signer?.getAddress().then(address => setSignerAddress(address));
+            signer?.getBalance().then(balance => setSignerTokenBalance(balance))
         }
     }, [signer]);
 
@@ -491,7 +492,7 @@ export const AppNavBar = props => {
                                                     { 
                                                         label: "Disconnect Wallet", 
                                                         onClick: () => {
-                                                            const defaultProvider = new ethers.providers.getDefaultProvider("http://localhost:7545");
+                                                            const defaultProvider = new ethers.providers.getDefaultProvider(ETH_NODE_URL);
                                                             setProvider(defaultProvider);
                                                             setSigner(null);
                                                         }

@@ -6,16 +6,15 @@ import ExchangeContract from "../public/contracts/Exchange.json";
 import ERC20Contract from "../public/contracts/ERC20.json";
 import DividendERC20Contract from "../public/contracts/DividendERC20.json";
 import ImebToken from "../public/contracts/IMEBToken.json";
+import { ETH_NODE_URL } from "../ENV";
 
 export const EthersContext = createContext();
 
 export const EthersProvider = ({ children }) => {
-    const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider("http://localhost:7545"));
+    console.log("url", ETH_NODE_URL)
+    const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
+    const [signer, setSigner] = useState();
     const [networkInfo, setNetworkInfo] = useState();
-
-    const signer = useMemo(() => {
-        return provider?.getSigner();
-    }, [provider]);
 
     // There will only ever be 1 instance of the factory contract so 
     // we can return a fully fledged "instance" of that contract;
@@ -24,8 +23,8 @@ export const EthersProvider = ({ children }) => {
     const [factoryContract,  imebTokenContract, erc20ContractAbi, exchangeContractAbi, dividendErc20ContractAbi] = useMemo(() => {
         return (
             [
-                new ethers.Contract(FactoryContract.address, FactoryContract.abi, signer),
-                new ethers.Contract(ImebToken.address, DividendERC20Contract.abi, signer),
+                new ethers.Contract(FactoryContract.address, FactoryContract.abi, signer || provider),
+                new ethers.Contract(ImebToken.address, DividendERC20Contract.abi, signer || provider),
                 ERC20Contract.abi,
                 ExchangeContract.abi,
                 DividendERC20Contract.abi,
@@ -37,10 +36,14 @@ export const EthersProvider = ({ children }) => {
         provider?.getNetwork().then(network => setNetworkInfo(network));
     }, [provider]);
 
+    console.log("getting signer", provider.getSigner())
+
     return (
         <EthersContext.Provider 
-            value={{ 
+            value={{
                 provider, 
+                signer,
+                setSigner,
                 setProvider,
                 networkInfo,
                 contracts: {

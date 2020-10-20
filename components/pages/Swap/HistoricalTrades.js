@@ -109,6 +109,8 @@ export const HistoricalTrades = () => {
     const [yourTrades, getMoreYourTrades, isYourTradesLoading, gotAllYourTrades] = useHistoricalTrades({ exchangeContract: exchangeContract?.address, user: address });
     const [selectedTab, setSelectedTab] = useState(TABS.historicalTrades);
 
+    console.log(historicalTrades);
+
     const trades = useMemo(() => {
         const trades = selectedTab === TABS.historicalTrades ? historicalTrades : yourTrades;
 
@@ -170,7 +172,8 @@ export const HistoricalTrades = () => {
                         {
                             (!trades || trades.length === 0) && !isLoading ?
                                 <Text secondary className={"center-absolute"}>No trades to show</Text>
-                                : trades.map(({ price, volume, timestamp, user, txId, isBuy }) => 
+                                : trades.map(({ price, volume, timestamp, user, txId, isBuy }) =>
+                                    // MAJOR TODO: Add in conditional here so that isBuy is correct
                                     <TradeRowContainer 
                                         isBuy={isBuy} 
                                         key={txId} 

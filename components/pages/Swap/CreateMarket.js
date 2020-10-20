@@ -21,6 +21,12 @@ export const CreateMarket = () => {
     const [imebTokenAmount, setImebTokenAmount] = useState();
 
     const onSubmit = async () => {
+        console.log(
+            "contracts",
+            token0.address,
+            token1.address,
+            imebToken.address
+        );
         await token0.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
         await token1.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
         await imebToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());

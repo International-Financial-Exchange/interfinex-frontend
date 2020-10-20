@@ -48,7 +48,9 @@ export const NotificationsProvider = ({ children }) => {
                         {content}
                     </Text>
 
-                    <TextButton>
+                    <TextButton
+                        onClick={() => window.open(`https://etherscan.io/tx/${tx.hash}`)}
+                    >
                         Tx Id: {tx.hash.slice(0, 28)}...
                     </TextButton>
                 </div>,

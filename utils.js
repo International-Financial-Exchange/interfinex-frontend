@@ -127,7 +127,7 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
         ""
     );
 
-    const url = `http://localhost:8080${endpoint}?${urlParams}`;
+    const url = `http://161.35.239.165:8080${endpoint}?${urlParams}`;
 
     if (isJSON) 
         return fetch(url).then(res => res.json());

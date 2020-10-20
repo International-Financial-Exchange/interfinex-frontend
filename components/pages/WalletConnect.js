@@ -42,8 +42,7 @@ const WalletOption = ({ label, icon, onClick }) => {
 export const WalletConnect = () => {
     const document = useDocument(); 
     const router = useRouter();
-    const { setSigner } = useContext(AccountContext);
-    const { setProvider } = useContext(EthersContext);
+    const { setProvider, setSigner } = useContext(EthersContext);
 
     return (
         !document ?
@@ -67,6 +66,8 @@ export const WalletConnect = () => {
                                 onClick={() => {
                                     window.ethereum.enable().then(async () => {                
                                         const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+                                        console.log(newProvider)
+                                        console.log(newProvider.getSigner());
                                         setProvider(newProvider);
                                         setSigner(newProvider.getSigner());
                                         router.back();

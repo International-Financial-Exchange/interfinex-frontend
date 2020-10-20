@@ -21,9 +21,10 @@ import { AccountContext } from "../../../context/Account";
 export const SwapContext = createContext();
 
 export const Swap = () => {
-    const { contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
+    const { provider, contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
-    const { signer, address } = useContext(AccountContext);
+    const { signer } = useContext(EthersContext);
+    const { address } = useContext(AccountContext);
     const [marketExists, setMarketExists] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [exchangeContract, setExchangeContract] = useState();
@@ -35,6 +36,12 @@ export const Swap = () => {
     const [exchangeHasAllowance, setExchangeHasAllowance] = useState(false);
 
     const approveExchange = useCallback(() => {
+        console.log(
+            "contract",
+            assetToken.contract,
+            baseToken.contract,
+            liquidityToken,
+        )
         return Promise.all([
             assetToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,),
             baseToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,),
@@ -50,22 +57,45 @@ export const Swap = () => {
         ]);
     }, [factoryContract, assetToken, baseToken, imebToken]);
 
-    // Check if swap market exists
+    // check swap market exists and update contract and liquidity token
     useEffect(() => {
-        if (token0 && token1 && imebToken) {
-            // Check that all required market pairs exist
-            Promise.all(
-                (token0.address !== imebToken.address && token1.address !== imebToken.address ?
-                    [[token0, token1], [token0, imebToken], [token1, imebToken],]
-                    : [[token0, token1]])
-                .map(pair => 
-                    factoryContract.pair_to_exchange(pair[0].address, pair[1].address, { gasLimit: 100000 })
-                )
-            ).then(async exchanges => {
-                const marketExists = exchanges.every(address => address !== ethers.constants.AddressZero);
+        setIsLoading(true);
+        if (baseToken && assetToken) {
+            factoryContract.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
+                const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
+    
+                if (marketExists) {
+                    const exchangeContract = new ethers.Contract(exchangeAddress, exchangeContractAbi, signer || provider);
+                    setExchangeContract(exchangeContract);
+    
+                    const liquidityTokenAddress = await exchangeContract.liquidity_token({ gasLimit: 1000000 });
+                    const liquidityToken = new ethers.Contract(liquidityTokenAddress, dividendErc20ContractAbi, signer || provider);
+                    setLiquidityToken(liquidityToken);
+                }
+    
+                setIsLoading(false);
+            });
+        }
+    }, [provider, baseToken, assetToken]);
 
-                if (marketExists && signer && address) {
+    // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
+    useEffect(() => {
+        if (exchangeContract) {
+            Promise.all([
+                assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
+                baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
+            ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
+                const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
+                const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
+
+                setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
+                setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
+            });
+
+            if (signer && liquidityToken) {
+                // For permformance this only really needs to be called if its false (as well as on init)
+                if (!factoryHasAllowance) {
                     Promise.all([
                         assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
                         baseToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
@@ -75,24 +105,9 @@ export const Swap = () => {
                             allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
                         );
                     });
-                        
-                    // TODO: Should be a server query not a blockchain/node query
-                    // exchanges[0] is [token0, token1]
-                    const exchangeContract = new ethers.Contract(exchanges[0], exchangeContractAbi, signer);
-                    setExchangeContract(exchangeContract);
-
-                    const liquidityToken = new ethers.Contract(
-                        await exchangeContract.liquidity_token({ gasLimit: 1000000 }),
-                        dividendErc20ContractAbi, 
-                        signer,
-                    );
-                    setLiquidityToken(liquidityToken);
-                    const accountLiquidityTokenBalance = ethers.utils.formatUnits(await liquidityToken.balanceOf(address, { gasLimit: 800000 }), 18);
-                    setAccount(old => ({
-                        ...old,
-                        liquidityTokenBalance: accountLiquidityTokenBalance,
-                    }));
-
+                }
+        
+                if (!exchangeHasAllowance) {
                     Promise.all([
                         assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                         baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
@@ -104,36 +119,21 @@ export const Swap = () => {
                     });
                 }
 
-                setIsLoading(false);
-            });
-        }
-    }, [factoryContract, token0, token1, signer, address]);
-
-    useEffect(() => {
-        if (exchangeContract) {
-            Promise.all([
-                assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
-                baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
-            ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-                console.log(assetTokenBalance.toString(), baseTokenBalance.toString());
-                const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
-                const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
-                console.log(exchangeAssetTokenBalance, exchangeBaseTokenBalance)
-
-                setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
-                setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
-
-                if (account?.liquidityTokenBalance) {
-                    const liquidityTokenTotalSupply = ethers.utils.formatUnits(await liquidityToken.totalSupply({ gasLimit: 10000000 }), 18);
+                // Update the liquidity for the user and the total liquidity
+                Promise.all([
+                    liquidityToken.totalSupply({ gasLimit: 10000000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
+                    liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
+                ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
                     setAccount(old => ({
                         ...old,
-                        depositedAssetTokenAmount: (parseFloat(exchangeAssetTokenBalance) * parseFloat(account.liquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply)).toString(),
-                        depositedBaseTokenAmount: (parseFloat(exchangeBaseTokenBalance) * parseFloat(account.liquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply)).toString()
+                        liquidityTokenBalance,
+                        depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
+                        depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
                     }));
-                }
-            });
+                });
+            }
         }
-    }, [exchangeContract, account?.liquidityTokenBalance]);
+    }, [exchangeContract, signer, liquidityToken]);
 
     return (
         <Layout>

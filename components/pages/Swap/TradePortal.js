@@ -15,6 +15,7 @@ import { SwapContext } from "./Swap";
 import { NotificationsContext } from "../../../context/Notifications";
 import ethers from "ethers";
 
+
 const Container = styled.div`
     border-radius: ${PIXEL_SIZING.tiny};
     border: 1px solid ${({ theme }) => theme.colors.highlight};
@@ -329,8 +330,8 @@ const TradeTab = ({ isBuy }) => {
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
-    console.log("balance", baseTokenBalance);
-    console.log("max buy", parseFloat(baseTokenBalance) * parseFloat(exchangeAssetTokenBalance) / (parseFloat(exchangeBaseTokenBalance) + parseFloat(baseTokenBalance)))
+    console.log("a", parseFloat(baseTokenBalance))
+    console.log("b", outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
 
     return (
         showTokenSelectMenu ?
@@ -353,7 +354,7 @@ const TradeTab = ({ isBuy }) => {
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             onClick={() => {
                                 setAssetTokenAmount(isBuy ? 
-                                    inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                    inputToOutputAmount(baseTokenBalance - baseTokenBalance * 0.0001, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                     : assetTokenBalance
                                 );
                             }}
@@ -432,6 +433,9 @@ const TradeTab = ({ isBuy }) => {
     
                             if (!exchangeHasAllowance)
                                 await approveExchange();
+
+                            console.log("balances", exchangeAssetTokenBalance, exchangeBaseTokenBalance);
+
     
                             console.log(
                                 sendToken.address,

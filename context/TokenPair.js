@@ -5,13 +5,14 @@ import { tokens as InchTokens } from "../public/1InchTokenList.json";
 import { tokens as LocalTokens } from "../public/contracts/local-tokens.json";
 import { EthersContext } from "./Ethers";
 import { ethers } from "ethers";
+import { AccountContext } from "./Account";
 export const TokenPairContext = createContext();
 
 
 export const TokenPairProvider = ({ children }) => {
     const router = useRouter();
     const [tokens, setTokens] = useState();
-    const { networkInfo, provider, contracts: { erc20ContractAbi, imebTokenContract } } = useContext(EthersContext);
+    const { signer, networkInfo, provider, contracts: { erc20ContractAbi, imebTokenContract } } = useContext(EthersContext);
 
     const [assetToken, setAssetToken] = useState();
     const [baseToken, setBaseToken] = useState();
@@ -50,9 +51,11 @@ export const TokenPairProvider = ({ children }) => {
             if (assetTokenName) {
                 const assetToken = tokens.find(({ name }) => name === assetTokenName);
                 if (assetToken) {
+                    console.log(provider);
+                    console.log("heloooooooooooooooooo", new ethers.Contract(assetToken.address, erc20ContractAbi, signer || provider));
                     setAssetToken({
                         ...assetToken,
-                        contract: new ethers.Contract(assetToken.address, erc20ContractAbi, provider.getSigner()),
+                        contract: new ethers.Contract(assetToken.address, erc20ContractAbi, signer || provider),
                     });
                 } else if (
                     assetTokenAddress && 
@@ -63,7 +66,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: assetTokenName,
                         symbol: assetTokenSymbol,
                         address: assetTokenAddress,
-                        contract: new ethers.Contract(assetTokenAddress, erc20ContractAbi, provider.getSigner()),
+                        contract: new ethers.Contract(assetTokenAddress, erc20ContractAbi, signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
@@ -71,7 +74,7 @@ export const TokenPairProvider = ({ children }) => {
                 const assetTokenDefault = tokens[1];
                 setAssetToken({
                     ...assetTokenDefault,
-                    contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, provider.getSigner()),
+                    contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, signer || provider),
                 });
             }
     
@@ -80,7 +83,7 @@ export const TokenPairProvider = ({ children }) => {
                 if (baseToken) {
                     setBaseToken({
                         ...baseToken,
-                        contract: new ethers.Contract(baseToken.address, erc20ContractAbi, provider.getSigner()),
+                        contract: new ethers.Contract(baseToken.address, erc20ContractAbi, signer || provider),
                     });
                 } else if (
                     baseTokenAddress && 
@@ -91,7 +94,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: baseTokenName,
                         symbol: baseTokenSymbol,
                         address: baseTokenAddress,
-                        contract: new ethers.Contract(baseTokenAddress, erc20ContractAbi, provider.getSigner()),
+                        contract: new ethers.Contract(baseTokenAddress, erc20ContractAbi, signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
@@ -99,11 +102,11 @@ export const TokenPairProvider = ({ children }) => {
                 const baseTokenDefault = tokens[0];
                 setBaseToken({
                     ...baseTokenDefault,
-                    contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, provider.getSigner()),
+                    contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, signer || provider),
                 });
             }
         }
-    }, [router.query, tokens]);
+    }, [router.query, tokens, provider]);
 
     const _setToken = (token, isCustomToken, type) => {
         if (isCustomToken) {
