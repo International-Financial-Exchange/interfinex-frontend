@@ -127,7 +127,7 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
         ""
     );
 
-    const url = `http://server.intermex.io${endpoint}?${urlParams}`;
+    const url = `https://server.intermex.io${endpoint}?${urlParams}`;
 
     if (isJSON) 
         return fetch(url).then(res => res.json());
