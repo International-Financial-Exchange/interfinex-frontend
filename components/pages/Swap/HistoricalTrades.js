@@ -64,8 +64,9 @@ const TradeRowContainer = styled.div`
 const TradeHeaderContainer = styled(TradeRowContainer)`
     background-color: ${({ theme }) => theme.colors.invert};
     border: 0;
-
+    
     &:hover {
+        cursor: default;
         transform: scale(1.0);
     }
 `;
@@ -161,7 +162,7 @@ export const HistoricalTrades = () => {
                     useWindow={false}
                 >
                     <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, }}>
-                        <TradeHeaderContainer>
+                        <TradeHeaderContainer key={"n"}>
                             <Text secondary>Price</Text>
                             <Text secondary>Volume ({ baseToken.symbol })</Text>
                             <Text secondary>Timestamp</Text>

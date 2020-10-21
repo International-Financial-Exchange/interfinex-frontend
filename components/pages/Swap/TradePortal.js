@@ -330,7 +330,9 @@ const TradeTab = ({ isBuy }) => {
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
-    console.log("a", parseFloat(baseTokenBalance))
+    console.log("exchange base balance", parseFloat(exchangeBaseTokenBalance))
+    console.log("exchange asset balance", exchangeAssetTokenBalance)
+    console.log("account base balanec", baseTokenBalance)
     console.log("b", outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
 
     return (
