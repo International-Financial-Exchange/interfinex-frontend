@@ -154,13 +154,7 @@ export const TokenPairProvider = ({ children }) => {
 
     const [token0, token1] = useMemo(() => {
         if (assetToken && baseToken) {
-            // Always make the imeb token the token1
-            if (assetToken.address === IMEB_TOKEN.address)
-                return [baseToken, assetToken];
-            else if (baseToken.address === IMEB_TOKEN.address)
-                return [assetToken, baseToken];
-    
-            // token0 should always be the smaller address (if it's not IMEB token)
+            // token0 should always be the smaller address
             return assetToken.address < baseToken.address ? 
                 [assetToken, baseToken] 
                 : [baseToken, assetToken];
