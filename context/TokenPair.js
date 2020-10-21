@@ -109,41 +109,23 @@ export const TokenPairProvider = ({ children }) => {
     }, [router.query, tokens, provider]);
 
     const _setToken = (token, isCustomToken, type) => {
+        const keyPrefix = type === "ASSET" ? "asset" : "base";
+
         if (isCustomToken) {
             router.push({ 
                 query: { 
                     ...router.query,
-                    [
-                        type === "ASSET" 
-                            ? "assetTokenName" 
-                            : "baseTokenName"
-                    ]: token.name,
-                    [
-                        type === "ASSET" 
-                            ? "assetTokenAddress" 
-                            : "baseTokenAddress"
-                    ]: token.address,
-                    [
-                        type === "ASSET" 
-                            ? "assetTokenDecimals" 
-                            : "baseTokenDecimals"
-                    ]: token.decimals,
-                    [
-                        type === "ASSET" 
-                            ? "assetTokenSymbol" 
-                            : "baseTokenSymbol"
-                    ]: token.symbol,
+                    [`${keyPrefix}Name`]: token.name,
+                    [`${keyPrefix}Address`]: token.address,
+                    [`${keyPrefix}Decimals`]: token.decimals,
+                    [`${keyPrefix}Symbol`]: token.symbol,
                 }
             });
         } else {
             router.push({ 
                 query: { 
                     ...router.query,
-                    [
-                        type === "ASSET" 
-                            ? "assetTokenName" 
-                            : "baseTokenName"
-                    ]: token.name, 
+                    [`${keyPrefix}Name`]: token.name,
                 }
             });
         }
