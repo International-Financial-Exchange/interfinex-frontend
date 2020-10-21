@@ -116,7 +116,11 @@ export const shade = (col, light)=> {
     return color(r, g, b);
 }
 
-export const parseTokenAmount = (amount, token) => ethers.utils.parseUnits(amount.toString(), token.decimals).toString();
+export const parseTokenAmount = (amount, token) => {
+    const truncatedAmount = amount.toFixed(token.decimals);
+    return ethers.utils.parseUnits(truncatedAmount.toString(), token.decimals).toString();
+};
+
 export const humanizeTokenAmount = (amount, token) => parseFloat(ethers.utils.formatUnits(amount.toString(), token.decimals));
 
 export const MULTIPLIER = BigNumber.from(parseTokenAmount(1, 18));

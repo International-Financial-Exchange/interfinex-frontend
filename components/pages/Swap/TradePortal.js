@@ -439,6 +439,8 @@ const TradeTab = ({ isBuy }) => {
                             console.log("balances", exchangeAssetTokenBalance, exchangeBaseTokenBalance);
 
     
+                            console.log("before", sendAmount, receiveAmount * (1 - slippagePercentage), receiveAmount * (1 + slippagePercentage));
+
                             console.log(
                                 sendToken.address,
                                 parseTokenAmount(sendAmount, sendToken), 
