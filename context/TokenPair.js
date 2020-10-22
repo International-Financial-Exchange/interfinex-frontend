@@ -109,7 +109,7 @@ export const TokenPairProvider = ({ children }) => {
     }, [router.query, tokens, provider]);
 
     const _setToken = (token, isCustomToken, type) => {
-        const keyPrefix = type === "ASSET" ? "asset" : "base";
+        const keyPrefix = type === "ASSET" ? "assetToken" : "baseToken";
 
         if (isCustomToken) {
             router.push({ 

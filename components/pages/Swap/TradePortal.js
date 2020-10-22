@@ -183,9 +183,8 @@ const PoolTab = () => {
                                 [baseTokenAmount, assetTokenAmount]
                                 : [assetTokenAmount, baseTokenAmount];
     
-                            if (!exchangeHasAllowance)
-                                await approveExchange();
-                                
+                            await approveExchange(baseToken, assetToken);
+
                             const slippagePercentage = slippageValue / 100;
                             await addTransactionNotification({
                                 content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
@@ -216,8 +215,7 @@ const PoolTab = () => {
                     onClick={async () => {
                         setIsWithdrawLoading(true);
                         try {
-                            if (!exchangeHasAllowance)
-                                await approveExchange();
+                            await approveExchange(liquidityToken);
     
                             const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
                             await addTransactionNotification({
@@ -420,12 +418,8 @@ const TradeTab = ({ isBuy }) => {
                         setIsLoading(true);
                         try {   
                             const slippagePercentage = slippageValue / 100;
-                            const sendToken = isBuy ?
-                                baseToken
-                                : assetToken;
-                            const receiveToken = isBuy ?
-                                assetToken
-                                : baseToken;
+                            const sendToken = isBuy ? baseToken : assetToken;
+                            const receiveToken = isBuy ? assetToken : baseToken;
                             const sendAmount = isBuy ? 
                                 outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                 : assetTokenAmount;
@@ -433,9 +427,7 @@ const TradeTab = ({ isBuy }) => {
                                 assetTokenAmount 
                                 : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
     
-                            if (!exchangeHasAllowance)
-                                await approveExchange();
-
+                            await approveExchange(sendToken);
                             await addTransactionNotification({
                                 content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                                 transactionPromise: exchangeContract.swap(

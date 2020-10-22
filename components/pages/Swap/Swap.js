@@ -20,6 +20,8 @@ import { AccountContext } from "../../../context/Account";
 
 export const SwapContext = createContext();
 
+const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')));
+
 export const Swap = () => {
     const { provider, contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
@@ -33,21 +35,36 @@ export const Swap = () => {
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
     const [factoryHasAllowance, setFactoryHasAllowance] = useState(false);
-    const [exchangeHasAllowance, setExchangeHasAllowance] = useState(false);
+    const [exchangeAllowances, setExchangeAllowances] = useState(false);
 
-    const approveExchange = useCallback(() => {
-        console.log(
-            "contract",
-            assetToken.contract,
-            baseToken.contract,
-            liquidityToken,
-        )
-        return Promise.all([
-            assetToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,),
-            baseToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,),
-            liquidityToken.approve(exchangeContract.address, ethers.constants.MaxUint256,),
-        ]);
-    }, [exchangeContract, assetToken, baseToken, liquidityToken]);
+    const updateExchangeAllowances = useCallback(async () => {
+        if (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v)) {
+            Promise.all([
+                assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
+                baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
+                liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
+            ]).then(([assetAllowance, baseAllowance, liquidityAllowance]) =>
+                setExchangeAllowances({
+                    hasAssetTokenAllowance: hasAllowance(assetAllowance),
+                    hasBaseTokenAllowance: hasAllowance(baseAllowance),
+                    hasLiquidityTokenAllowance: hasAllowance(liquidityAllowance),
+                })
+            );
+        }
+    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances]);
+
+    const approveExchange = useCallback(async (...tokensToApprove) => {
+        const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasLiquidityTokenAllowance } = exchangeAllowances;
+
+        if (!hasAssetTokenAllowance && tokensToApprove.some(({ address }) => address === assetToken.address))
+            await assetToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,);
+
+        if (!hasBaseTokenAllowance && tokensToApprove.some(({ address }) => address === baseToken.address))
+            await baseToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,);
+
+        if (!hasLiquidityTokenAllowance && tokensToApprove.some(({ address }) => address === liquidityToken.address))
+            await liquidityToken.approve(exchangeContract.address, ethers.constants.MaxUint256,);
+    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances]);
 
     const approveFactory = useCallback(() => {
         return Promise.all([
@@ -107,17 +124,7 @@ export const Swap = () => {
                     });
                 }
         
-                if (!exchangeHasAllowance) {
-                    Promise.all([
-                        assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-                        baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-                        liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-                    ]).then(allowances => {
-                        setExchangeHasAllowance(
-                            allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
-                        );
-                    });
-                }
+                updateExchangeAllowances();
 
                 // Update the liquidity for the user and the total liquidity
                 Promise.all([
@@ -143,7 +150,6 @@ export const Swap = () => {
                     exchangeAssetTokenBalance,
                     exchangeBaseTokenBalance,
                     factoryHasAllowance,
-                    exchangeHasAllowance,
                     approveFactory,
                     approveExchange,
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
