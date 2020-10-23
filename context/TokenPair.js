@@ -32,19 +32,21 @@ export const TokenPairProvider = ({ children }) => {
     }, [imebTokenContract, networkInfo?.chainId]);
 
     useEffect(() => {
-        if (networkInfo?.chainId === 1) {
-            fetch("https://t2crtokens.eth.link/")
-                .then(res => res.json())
-                .then(({ tokens }) => {
-                    const newTokens = tokens.map(token => {
-                        token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
-                        return token;
+        if (networkInfo) {
+            if (networkInfo.chainId === 1) {
+                fetch("https://t2crtokens.eth.link/")
+                    .then(res => res.json())
+                    .then(({ tokens }) => {
+                        const newTokens = tokens.map(token => {
+                            token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
+                            return token;
+                        });
+                        setTokens([IMEB_TOKEN].concat(newTokens));
                     });
-                    setTokens([IMEB_TOKEN].concat(newTokens));
-                });
-        } else {
-            // const tokens = [IMEB_TOKEN].concat(networkInfo?.chainId === 1 ? InchTokens : LocalTokens);
-            // setTokens(tokens);
+            } else {
+                const tokens = [IMEB_TOKEN].concat(LocalTokens);
+                setTokens(tokens);
+            }
         }
     }, [networkInfo?.chainId, imebTokenContract]);
 
