@@ -62,12 +62,12 @@ const TradeRowContainer = styled.div`
 `;
 
 const TradeHeaderContainer = styled(TradeRowContainer)`
-    background-color: ${({ theme }) => theme.colors.invert};
-    border: 0;
+    background-color: ${({ theme }) => theme.colors.invert} !important;
+    border: 0 !important;
     
     &:hover {
-        cursor: default;
-        transform: scale(1.0);
+        cursor: default !important;
+        transform: scale(1.0) !important;
     }
 `;
 
