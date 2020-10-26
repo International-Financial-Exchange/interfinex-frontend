@@ -13,23 +13,23 @@ export const TokenPairContext = createContext();
 export const TokenPairProvider = ({ children }) => {
     const router = useRouter();
     const [tokens, setTokens] = useState();
-    const { signer, networkInfo, provider, contracts: { erc20ContractAbi, imebTokenContract } } = useContext(EthersContext);
+    const { signer, networkInfo, provider, contracts: { erc20ContractAbi, ifexTokenContract } } = useContext(EthersContext);
 
     const [assetToken, setAssetToken] = useState();
     const [baseToken, setBaseToken] = useState();
-    const [imebToken, setImebToken] = useState();
+    const [ifexToken, setIfexToken] = useState();
 
-    const IMEB_TOKEN = useMemo(() => {
+    const IFEX_TOKEN = useMemo(() => {
         return {
-            address: imebTokenContract.address,
+            address: ifexTokenContract.address,
             decimals: 18,
             name: "Intermex Bills",
-            symbol: "IMEB",
+            symbol: "IFEX",
             chainId: networkInfo?.chainId,
-            contract: imebTokenContract,
+            contract: ifexTokenContract,
             logoURI: "https://1inch.exchange/assets/tokens/0x0000000000b3f879cb30fe243b4dfee438691c04.png"
         }
-    }, [imebTokenContract, networkInfo?.chainId]);
+    }, [ifexTokenContract, networkInfo?.chainId]);
 
     useEffect(() => {
         if (networkInfo) {
@@ -41,14 +41,14 @@ export const TokenPairProvider = ({ children }) => {
                             token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
                             return token;
                         });
-                        setTokens([IMEB_TOKEN].concat(newTokens));
+                        setTokens([IFEX_TOKEN].concat(newTokens));
                     });
             } else {
-                const tokens = [IMEB_TOKEN].concat(LocalTokens);
+                const tokens = [IFEX_TOKEN].concat(LocalTokens);
                 setTokens(tokens);
             }
         }
-    }, [networkInfo?.chainId, imebTokenContract]);
+    }, [networkInfo?.chainId, ifexTokenContract]);
 
     useEffect(() => {
         const {
@@ -163,7 +163,7 @@ export const TokenPairProvider = ({ children }) => {
     return (
         <TokenPairContext.Provider 
             value={{ 
-                imebToken: IMEB_TOKEN,
+                ifexToken: IFEX_TOKEN,
                 assetToken, 
                 baseToken, 
                 token0,

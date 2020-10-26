@@ -11,25 +11,25 @@ import ethers from "ethers";
 import { NotificationsContext } from "../../../context/Notifications"
 
 export const CreateMarket = () => {
-    const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
-    const { assetTokenBalance, baseTokenBalance, imebTokenBalance } = useContext(AccountContext);
+    const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
+    const { assetTokenBalance, baseTokenBalance, ifexTokenBalance } = useContext(AccountContext);
     const { contracts: { factoryContract }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
 
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
-    const [imebTokenAmount, setImebTokenAmount] = useState();
+    const [ifexTokenAmount, setIfexTokenAmount] = useState();
 
     const onSubmit = async () => {
         console.log(
             "contracts",
             token0.address,
             token1.address,
-            imebToken.address
+            ifexToken.address
         );
         await token0.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
         await token1.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
-        await imebToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
+        await ifexToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
 
         // create the market
         const [token0Amount, token1Amount] = assetToken.address === token0.address 
@@ -43,7 +43,7 @@ export const CreateMarket = () => {
                 token1.address,
                 ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
                 ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
-                ethers.utils.parseUnits(imebTokenAmount.toString(), imebToken.decimals).toString(),
+                ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
                 { gasLimit: 3_000_000 }
             ),
         });
@@ -58,7 +58,7 @@ export const CreateMarket = () => {
                     onClick={() => {
                         setAssetTokenAmount(assetTokenBalance);
                         setBaseTokenAmount(baseTokenBalance);
-                        setImebTokenAmount(imebTokenBalance);
+                        setIfexTokenAmount(ifexTokenBalance);
                     }}
                 >
                     Max
@@ -78,9 +78,9 @@ export const CreateMarket = () => {
             />
 
             <TokenAmountInput 
-                value={imebTokenAmount}
-                onChange={e => setImebTokenAmount(e.target.value)}
-                token={imebToken}
+                value={ifexTokenAmount}
+                onChange={e => setIfexTokenAmount(e.target.value)}
+                token={ifexToken}
             />
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
@@ -88,7 +88,7 @@ export const CreateMarket = () => {
                     1 {baseToken.symbol} ≈ {Number.isNaN(assetTokenAmount / baseTokenAmount) ? 0 : (assetTokenAmount / baseTokenAmount).toFixed(4)} {assetToken.symbol}
                 </Text>
 
-                <Text secondary>1 {baseToken.symbol} ≈ {Number.isNaN(imebTokenAmount / (baseTokenAmount / 10)) ? 0 : (imebTokenAmount / (baseTokenAmount / 10)).toFixed(4)} {imebToken.symbol}</Text>
+                <Text secondary>1 {baseToken.symbol} ≈ {Number.isNaN(ifexTokenAmount / (baseTokenAmount / 10)) ? 0 : (ifexTokenAmount / (baseTokenAmount / 10)).toFixed(4)} {ifexToken.symbol}</Text>
             </div>
 
             <Button 

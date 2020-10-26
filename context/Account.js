@@ -9,12 +9,12 @@ export const AccountContext = createContext();
 
 export const AccountProvider = ({ children }) => {
     const { signer, provider, contracts: { erc20ContractAbi } } = useContext(EthersContext);
-    const { baseToken, assetToken, imebToken } = useContext(TokenPairContext);
+    const { baseToken, assetToken, ifexToken } = useContext(TokenPairContext);
     const { addLayoutNotification } = useContext(NotificationsContext);
     const [address, setAddress] = useState();
     const [baseTokenBalance, setBaseTokenBalance] = useState();
     const [assetTokenBalance, setAssetTokenBalance] = useState();
-    const [imebTokenBalance, setImebTokenBalance] = useState();
+    const [ifexTokenBalance, setIfexTokenBalance] = useState();
     const [deleteWalletWarning, setDeleteWalletWarning] = useState();
 
     useEffect(() => {
@@ -35,7 +35,7 @@ export const AccountProvider = ({ children }) => {
     useEffect(() => {
         if (address) {
             console.log(address);
-            console.log(baseToken, assetToken, imebToken)
+            console.log(baseToken, assetToken, ifexToken)
             baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 console.log("base", baseToken)
                 setBaseTokenBalance(ethers.utils.formatUnits(balance, baseToken.decmials))
@@ -46,19 +46,19 @@ export const AccountProvider = ({ children }) => {
                 setAssetTokenBalance(ethers.utils.formatUnits(balance, assetToken.decmials))
             });
 
-            imebToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                console.log("imeb", imebToken)
-                setImebTokenBalance(ethers.utils.formatUnits(balance, imebToken.decmials))
+            ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                console.log("ifex", ifexToken)
+                setIfexTokenBalance(ethers.utils.formatUnits(balance, ifexToken.decmials))
             });
         }
-    }, [provider, address, baseToken, assetToken, imebToken]);
+    }, [provider, address, baseToken, assetToken, ifexToken]);
 
     return (
         <AccountContext.Provider 
             value={{ 
                 baseTokenBalance,
                 assetTokenBalance,
-                imebTokenBalance,
+                ifexTokenBalance,
                 address,
             }}
         >

@@ -22,7 +22,7 @@ export default function Home() {
                     }}
                 >
                     <Text primary style={{ fontSize: PIXEL_SIZING.larger, marginBottom: PIXEL_SIZING.small, textAlign: "center" }}>
-                        Welcome to Intermex
+                        Welcome to Interfinex
                     </Text>
 
                     <Text secondary style={{ fontSize: PIXEL_SIZING.medium, textAlign: "center" }}>

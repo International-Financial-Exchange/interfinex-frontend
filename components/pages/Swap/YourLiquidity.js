@@ -13,7 +13,7 @@ import Skeleton from "react-loading-skeleton";
 import { NotificationsContext } from "../../../context/Notifications";
 
 export const YourLiquidity = () => {
-    const { assetToken, baseToken, imebToken } = useContext(TokenPairContext);
+    const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const { 
         exchangeContract, 
@@ -23,7 +23,7 @@ export const YourLiquidity = () => {
     } = useContext(SwapContext);
     const [accountLiquidityTokenBalance, setAccountLiquidityTokenBalance] = useState();
     const [liquidityTokenTotalSupply, setLiquidityTokenTotalSupply] = useState();
-    const [accountUnclaimedImebEarnings, setAccountUnclaimedImebEarnings] = useState();
+    const [accountUnclaimedIfexEarnings, setAccountUnclaimedIfexEarnings] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
@@ -39,7 +39,7 @@ export const YourLiquidity = () => {
                     setLiquidityTokenTotalSupply(ethers.utils.formatUnits(rawTotalSupply, 18));
                 }),
                 liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(rawDividends => {
-                    setAccountUnclaimedImebEarnings(ethers.utils.formatUnits(rawDividends, 18));
+                    setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
                 }),
             ]).then(() => {
                 setIsLoading(false);
@@ -82,13 +82,13 @@ export const YourLiquidity = () => {
                     </div>
                     
                     <div style={{ display: "grid", rowGap: PIXEL_SIZING.small, }}>
-                        <Text bold>Intermex Bill Earnings (Unclaimed)</Text>
+                        <Text bold>Interfinex Bill Earnings (Unclaimed)</Text>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
-                            <TokenAndLogo token={imebToken}/>
+                            <TokenAndLogo token={ifexToken}/>
                             {
                                 isLoading ?
                                     <Skeleton width={CONTAINER_SIZING.miniscule}/>
-                                    : <Text secondary bold>{parseFloat(accountUnclaimedImebEarnings)?.toFixed(4)} {imebToken.symbol}</Text>
+                                    : <Text secondary bold>{parseFloat(accountUnclaimedIfexEarnings)?.toFixed(4)} {ifexToken.symbol}</Text>
                             }
                         </div>
 
@@ -99,7 +99,7 @@ export const YourLiquidity = () => {
                                 setIsClaimEarningsLoading(true);
                                 const transactionPromise = liquidityToken.claimDividends({ gasLimit: 1000000 });
                                 addTransactionNotification({
-                                    content: `Claim Intermex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
+                                    content: `Claim Interfinex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
                                     transactionPromise,
                                 });
                                 transactionPromise.finally(() =>

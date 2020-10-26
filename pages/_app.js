@@ -16,7 +16,7 @@ export default ({ Component, pageProps }) => {
                     <TokenPairProvider>
                         <AccountProvider>
                             <Head>
-                                <title>Intermex</title>
+                                <title>Interfinex</title>
                                 <link rel="icon" href="/favicon.ico" />
                             </Head>
 

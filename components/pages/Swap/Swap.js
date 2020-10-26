@@ -24,7 +24,7 @@ const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(
 
 export const Swap = () => {
     const { provider, contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
-    const { token0, token1, assetToken, baseToken, imebToken } = useContext(TokenPairContext);
+    const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { signer } = useContext(EthersContext);
     const { address } = useContext(AccountContext);
     const [marketExists, setMarketExists] = useState(true);
@@ -70,9 +70,9 @@ export const Swap = () => {
         return Promise.all([
             assetToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,),
             baseToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,),
-            imebToken.approve(factoryContract.address, ethers.constants.MaxUint256,),
+            ifexToken.approve(factoryContract.address, ethers.constants.MaxUint256,),
         ]);
-    }, [factoryContract, assetToken, baseToken, imebToken]);
+    }, [factoryContract, assetToken, baseToken, ifexToken]);
 
     // check swap market exists and update contract and liquidity token
     useEffect(() => {
@@ -116,7 +116,7 @@ export const Swap = () => {
                     Promise.all([
                         assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
                         baseToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                        imebToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
+                        ifexToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
                     ]).then(allowances => {
                         setFactoryHasAllowance(
                             allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
