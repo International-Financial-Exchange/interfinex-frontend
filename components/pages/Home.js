@@ -26,7 +26,7 @@ export default function Home() {
                     </Text>
 
                     <Text secondary style={{ fontSize: PIXEL_SIZING.medium, textAlign: "center" }}>
-                        The International Mercantile Exchange
+                        The International Financial Exchange
                     </Text>
 
                     <Link href={"/app/swap"}>

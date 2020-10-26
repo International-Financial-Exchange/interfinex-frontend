@@ -23,7 +23,7 @@ export const TokenPairProvider = ({ children }) => {
         return {
             address: ifexTokenContract.address,
             decimals: 18,
-            name: "Intermex Bills",
+            name: "Interfinex Bills",
             symbol: "IFEX",
             chainId: networkInfo?.chainId,
             contract: ifexTokenContract,
