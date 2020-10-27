@@ -99,7 +99,7 @@ const StyledTextButton = styled.div`
 
     &:hover {
         cursor: pointer;
-        color: ${({ theme }) => theme.colors.secondary};
+        color: ${({ theme }) => theme.colors.secondary} !important;
     }
 
     &:active {

@@ -15,6 +15,7 @@ const Container = styled.div`
     padding: ${PIXEL_SIZING.small};
     background-color: ${({ theme }) => theme.colors.invert};
     box-shadow: ${({ theme }) => theme.colors.boxShadow};
+    height: fit-content;
 `
 
 

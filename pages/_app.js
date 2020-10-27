@@ -7,6 +7,7 @@ import { EthersProvider } from '../context/Ethers';
 import { TokenPairProvider } from '../context/TokenPair';
 import { AccountProvider } from '../context/Account';
 import { NotificationsProvider } from '../context/Notifications';
+import { Footer } from '../components/layout/Footer';
 
 export default ({ Component, pageProps }) => {
     return (
@@ -20,10 +21,12 @@ export default ({ Component, pageProps }) => {
                                 <link rel="icon" href="/favicon.ico" />
                             </Head>
 
-                            <div style={{ display: "grid", width: "100%", height: "100%" }} id={"root"}>
+                            <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", height: "100%" }} id={"root"}>
                                 <NavBar/>
                                 <Component {...pageProps}/>
                             </div>
+                            
+                            <Footer/>
                         </AccountProvider>
                     </TokenPairProvider>
                 </EthersProvider>
