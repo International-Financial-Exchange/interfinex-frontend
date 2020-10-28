@@ -34,11 +34,11 @@ export const Swap = () => {
     const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
-    const [factoryHasAllowance, setFactoryHasAllowance] = useState(false);
-    const [exchangeAllowances, setExchangeAllowances] = useState(false);
+    const [factoryAllowances, setFactoryAllowances] = useState();
+    const [exchangeAllowances, setExchangeAllowances] = useState();
 
     const updateExchangeAllowances = useCallback(async () => {
-        if (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v)) {
+        if (address && (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v))) {
             Promise.all([
                 assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                 baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
@@ -51,7 +51,7 @@ export const Swap = () => {
                 })
             );
         }
-    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances]);
+    }, [exchangeContract, assetToken, baseToken, liquidityToken, address]);
 
     const approveExchange = useCallback(async (...tokensToApprove) => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasLiquidityTokenAllowance } = exchangeAllowances;
@@ -64,21 +64,47 @@ export const Swap = () => {
 
         if (!hasLiquidityTokenAllowance && tokensToApprove.some(({ address }) => address === liquidityToken.address))
             await liquidityToken.approve(exchangeContract.address, ethers.constants.MaxUint256,);
-    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances]);
+    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances,]);
 
-    const approveFactory = useCallback(() => {
-        return Promise.all([
-            assetToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,),
-            baseToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,),
-            ifexToken.approve(factoryContract.address, ethers.constants.MaxUint256,),
-        ]);
-    }, [factoryContract, assetToken, baseToken, ifexToken]);
+    const updateFactoryAllowances = useCallback(async () => {
+        console.log("updating");
+        if ((assetToken && baseToken && address) && (!factoryAllowances || Object.values(factoryAllowances).some(v => !v))) {
+            Promise.all([
+                assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
+                baseToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
+                ifexToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
+            ]).then(([assetAllowance, baseAllowance, ifexAllowance]) =>
+                setFactoryAllowances({
+                    hasAssetTokenAllowance: hasAllowance(assetAllowance),
+                    hasBaseTokenAllowance: hasAllowance(baseAllowance),
+                    hasIfexTokenAllowance: hasAllowance(ifexAllowance),
+                })
+            );
+        }
+    }, [factoryContract, assetToken, baseToken, address]);
+
+    console.log("allowance", factoryAllowances);
+    console.log("factory", factoryContract.address);
+
+    const approveFactory = useCallback(async () => {
+        const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
+
+        if (!hasAssetTokenAllowance)
+            await assetToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
+
+        if (!hasBaseTokenAllowance)
+            await baseToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
+
+        if (!hasIfexTokenAllowance)
+            await ifexToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
+    }, [factoryContract, assetToken, baseToken, ifexToken, factoryAllowances]);
 
     // check swap market exists and update contract and liquidity token
     useEffect(() => {
         setIsLoading(true);
         if (baseToken && assetToken) {
             factoryContract.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
+                console.log("exchange", exchangeAddress)
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
     
@@ -96,6 +122,10 @@ export const Swap = () => {
         }
     }, [provider, baseToken, assetToken]);
 
+    useEffect(() => {
+        updateFactoryAllowances();
+    }, [baseToken, assetToken, ifexToken, factoryContract]);
+
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
         if (exchangeContract) {
@@ -111,19 +141,6 @@ export const Swap = () => {
             });
 
             if (signer && liquidityToken) {
-                // For permformance this only really needs to be called if its false (as well as on init)
-                if (!factoryHasAllowance) {
-                    Promise.all([
-                        assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                        baseToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                        ifexToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                    ]).then(allowances => {
-                        setFactoryHasAllowance(
-                            allowances.every(v => v.gte(ethers.constants.MaxUint256.div(BigNumber.from('100'))))
-                        );
-                    });
-                }
-        
                 updateExchangeAllowances();
 
                 // Update the liquidity for the user and the total liquidity
@@ -149,7 +166,6 @@ export const Swap = () => {
                     exchangeContract,
                     exchangeAssetTokenBalance,
                     exchangeBaseTokenBalance,
-                    factoryHasAllowance,
                     approveFactory,
                     approveExchange,
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),

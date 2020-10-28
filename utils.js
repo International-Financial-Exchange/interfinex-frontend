@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { keyframes } from "styled-components";
 import { ethers, BigNumber } from "ethers";
 
@@ -44,6 +44,14 @@ export const useWindow = () => {
 
     return _window;
 };
+
+export const useForceUpdate = () => {
+    const [, setTick] = useState(0);
+    const update = useCallback(() => {
+      setTick(tick => tick + 1);
+    }, [])
+    return update;
+  }
 
 export const useLocalStorage = (key, initialValue) => {
     const window = useWindow();
@@ -147,4 +155,4 @@ export const TIMEFRAMES = {
 };
 
 
-export const FEE_RATE = 0.003;
+export const FEE_RATE = 0.001;

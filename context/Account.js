@@ -4,6 +4,7 @@ import { TokenPairContext } from "./TokenPair";
 import ethers from "ethers";
 import { NotificationsContext, NOTIFICATION_TYPES } from "./Notifications";
 import Text from "../components/core/Text";
+import { humanizeTokenAmount } from "../utils";
 
 export const AccountContext = createContext();
 
@@ -38,20 +39,23 @@ export const AccountProvider = ({ children }) => {
             console.log(baseToken, assetToken, ifexToken)
             baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 console.log("base", baseToken)
-                setBaseTokenBalance(ethers.utils.formatUnits(balance, baseToken.decmials))
+                setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
             });
 
             assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 console.log("asset", assetToken)
-                setAssetTokenBalance(ethers.utils.formatUnits(balance, assetToken.decmials))
+                setAssetTokenBalance(humanizeTokenAmount(balance, assetToken))
             });
 
             ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 console.log("ifex", ifexToken)
-                setIfexTokenBalance(ethers.utils.formatUnits(balance, ifexToken.decmials))
+                setIfexTokenBalance(humanizeTokenAmount(balance, ifexToken))
             });
         }
     }, [provider, address, baseToken, assetToken, ifexToken]);
+
+
+    console.log("asset balance", assetTokenBalance);
 
     return (
         <AccountContext.Provider 

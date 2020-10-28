@@ -9,12 +9,14 @@ import { AccountContext } from "../../../context/Account"
 import { EthersContext } from "../../../context/Ethers"
 import ethers from "ethers";
 import { NotificationsContext } from "../../../context/Notifications"
+import { SwapContext } from "./Swap"
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, ifexTokenBalance } = useContext(AccountContext);
     const { contracts: { factoryContract }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
+    const { approveFactory } = useContext(SwapContext);
 
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
@@ -27,22 +29,25 @@ export const CreateMarket = () => {
             token1.address,
             ifexToken.address
         );
-        await token0.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
-        await token1.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
-        await ifexToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256.toString());
+        
+        await approveFactory();
+        
+        console.log(baseToken.address, 
+            assetToken.address,
+            ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
+            ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
+            ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),);
 
-        // create the market
-        const [token0Amount, token1Amount] = assetToken.address === token0.address 
-            ? [assetTokenAmount, baseTokenAmount] 
-            : [baseTokenAmount, assetTokenAmount];
+            // return;
+
             
         addTransactionNotification({
             content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
             transactionPromise: factoryContract.create_exchange(
-                token0.address, 
-                token1.address,
-                ethers.utils.parseUnits(token0Amount.toString(), token0.decimals).toString(),
-                ethers.utils.parseUnits(token1Amount.toString(), token1.decimals).toString(),
+                baseToken.address, 
+                assetToken.address,
+                ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
+                ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
                 ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
                 { gasLimit: 3_000_000 }
             ),
@@ -93,6 +98,7 @@ export const CreateMarket = () => {
 
             <Button 
                 style={{ height: PIXEL_SIZING.larger, width: "100%" }}
+                requiresWallet
                 onClick={onSubmit}
             >
                 Create Swap Market

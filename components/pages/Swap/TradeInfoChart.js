@@ -32,10 +32,12 @@ export const TradeInfoChart = () => {
                     limit: 500,
                     assetTokenAddress: assetToken.address,
                     baseTokenAddress: baseToken.address,
-                }).then(candles => setCandles(old => ({
-                    ...old,
-                    [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(4) })),
-                })));
+                })
+                    .then(candles => setCandles(old => ({
+                        ...old,
+                        [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(4) })),
+                    })))
+                    .catch(e => console.log(e));
             })
         }
     }, [assetToken, baseToken]);

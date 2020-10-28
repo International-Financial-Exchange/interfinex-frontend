@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { PIXEL_SIZING, CONTAINER_SIZING, MULTIPLIER, humanizeTokenAmount } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING, MULTIPLIER, humanizeTokenAmount, useForceUpdate } from "../../../utils";
 import Text from "../../core/Text";
 import { shade } from "../../../utils";
 import { TextOption } from "../../core/TextOption";
@@ -71,15 +71,18 @@ const TradeHeaderContainer = styled(TradeRowContainer)`
     }
 `;
 
+let isLoading = false;
 const useHistoricalTrades = query => {
     const [trades, setTrades] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [gotAllTrades, setGotAllTrades] = useState(false);
     const [oldestTradeTimestamp, setOldestTradeTimestamp] = useState();
+    const forceUpdate = useForceUpdate();
+    const [_isLoading, setIsLoading] = useState(false);
 
     const getMoreTrades = async () => {
         if (isLoading || !query.exchangeContract || gotAllTrades) return;
         
+        isLoading = true;
         setIsLoading(true);
         try {
             const trades = await getHistoricalTrades({ 
@@ -92,12 +95,17 @@ const useHistoricalTrades = query => {
             setTrades(existing => existing.concat(trades));
             setOldestTradeTimestamp(trades.last()?.timestamp)
             if (trades.length === 0) setGotAllTrades(true);
-        } finally {
-            setIsLoading(false);
+            isLoading = false;
+            setIsLoading(false)
+        } catch {
+            setTimeout(() => {
+                isLoading = false
+                setIsLoading(false);
+            }, 3000);
         }
     };
 
-    return [trades, getMoreTrades, isLoading, gotAllTrades];
+    return [trades, getMoreTrades, _isLoading, gotAllTrades];
 };
 
 export const HistoricalTrades = () => {
@@ -109,8 +117,6 @@ export const HistoricalTrades = () => {
     const [historicalTrades, getMoreHistoricalTrades, isHistoricalTradesLoading, gotAllHistoricalTrades] = useHistoricalTrades({ exchangeContract: exchangeContract?.address });
     const [yourTrades, getMoreYourTrades, isYourTradesLoading, gotAllYourTrades] = useHistoricalTrades({ exchangeContract: exchangeContract?.address, user: address });
     const [selectedTab, setSelectedTab] = useState(TABS.historicalTrades);
-
-    console.log(historicalTrades);
 
     const trades = useMemo(() => {
         const trades = selectedTab === TABS.historicalTrades ? historicalTrades : yourTrades;
@@ -174,7 +180,6 @@ export const HistoricalTrades = () => {
                             (!trades || trades.length === 0) && !isLoading ?
                                 <Text secondary className={"center-absolute"}>No trades to show</Text>
                                 : trades.map(({ price, volume, timestamp, user, txId, isBuy }) =>
-                                    // MAJOR TODO: Add in conditional here so that isBuy is correct
                                     <TradeRowContainer 
                                         isBuy={isBuy} 
                                         key={txId} 
@@ -190,7 +195,7 @@ export const HistoricalTrades = () => {
                         }
 
                         {
-                            isYourTradesLoading && isHistoricalTradesLoading &&
+                            isLoading &&
                                 <Spinner style={{ marginTop: PIXEL_SIZING.medium, marginBottom: PIXEL_SIZING.medium, marginLeft: "50%", transform: "translateX(-12px)" }}/>
                         }
                     </div>

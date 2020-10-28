@@ -427,6 +427,13 @@ const TradeTab = ({ isBuy }) => {
                                 assetTokenAmount 
                                 : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
     
+                            console.log(sendToken.address,
+                                parseTokenAmount(sendAmount, sendToken), 
+                                address,
+                                parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                                parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                                0);
+                                
                             await approveExchange(sendToken);
                             await addTransactionNotification({
                                 content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,

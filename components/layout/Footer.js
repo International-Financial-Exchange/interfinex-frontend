@@ -4,12 +4,31 @@ import { TextButton } from "../core/Button";
 import Text from "../core/Text";
 import { LayoutContainer } from "./Layout";
 
+import {
+    FacebookIcon,
+    RedditIcon,
+    TelegramIcon,
+    TwitterIcon,
+  } from "react-share";
+
 const FooterContainer = styled(LayoutContainer)`
     height: fit-content;
     padding: ${PIXEL_SIZING.medium};
     background-color: #003049;
     display: grid;
     grid-template-columns: 1fr auto;
+`;
+
+const SocialMediaLink = styled.div`
+    display: grid; 
+    grid-template-columns: auto 1fr; 
+    column-gap: ${PIXEL_SIZING.miniscule}; 
+    align-items: center;
+
+    &:hover {
+        cursor: pointer;
+        color: ${({ theme }) => theme.colors.secondary} !important;
+    }
 `;
 
 export const Footer = () => {
@@ -30,16 +49,24 @@ export const Footer = () => {
                         Social Media
                     </Text>
 
-                    <div onClick={() => window.open("https://twitter.com/Interfinex_io")}>
-                        <TextButton style={{ color: "white" }}>
-                            Twitter
-                        </TextButton>
-                    </div>
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
+                        {
+                            [
+                                { label: "Twitter", link: "https://twitter.com/Interfinex_io", icon: <TwitterIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                { label: "Facebook", link: "https://twitter.com/Interfinex_io", icon: <FacebookIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                { label: "Telegram", link: "https://twitter.com/Interfinex_io", icon: <TelegramIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                { label: "Reddit", link: "https://twitter.com/Interfinex_io", icon: <RedditIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                { label: "Medium", link: "https://medium.com/@interfinexio", icon: <div style={{ height: 30, width: 30 }}/>},
+                            ].map(({ label, link, icon }) =>
+                                <SocialMediaLink onClick={() => window.open(link)}>
+                                    { icon }
 
-                    <div onClick={() => window.open("https://medium.com/@interfinexio")}>
-                        <TextButton style={{ color: "white" }}>
-                            Medium
-                        </TextButton>
+                                    <TextButton style={{ color: "white" }}>
+                                        {label}
+                                    </TextButton>
+                                </SocialMediaLink>
+                            )
+                        }
                     </div>
                 </div>
             </FooterContainer>
