@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { keyframes } from "styled-components";
 import { ethers, BigNumber } from "ethers";
+import { SERVER_URL } from "./ENV";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -139,7 +140,7 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
         ""
     );
 
-    const url = `https://server.interfinex.io${endpoint}?${urlParams}`;
+    const url = `${SERVER_URL}${endpoint}?${urlParams}`;
 
     if (isJSON) 
         return fetch(url).then(res => res.json());

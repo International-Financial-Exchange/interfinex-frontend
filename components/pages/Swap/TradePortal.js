@@ -328,11 +328,6 @@ const TradeTab = ({ isBuy }) => {
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
-    console.log("exchange base balance", parseFloat(exchangeBaseTokenBalance))
-    console.log("exchange asset balance", exchangeAssetTokenBalance)
-    console.log("account base balanec", baseTokenBalance)
-    console.log("b", outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
-
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu 
@@ -433,7 +428,7 @@ const TradeTab = ({ isBuy }) => {
                                 parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
                                 parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
                                 0);
-                                
+
                             await approveExchange(sendToken);
                             await addTransactionNotification({
                                 content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
