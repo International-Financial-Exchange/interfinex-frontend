@@ -8,6 +8,7 @@ import { TokenPairProvider } from '../context/TokenPair';
 import { AccountProvider } from '../context/Account';
 import { NotificationsProvider } from '../context/Notifications';
 import { Footer } from '../components/layout/Footer';
+import { PIXEL_SIZING } from '../utils';
 
 export default ({ Component, pageProps }) => {
     return (
@@ -21,7 +22,7 @@ export default ({ Component, pageProps }) => {
                                 <link rel="icon" href="/favicon.ico" />
                             </Head>
 
-                            <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", height: "100%" }} id={"root"}>
+                            <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", minHeight: "100%", marginBottom: PIXEL_SIZING.large }} id={"root"}>
                                 <NavBar/>
                                 <Component {...pageProps}/>
                             </div>

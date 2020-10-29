@@ -186,6 +186,12 @@ const PoolTab = () => {
                             await approveExchange(baseToken, assetToken);
 
                             const slippagePercentage = slippageValue / 100;
+
+                            console.log(parseTokenAmount(token0Amount, token0),
+                            parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
+                            parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
+                            address,
+                            0,)
                             await addTransactionNotification({
                                 content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
                                 transactionPromise: exchangeContract.mint_liquidity(
@@ -217,7 +223,9 @@ const PoolTab = () => {
                         try {
                             await approveExchange(liquidityToken);
     
+                            console.log("account", account)
                             const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                            console.log("amount", liquidityTokenAmount)
                             await addTransactionNotification({
                                 content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                 transactionPromise: exchangeContract.burn_liquidity(
@@ -440,7 +448,7 @@ const TradeTab = ({ isBuy }) => {
                                     parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
                                     0,
                                     ethers.constants.AddressZero, 
-                                    { gasLimit: 450_000 },
+                                    { gasLimit: 500_000 },
                                 ),
                             });
                         } finally {

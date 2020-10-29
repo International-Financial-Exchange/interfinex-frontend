@@ -7,7 +7,7 @@ export const LayoutContainer = styled.div`
     width: 1250px;
     justify-self: center;
     color: ${props => props.theme.colors.textPrimary};
-`
+`;
 
 
 export const Layout = props => {

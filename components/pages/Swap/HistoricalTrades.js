@@ -124,7 +124,13 @@ export const HistoricalTrades = () => {
         return trades
             ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
                 const isInverted = baseToken.address !== token0.address;
-                const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [humanizeTokenAmount(baseTokenAmount, baseToken), humanizeTokenAmount(assetTokenAmount, assetToken)];
+                const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [
+                    humanizeTokenAmount(baseTokenAmount, isInverted ? assetToken : baseToken), 
+                    humanizeTokenAmount(assetTokenAmount, isInverted ? baseToken : assetToken)
+                ];
+
+                console.log("trade", humanizedBaseTokenAmount)
+                
                 return {
                     price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
                     volume: isInverted ? humanizedAssetTokenAmount : humanizedBaseTokenAmount,

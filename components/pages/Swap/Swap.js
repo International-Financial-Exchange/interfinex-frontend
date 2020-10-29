@@ -86,6 +86,7 @@ export const Swap = () => {
     console.log("allowance", factoryAllowances);
     console.log("factory", factoryContract.address);
 
+
     const approveFactory = useCallback(async () => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
 
@@ -102,6 +103,7 @@ export const Swap = () => {
     // check swap market exists and update contract and liquidity token
     useEffect(() => {
         setIsLoading(true);
+
         if (baseToken && assetToken) {
             factoryContract.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
                 console.log("exchange", exchangeAddress)
@@ -129,7 +131,11 @@ export const Swap = () => {
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
         if (exchangeContract) {
-            Promise.all([
+
+        baseToken.contract.allowance(factoryContract.address, exchangeContract.address, { gasLimit: 1000000 }).then(res => console.log("base balance from factory to exchange", res));
+    
+        assetToken.contract.allowance(factoryContract.address, exchangeContract.address, { gasLimit: 1000000 }).then(res => console.log("asset balance from factory to exchange", res));    
+        Promise.all([
                 assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
                 baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
             ]).then(async ([assetTokenBalance, baseTokenBalance]) => {

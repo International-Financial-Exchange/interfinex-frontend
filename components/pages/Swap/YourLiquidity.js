@@ -38,7 +38,9 @@ export const YourLiquidity = () => {
                 liquidityToken.totalSupply({ gasLimit: 100000 }).then(rawTotalSupply => {
                     setLiquidityTokenTotalSupply(ethers.utils.formatUnits(rawTotalSupply, 18));
                 }),
-                liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(rawDividends => {
+                liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
+                    console.log("raw dividends", rawDividends.toString())
+                    console.log("liquidity token balance", (await ifexToken.contract.balanceOf(liquidityToken.address)).toString());
                     setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
                 }),
             ]).then(() => {
