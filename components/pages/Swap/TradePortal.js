@@ -112,7 +112,7 @@ const PoolTab = () => {
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [slippageValue, setSlippageValue] = useState(0.1);
+    const [slippageValue, setSlippageValue] = useState(0.75);
     const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
     const [isDepositLoading, setIsDepositLoading] = useState(false);
     const theme = useContext(ThemeContext);
