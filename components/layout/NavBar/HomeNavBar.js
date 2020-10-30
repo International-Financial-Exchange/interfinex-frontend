@@ -15,13 +15,14 @@ export default props => {
                     columnGap: PIXEL_SIZING.medium 
                 }}
             >
-                <Text>
+                <Text bold>v0.9 Beta</Text>
+                {/* <Text>
                     Total Invested: <Span bold>$183.76 million</Span>
                 </Text>
 
                 <Text>
                     Total 24h Volume: <Span bold>$1.43 billion</Span>
-                </Text>
+                </Text> */}
             </div>
 
             <div>

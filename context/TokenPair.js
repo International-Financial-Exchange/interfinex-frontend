@@ -66,8 +66,6 @@ export const TokenPairProvider = ({ children }) => {
             if (assetTokenName) {
                 const assetToken = tokens.find(({ name }) => name === assetTokenName);
                 if (assetToken) {
-                    console.log(provider);
-                    console.log("heloooooooooooooooooo", new ethers.Contract(assetToken.address, erc20ContractAbi, signer || provider));
                     setAssetToken({
                         ...assetToken,
                         contract: new ethers.Contract(assetToken.address, erc20ContractAbi, signer || provider),
@@ -86,7 +84,7 @@ export const TokenPairProvider = ({ children }) => {
                     });
                 }
             } else {
-                const assetTokenDefault = tokens[1];
+                const assetTokenDefault = IFEX_TOKEN;
                 setAssetToken({
                     ...assetTokenDefault,
                     contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, signer || provider),
@@ -114,7 +112,7 @@ export const TokenPairProvider = ({ children }) => {
                     });
                 }
             } else {
-                const baseTokenDefault = tokens[0];
+                const baseTokenDefault = tokens.find(({ name }) => name === "Tether");
                 setBaseToken({
                     ...baseTokenDefault,
                     contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, signer || provider),
