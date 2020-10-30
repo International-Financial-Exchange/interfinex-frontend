@@ -54,8 +54,8 @@ export const Footer = () => {
                             [
                                 { label: "Twitter", link: "https://twitter.com/Interfinex_io", icon: <TwitterIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 { label: "Facebook", link: "https://www.facebook.com/Interfinex-108430867734360", icon: <FacebookIcon bgStyle={{ fill: "none" }} size={30}/> },
-                                { label: "Telegram", link: "https://twitter.com/Interfinex_io", icon: <TelegramIcon bgStyle={{ fill: "none" }} size={30}/> },
-                                { label: "Reddit", link: "https://twitter.com/Interfinex_io", icon: <RedditIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                { label: "Telegram", link: "https://t.me/interfinexio", icon: <TelegramIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                // { label: "Reddit", link: "https://twitter.com/Interfinex_io", icon: <RedditIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 { label: "Medium", link: "https://medium.com/@interfinexio", icon: <div style={{ height: 30, width: 30 }}/>},
                             ].map(({ label, link, icon }) =>
                                 <SocialMediaLink onClick={() => window.open(link)}>
