@@ -35,7 +35,7 @@ export const TradeInfoChart = () => {
                 })
                     .then(candles => setCandles(old => ({
                         ...old,
-                        [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(4) })),
+                        [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(6) })),
                     })))
                     .catch(e => console.log(e));
             })
@@ -48,7 +48,7 @@ export const TradeInfoChart = () => {
                 { 
                     label: "Price", 
                     value: "PRICE", 
-                    currentValue: (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(4),
+                    currentValue: (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
                     suffix: baseToken.symbol,
                     data: candles ?? {},
                 }
