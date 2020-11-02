@@ -20,6 +20,7 @@ export default ({ Component, pageProps }) => {
                             <Head>
                                 <title>Interfinex</title>
                                 <link rel="icon" href="/favicon.ico" />
+                                <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
                             </Head>
 
                             <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", minHeight: "100%", marginBottom: PIXEL_SIZING.large }} id={"root"}>

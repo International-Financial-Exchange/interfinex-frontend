@@ -16,13 +16,12 @@ const Container = styled.div`
     background-color: ${({ theme }) => theme.colors.invert};
     box-shadow: ${({ theme }) => theme.colors.boxShadow};
     height: fit-content;
-`
+`;
 
 
 export default () => {
     const router = useRouter();
     const isAppPage = router.asPath.startsWith("/app");
-    console.log(router);
 
     return (
         <Container>

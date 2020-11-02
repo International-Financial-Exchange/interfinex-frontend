@@ -55,7 +55,7 @@ export const WalletConnect = () => {
                     />
 
                     <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}>
-                        <Text primary style={{ textAlign: "center" }}>
+                        <Text primary style={{ textAlign: "center", width: 300 }}>
                             Connect your wallet
                         </Text>
                         

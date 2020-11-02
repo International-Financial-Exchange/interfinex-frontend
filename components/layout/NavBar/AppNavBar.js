@@ -114,7 +114,6 @@ export const PairQuickInfoCard = styled(Card)`
     grid-template-columns: 1fr auto; 
     align-items: center; 
     column-gap: ${PIXEL_SIZING.microscopic};
-    position: absolute;
     height: fit-content;
 
     &:active {
@@ -424,6 +423,19 @@ const PairSelect = () => {
     );
 };
 
+const Container = styled.div`
+    display: grid; 
+    grid-template-columns: auto 1fr auto; 
+    align-items: center; 
+    position: relative;
+
+    @media (max-width: 600px) {
+        #tab-nav {
+            display: none;
+        }
+    }
+`;
+
 export const AppNavBar = props => {
     const router = useRouter();
     const { setProvider } = useContext(EthersContext);
@@ -440,13 +452,11 @@ export const AppNavBar = props => {
         }
     }, [signer]);
 
-    console.log(router);
-
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", alignItems: "center", position: "relative" }}>
+        <Container>
             <PairSelect/>
 
-            <div style={{ justifySelf: "center", }}>
+            <div id={"tab-nav"} style={{ justifySelf: "center", }}>
                 <TabNav
                     selected={router.pathname.split("/app/")[1]}
                     onChange={selected => router.push(`/app/${selected}`)}
@@ -516,6 +526,6 @@ export const AppNavBar = props => {
                         </Link>
                 }
             </div>
-        </div>
+        </Container>
     );
 };

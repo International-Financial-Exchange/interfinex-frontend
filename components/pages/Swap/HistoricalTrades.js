@@ -48,6 +48,20 @@ const TradeRowContainer = styled.div`
     justify-items: center;
     transition: transform 0.05s ease-out;
 
+    @media (max-width: 1000px) {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        div:nth-child(5) {
+            display: none;
+        }
+    }
+
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr 1fr 1fr;
+        div:nth-child(4) {
+            display: none;
+        }
+    }
+
     div {
         white-space: nowrap;
         overflow: hidden;

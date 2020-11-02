@@ -17,10 +17,25 @@ import { TokenAmountInput } from "../../core/TokenAmountInput";
 import { CreateMarket } from "./CreateMarket";
 import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
+import styled from "styled-components";
 
 export const SwapContext = createContext();
 
 const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')));
+
+const SwapContainer = styled.div`
+    margin-top: ${PIXEL_SIZING.medium}; 
+    display: grid; 
+    grid-template-columns: 1fr auto; 
+    column-gap: ${PIXEL_SIZING.large};
+
+    @media (max-width: 600px) {
+        width: 100%;
+        grid-template-columns: 1fr;
+        column-gap: 0px;
+        row-gap: ${PIXEL_SIZING.large};
+    }
+`;
 
 export const Swap = () => {
     const { provider, contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
@@ -67,7 +82,6 @@ export const Swap = () => {
     }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances,]);
 
     const updateFactoryAllowances = useCallback(async () => {
-        console.log("updating");
         if ((assetToken && baseToken && address) && (!factoryAllowances || Object.values(factoryAllowances).some(v => !v))) {
             Promise.all([
                 assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
@@ -82,9 +96,6 @@ export const Swap = () => {
             );
         }
     }, [factoryContract, assetToken, baseToken, address]);
-
-    console.log("allowance", factoryAllowances);
-    console.log("factory", factoryContract.address);
 
 
     const approveFactory = useCallback(async () => {
@@ -191,7 +202,7 @@ export const Swap = () => {
                         />
                     : 
                         marketExists ?
-                            <div style={{ marginTop: PIXEL_SIZING.medium, display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.large }}>
+                            <SwapContainer>
                                 <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
                                     <TradeInfoChart/>
                                     <HistoricalTrades/>
@@ -201,7 +212,7 @@ export const Swap = () => {
                                     <TradePortal/>
                                     <YourLiquidity/>
                                 </div>
-                            </div>
+                            </SwapContainer>
                         :
                             <div 
                                 style={{ 

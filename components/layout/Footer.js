@@ -35,16 +35,16 @@ export const Footer = () => {
     return (
         <footer style={{ width: "100%", display: "grid", backgroundColor: "#003049" }}>
             <FooterContainer>
-                <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
+                {/* <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
                     <Text style={{ color: "white" }} bold>
                         Business Enquiries
                     </Text>
                     <Text style={{ color: "white" }}>
                         thrasymachus01@gmail.com
                     </Text>
-                </div>
+                </div> */}
 
-                <div style={{ justifySelf: "right", display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
+                <div style={{ justifySelf: "left", display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
                     <Text style={{ color: "white"}} bold>
                         Social Media
                     </Text>
