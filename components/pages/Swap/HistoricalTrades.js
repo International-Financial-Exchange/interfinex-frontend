@@ -142,8 +142,6 @@ export const HistoricalTrades = () => {
                     humanizeTokenAmount(baseTokenAmount, isInverted ? assetToken : baseToken), 
                     humanizeTokenAmount(assetTokenAmount, isInverted ? baseToken : assetToken)
                 ];
-
-                console.log("trade", humanizedBaseTokenAmount)
                 
                 return {
                     price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,

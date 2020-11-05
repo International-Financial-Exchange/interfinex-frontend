@@ -2,7 +2,7 @@ import Text from "../../core/Text";
 import Link from "next/link";
 import { Button } from "../../core/Button";
 import Span from "../../core/Span";
-import { PIXEL_SIZING, CONTAINER_SIZING, dropinAnimation } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING, dropinAnimation, useDocument, useWindow } from "../../../utils";
 import styled from "styled-components";
 import { useRouter } from 'next/router'
 import { useState, useEffect, useRef, useContext, createRef, useLayoutEffect, useMemo } from "react";
@@ -436,6 +436,45 @@ const Container = styled.div`
     }
 `;
 
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
+const ConnectWallet = props => {
+    const document = useDocument();
+    const window = useWindow();
+    const { setProvider } = useContext(EthersContext);
+    const { setSigner } = useContext(EthersContext);
+
+    const web3Modal = useMemo(() => {
+        if (window && document) {
+            return new Web3Modal({
+                providerOptions: {
+                    disableInjectedProvider: false,
+                    cacheProvider: false,
+                    walletconnect: {
+                        package: WalletConnectProvider,
+                        options: {
+                            infuraId: "f6a09cc8f51c45d2bd74137004115dbf",
+                        }
+                    }
+                }
+            });
+        }
+    }, [window, document]);
+
+    return (
+        <Button onClick={async () => {
+            web3Modal.clearCachedProvider();
+            const web3Provider = await web3Modal.connect();
+            const ethersProvider = new ethers.providers.Web3Provider(web3Provider);
+            setSigner(ethersProvider.getSigner());
+            setProvider(ethersProvider);
+        }}>
+            Connect Wallet
+        </Button>
+    );
+};
+
 export const AppNavBar = props => {
     const router = useRouter();
     const { setProvider } = useContext(EthersContext);
@@ -498,7 +537,6 @@ export const AppNavBar = props => {
                                         <div style={{ padding: PIXEL_SIZING.medium, display: "grid", }}>
                                             {
                                                 [
-                                                    { label: "Switch Account", onClick: () => router.push("/app/wallet-connect")},
                                                     { 
                                                         label: "Disconnect Wallet", 
                                                         onClick: () => {
@@ -519,11 +557,7 @@ export const AppNavBar = props => {
                                     </Dropdown>
                             }
                         </div>
-                        : <Link href={"/app/wallet-connect"}>
-                            <Button>
-                                Connect Wallet
-                            </Button>
-                        </Link>
+                        : <ConnectWallet/>
                 }
             </div>
         </Container>

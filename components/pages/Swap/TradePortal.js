@@ -54,7 +54,7 @@ export const TradePortal = () => {
 
     return (
         <Container>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", width: "100%" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", width: "100%", height: "fit-content" }}>
                 {
                     [
                         { label: "Buy", value: "BUY" },
@@ -134,6 +134,7 @@ const PoolTab = () => {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center" }}>
                     <Text>Amount to Pool</Text>
                     <TextButton
+                        requiresWallet
                         style={{ marginRight: PIXEL_SIZING.tiny }}
                         onClick={() => {
                             setBaseTokenAmount(parseFloat(baseTokenBalance));
@@ -143,6 +144,7 @@ const PoolTab = () => {
                         Max Deposit
                     </TextButton>
                     <TextButton
+                        requiresWallet
                         onClick={() => {
                             setBaseTokenAmount(parseFloat(account.depositedBaseTokenAmount));
                             setAssetTokenAmount(parseFloat(account.depositedAssetTokenAmount));
@@ -223,9 +225,7 @@ const PoolTab = () => {
                         try {
                             await approveExchange(liquidityToken);
     
-                            console.log("account", account)
                             const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
-                            console.log("amount", liquidityTokenAmount)
                             await addTransactionNotification({
                                 content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                 transactionPromise: exchangeContract.burn_liquidity(
@@ -355,6 +355,7 @@ const TradeTab = ({ isBuy }) => {
                         <Text>Amount to {isBuy ? "Buy" : "Sell"}</Text>
                         <TextButton
                             style={{ marginRight: PIXEL_SIZING.tiny }}
+                            requiresWallet
                             onClick={() => {
                                 setAssetTokenAmount(isBuy ? 
                                     inputToOutputAmount(baseTokenBalance - baseTokenBalance * 0.0001, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 

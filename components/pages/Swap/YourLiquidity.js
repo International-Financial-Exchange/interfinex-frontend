@@ -48,9 +48,7 @@ export const YourLiquidity = () => {
             });
         }
     }, [liquidityToken]);
-
-    console.log("exchange", exchangeAssetTokenBalance)
-    console.log("exchange", exchangeBaseTokenBalance)
+    
     const [accountAssetDeposit, accountBaseDeposit] = [
         parseFloat(exchangeAssetTokenBalance) * parseFloat(accountLiquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply),
         parseFloat(exchangeBaseTokenBalance) * parseFloat(accountLiquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply)

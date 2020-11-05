@@ -28,7 +28,6 @@ export const AccountProvider = ({ children }) => {
             setDeleteWalletWarning(() => deleteWalletWarning)
         } else {
             if (deleteWalletWarning) deleteWalletWarning();
-            // console.log(signer);
             signer?.getAddress().then(address => setAddress(address));
         }
     }, [signer]);
@@ -38,24 +37,19 @@ export const AccountProvider = ({ children }) => {
             console.log(address);
             console.log(baseToken, assetToken, ifexToken)
             baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                console.log("base", baseToken)
                 setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
             });
 
             assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                console.log("asset", assetToken)
                 setAssetTokenBalance(humanizeTokenAmount(balance, assetToken))
             });
 
             ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                console.log("ifex", ifexToken)
                 setIfexTokenBalance(humanizeTokenAmount(balance, ifexToken))
             });
         }
     }, [provider, address, baseToken, assetToken, ifexToken]);
 
-
-    console.log("asset balance", assetTokenBalance);
 
     return (
         <AccountContext.Provider 
