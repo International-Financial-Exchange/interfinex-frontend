@@ -3,7 +3,7 @@ import { Layout } from '../layout/Layout'
 import { ThemeContext } from 'styled-components'
 import { useContext } from 'react';
 import Text from "../core/Text";
-import { Button } from '../core/Button';
+import { ArrowButton, Button } from '../core/Button';
 import { PIXEL_SIZING } from '../../utils';
 import Link from 'next/link';
 
@@ -26,14 +26,20 @@ export default function Home() {
                 </Text>
 
                 <Text secondary style={{ fontSize: PIXEL_SIZING.medium, textAlign: "center" }}>
-                    The International Financial Exchange
+                    The future of decentralised finance
                 </Text>
 
-                <Link href={"/app/swap"}>
-                    <Button style={{ width: "80%", marginTop: PIXEL_SIZING.large, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}>
-                        Start Investing
-                    </Button>
-                </Link>
+                <div style={{ display: "grid", width: "80%", rowGap: PIXEL_SIZING.small }}>
+                    <Link href={"/app/swap"}>
+                        <Button style={{ width: "100%", marginTop: PIXEL_SIZING.large, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}>
+                            Start Investing
+                        </Button>
+                    </Link>
+
+                    <ArrowButton onClick={() => window.open("https://t.me/interfinexio")} style={{ justifySelf: "right" }}>
+                        Join us on Telegram
+                    </ArrowButton>
+                </div>
             </div>
         </Layout>
     )

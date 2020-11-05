@@ -123,3 +123,41 @@ export const TextButton = ({ requiresWallet, ...props }) => {
         </div>
     );
 }
+
+const StyledArrowButton = styled.div`
+    color: ${({ theme }) => theme.colors.textPrimary};
+    width: fit-content;
+    transition: transform 0.1s ease-out;
+    user-select: none;
+    position: relative;
+    margin-right: 25px;
+
+    img {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: right 0.1s ease-out;
+        right: -25px;
+    }
+    
+    &:hover {
+        img {
+            right: -30px;
+        }
+
+        color: ${({ theme }) => theme.colors.secondary} !important;
+        cursor: pointer;
+    }
+`;
+
+export const ArrowButton = props => {
+    return (
+        <StyledArrowButton {...props}>
+            { props.children }
+            <img
+                height={20}
+                src={"/arrow-direction-light-theme.png"}
+            />
+        </StyledArrowButton>
+    );
+}
