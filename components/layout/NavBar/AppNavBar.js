@@ -430,7 +430,7 @@ const Container = styled.div`
     position: relative;
 
     @media (max-width: 600px) {
-        #tab-nav {
+        #tab-nav, #nav-logo {
             display: none;
         }
     }
@@ -495,6 +495,7 @@ export const AppNavBar = props => {
         <Container>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
                 <img
+                    id={"nav-logo"}
                     height={20}
                     src={"/logo.png"}
                     style={{ cursor: "pointer" }}
