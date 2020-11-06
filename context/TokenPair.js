@@ -27,7 +27,7 @@ export const TokenPairProvider = ({ children }) => {
             symbol: "IFEX",
             chainId: networkInfo?.chainId,
             contract: ifexTokenContract,
-            logoURI: "/favicon.ico"
+            logoURI: "/logo.png"
         }
     }, [ifexTokenContract, networkInfo?.chainId]);
 

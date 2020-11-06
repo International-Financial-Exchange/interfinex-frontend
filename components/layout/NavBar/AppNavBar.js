@@ -493,7 +493,15 @@ export const AppNavBar = props => {
 
     return (
         <Container>
-            <PairSelect/>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
+                <img
+                    height={20}
+                    src={"/logo.png"}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => router.push(`/`)}
+                />
+                <PairSelect/>
+            </div>
 
             <div id={"tab-nav"} style={{ justifySelf: "center", }}>
                 <TabNav

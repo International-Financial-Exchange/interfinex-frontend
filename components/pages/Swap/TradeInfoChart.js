@@ -14,7 +14,7 @@ export const TradeInfoChart = () => {
     ];
 
     const { assetToken, baseToken } = useContext(TokenPairContext);
-    const { exchangeAssetTokenBalance, exchangeBaseTokenBalance } = useContext(SwapContext);
+    const { exchangeAssetTokenBalance, exchangeBaseTokenBalance, isExchangeInfoLoading } = useContext(SwapContext);
     const [candles, setCandles] = useState({
         ["1H"]: [],
         ["24H"]: [],
@@ -50,7 +50,7 @@ export const TradeInfoChart = () => {
                 { 
                     label: "Price", 
                     value: "PRICE", 
-                    currentValue: (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
+                    currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
                     suffix: baseToken.symbol,
                     data: candles ?? {},
                 }

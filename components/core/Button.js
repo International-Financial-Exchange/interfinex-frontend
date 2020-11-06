@@ -155,7 +155,7 @@ export const ArrowButton = props => {
         <StyledArrowButton {...props}>
             { props.children }
             <img
-                height={20}
+                height={18}
                 src={"/arrow-direction-light-theme.png"}
             />
         </StyledArrowButton>

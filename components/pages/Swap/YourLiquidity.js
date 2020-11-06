@@ -15,44 +15,26 @@ import { NotificationsContext } from "../../../context/Notifications";
 export const YourLiquidity = () => {
     const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
-    const { 
-        exchangeContract, 
-        exchangeAssetTokenBalance, 
-        exchangeBaseTokenBalance, 
-        liquidityToken,
-    } = useContext(SwapContext);
+    const { account, isExchangeInfoLoading, liquidityToken, } = useContext(SwapContext);
     const [accountLiquidityTokenBalance, setAccountLiquidityTokenBalance] = useState();
     const [liquidityTokenTotalSupply, setLiquidityTokenTotalSupply] = useState();
     const [accountUnclaimedIfexEarnings, setAccountUnclaimedIfexEarnings] = useState();
-    const [isLoading, setIsLoading] = useState(true);
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
+    const [isDividendsLoading, setIsDividendsLoading] = useState();
 
     useEffect(() => {
         if (liquidityToken && address) {
-            setIsLoading(true);
-            Promise.all([
-                liquidityToken.balanceOf(address, { gasLimit: 100000 }).then(rawBalance => {
-                    setAccountLiquidityTokenBalance(ethers.utils.formatUnits(rawBalance, 18));
-                }),
-                liquidityToken.totalSupply({ gasLimit: 100000 }).then(rawTotalSupply => {
-                    setLiquidityTokenTotalSupply(ethers.utils.formatUnits(rawTotalSupply, 18));
-                }),
-                liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
-                    console.log("raw dividends", rawDividends.toString())
-                    console.log("liquidity token balance", (await ifexToken.contract.balanceOf(liquidityToken.address)).toString());
-                    setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
-                }),
-            ]).then(() => {
-                setIsLoading(false);
+            setIsDividendsLoading(true);
+            liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
+                setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
+            }).then(() => {
+                setIsDividendsLoading(false);
             });
         }
     }, [liquidityToken]);
-    
-    const [accountAssetDeposit, accountBaseDeposit] = [
-        parseFloat(exchangeAssetTokenBalance) * parseFloat(accountLiquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply),
-        parseFloat(exchangeBaseTokenBalance) * parseFloat(accountLiquidityTokenBalance) / parseFloat(liquidityTokenTotalSupply)
-    ];
+
+    const isLoading = !account || isExchangeInfoLoading || isDividendsLoading;
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
@@ -69,7 +51,7 @@ export const YourLiquidity = () => {
                             {
                                 isLoading ?
                                     <Skeleton width={CONTAINER_SIZING.miniscule}/>
-                                    : <Text secondary bold>{accountAssetDeposit.toFixed(4)} {assetToken.symbol}</Text>
+                                    : <Text secondary bold>{account.depositedAssetTokenAmount.toFixed(4)} {assetToken.symbol}</Text>
                             }
                         </div>
 
@@ -78,7 +60,7 @@ export const YourLiquidity = () => {
                             {
                                 isLoading ?
                                     <Skeleton width={CONTAINER_SIZING.miniscule}/>
-                                    : <Text secondary bold>{accountBaseDeposit.toFixed(4)} {baseToken.symbol}</Text>
+                                    : <Text secondary bold>{account.depositedBaseTokenAmount.toFixed(4)} {baseToken.symbol}</Text>
                             }
                         </div>
                     </div>

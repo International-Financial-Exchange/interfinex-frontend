@@ -10,11 +10,16 @@ export default props => {
             <div 
                 style={{ 
                     display: "grid", 
-                    gridTemplateColumns: "1fr 1fr", 
+                    gridTemplateColumns: "auto 1fr", 
+                    alignItems: "center",
                     width: "fit-content", 
-                    columnGap: PIXEL_SIZING.medium 
+                    columnGap: PIXEL_SIZING.small 
                 }}
             >
+                <img
+                    height={20}
+                    src={"/logo.png"}
+                />
                 <Text bold>v0.9 Beta</Text>
                 {/* <Text>
                     Total Invested: <Span bold>$183.76 million</Span>

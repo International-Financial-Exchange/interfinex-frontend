@@ -51,10 +51,11 @@ export const Swap = () => {
     const [account, setAccount] = useState();
     const [factoryAllowances, setFactoryAllowances] = useState();
     const [exchangeAllowances, setExchangeAllowances] = useState();
+    const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState();
 
     const updateExchangeAllowances = useCallback(async () => {
         if (address && (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v))) {
-            Promise.all([
+            await Promise.all([
                 assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                 baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
                 liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
@@ -97,7 +98,6 @@ export const Swap = () => {
         }
     }, [factoryContract, assetToken, baseToken, address]);
 
-
     const approveFactory = useCallback(async () => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
 
@@ -111,7 +111,7 @@ export const Swap = () => {
             await ifexToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
     }, [factoryContract, assetToken, baseToken, ifexToken, factoryAllowances]);
 
-    // check swap market exists and update contract and liquidity token
+    // Check swap market exists and update contract and liquidity token
     useEffect(() => {
         setIsLoading(true);
 
@@ -138,39 +138,50 @@ export const Swap = () => {
         updateFactoryAllowances();
     }, [baseToken, assetToken, ifexToken, factoryContract]);
 
+    const updateExchangeInfo = useCallback(() => {
+        const exchangeBalancePromise = Promise.all([
+            assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
+            baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
+        ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
+            const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
+            const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
+
+            setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
+            setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
+        });
+
+        if (signer && liquidityToken) {
+            const exchangeAllowancePromise = updateExchangeAllowances();
+
+            // Update the liquidity for the user and the total liquidity
+            const accountLiquidityPromise = Promise.all([
+                liquidityToken.totalSupply({ gasLimit: 10000000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
+                liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
+            ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
+                setAccount(old => ({
+                    ...old,
+                    liquidityTokenBalance,
+                    depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
+                    depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
+                }));
+            });
+
+            return Promise.all([exchangeBalancePromise, exchangeAllowancePromise, accountLiquidityPromise]);
+        }
+
+        return exchangeBalancePromise;
+    }, [exchangeContract, liquidityToken]);
+
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
         if (exchangeContract) {
-
-        Promise.all([
-                assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
-                baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
-            ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-                const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
-                const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
-
-                setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
-                setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
+            setIsExchangeInfoLoading(true);
+            updateExchangeInfo().then(() => {
+                setIsExchangeInfoLoading(false);
             });
 
-            if (signer && liquidityToken) {
-                updateExchangeAllowances();
-
-                console.log("token", liquidityToken)
-                console.log(signer)
-                // Update the liquidity for the user and the total liquidity
-                Promise.all([
-                    liquidityToken.totalSupply({ gasLimit: 10000000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
-                    liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
-                ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
-                    setAccount(old => ({
-                        ...old,
-                        liquidityTokenBalance,
-                        depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
-                        depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
-                    }));
-                });
-            }
+            // Listen to swap events for that contract
+            // Clean up listener for those events
         }
     }, [exchangeContract, signer, liquidityToken]);
 
@@ -179,6 +190,7 @@ export const Swap = () => {
             <SwapContext.Provider 
                 value={{
                     exchangeContract,
+                    isExchangeInfoLoading,
                     exchangeAssetTokenBalance,
                     exchangeBaseTokenBalance,
                     approveFactory,

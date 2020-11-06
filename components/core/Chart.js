@@ -4,6 +4,7 @@ import Text from "./Text";
 import ChartJS from "chart.js";
 import { TextOption } from "../core/TextOption";
 import { useState, useRef, useEffect, useContext } from "react";
+import Skeleton from "react-loading-skeleton";
 
 const Container = styled.div`
     background-color: ${({ theme }) => theme.colors.invert};
@@ -158,9 +159,14 @@ export const Chart = ({
             
             
             <div style={{ marginLeft: PIXEL_SIZING.larger }}>
-                <Text primary secondary style={{ fontWeight: "bold" }}>
-                    {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
-                </Text>
+                {
+                    selectedOption.currentValue === null ?
+                        <Skeleton width={CONTAINER_SIZING.tiny} height={PIXEL_SIZING.large} />
+                    : 
+                        <Text primary secondary style={{ fontWeight: "bold" }}>
+                            {selectedOption.currentValue} <span style={{ fontSize: 13 }}>{selectedOption.suffix}</span> 
+                        </Text> 
+                }
             </div>
 
             <div style={{ position: "relative", height: "100%", width: "100%" }}>
