@@ -28,14 +28,15 @@ export const AccountProvider = ({ children }) => {
             setDeleteWalletWarning(() => deleteWalletWarning)
         } else {
             if (deleteWalletWarning) deleteWalletWarning();
-            signer?.getAddress().then(address => setAddress(address));
+            if (!address) signer.getAddress().then(address => {
+                console.log("settings", address)
+                setAddress(address)
+            });
         }
     }, [signer]);
 
     useEffect(() => {
         if (address) {
-            console.log(address);
-            console.log(baseToken, assetToken, ifexToken)
             baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
             });

@@ -18,6 +18,7 @@ import { CreateMarket } from "./CreateMarket";
 import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
 import styled from "styled-components";
+import { add } from "lodash";
 
 export const SwapContext = createContext();
 
@@ -138,21 +139,20 @@ export const Swap = () => {
         updateFactoryAllowances();
     }, [baseToken, assetToken, ifexToken, factoryContract]);
 
-    const updateExchangeInfo = useCallback(() => {
-        const exchangeBalancePromise = Promise.all([
+    const updateExchangeInfo = useCallback(async () => {
+        const [exchangeAssetTokenBalance, exchangeBaseTokenBalance] = await Promise.all([
             assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
             baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
         ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-            const exchangeAssetTokenBalance = humanizeTokenAmount(assetTokenBalance, assetToken);
-            const exchangeBaseTokenBalance = humanizeTokenAmount(baseTokenBalance, baseToken);
-
-            setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
-            setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
+            return [humanizeTokenAmount(assetTokenBalance, assetToken), humanizeTokenAmount(baseTokenBalance, baseToken)];
         });
 
-        if (signer && liquidityToken) {
-            const exchangeAllowancePromise = updateExchangeAllowances();
+        setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
+        setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
 
+        if (signer && liquidityToken && address) {
+            const exchangeAllowancePromise = updateExchangeAllowances();
+            
             // Update the liquidity for the user and the total liquidity
             const accountLiquidityPromise = Promise.all([
                 liquidityToken.totalSupply({ gasLimit: 10000000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
@@ -166,11 +166,11 @@ export const Swap = () => {
                 }));
             });
 
-            return Promise.all([exchangeBalancePromise, exchangeAllowancePromise, accountLiquidityPromise]);
+            return Promise.all([exchangeAllowancePromise, accountLiquidityPromise]);
         }
 
-        return exchangeBalancePromise;
-    }, [exchangeContract, liquidityToken]);
+        return;
+    }, [exchangeContract, liquidityToken, signer, address]);
 
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
@@ -180,10 +180,21 @@ export const Swap = () => {
                 setIsExchangeInfoLoading(false);
             });
 
-            // Listen to swap events for that contract
-            // Clean up listener for those events
+            exchangeContract.on("Swap", () => {
+                updateExchangeInfo();
+            });
+
+            exchangeContract.on("MintLiquidity", () => {
+                updateExchangeInfo();
+            });
+
+            exchangeContract.on("BurnLiquidity", () => {
+                updateExchangeInfo();
+            });
         }
-    }, [exchangeContract, signer, liquidityToken]);
+        
+        return () => exchangeContract?.removeAllListeners();
+    }, [exchangeContract, signer, liquidityToken, updateExchangeInfo]);
 
     return (
         <Layout>
