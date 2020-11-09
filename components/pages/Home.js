@@ -32,7 +32,7 @@ export default function Home() {
                 <div style={{ display: "grid", width: "80%", rowGap: PIXEL_SIZING.small }}>
                     <Link href={"/app/swap"}>
                         <Button style={{ width: "100%", marginTop: PIXEL_SIZING.large, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}>
-                            Start Investing
+                            Start Trading
                         </Button>
                     </Link>
 
