@@ -56,7 +56,7 @@ export const Footer = () => {
                                 { label: "Facebook", link: "https://www.facebook.com/Interfinex-108430867734360", icon: <FacebookIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 { label: "Telegram", link: "https://t.me/interfinexio", icon: <TelegramIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 // { label: "Reddit", link: "https://twitter.com/Interfinex_io", icon: <RedditIcon bgStyle={{ fill: "none" }} size={30}/> },
-                                { label: "Medium", link: "https://medium.com/@interfinexio", icon: <div style={{ height: 30, width: 30 }}/>},
+                                { label: "Medium", link: "https://medium.com/@interfinexio", icon: <img src={"/medium-logo.png"} style={{ height: 30, width: 30 }}/>},
                             ].map(({ label, link, icon }) =>
                                 <SocialMediaLink onClick={() => window.open(link)}>
                                     { icon }
