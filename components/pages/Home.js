@@ -37,7 +37,7 @@ export default function Home() {
                     </Link>
 
                     <ArrowButton onClick={() => window.open("https://t.me/interfinexio")} style={{ justifySelf: "right" }}>
-                        Join us on Telegram
+                        Join us on Telegram for FREE tokens
                     </ArrowButton>
                 </div>
             </div>
