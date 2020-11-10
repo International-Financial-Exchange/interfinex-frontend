@@ -20,7 +20,7 @@ export const Cross = props => {
         <CrossContainer {...props}>
             <img
                 src={"/cross-light-theme.png"}
-                style={{ height: props.style?.height ?? PIXEL_SIZING.large }}
+                style={{ height: props.style?.height ?? PIXEL_SIZING.large, width: props.style?.width || props.style?.height || PIXEL_SIZING.large }}
             />
         </CrossContainer>
     );
