@@ -36,9 +36,13 @@ export default function Home() {
                         </Button>
                     </Link>
 
-                    <ArrowButton onClick={() => window.open("https://t.me/interfinexio")} style={{ justifySelf: "right" }}>
+                    <Button 
+                        secondary
+                        style={{ width: "100%", marginTop: PIXEL_SIZING.tiny, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}
+                        onClick={() => window.open("https://t.me/interfinexio")}
+                    >
                         Join us on Telegram for FREE tokens
-                    </ArrowButton>
+                    </Button>
                 </div>
             </div>
         </Layout>
