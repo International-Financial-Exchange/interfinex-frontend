@@ -41,7 +41,7 @@ export default function Home() {
                         style={{ width: "100%", marginTop: PIXEL_SIZING.tiny, height: PIXEL_SIZING.larger, fontSize: PIXEL_SIZING.medium }}
                         onClick={() => window.open("https://t.me/interfinexio")}
                     >
-                        Join us on Telegram for FREE tokens
+                        Join us on Telegram
                     </Button>
                 </div>
             </div>
