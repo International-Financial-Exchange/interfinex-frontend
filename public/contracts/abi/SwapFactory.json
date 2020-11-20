@@ -1,0 +1,210 @@
+[
+  {
+    "name": "NewExchange",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "creator",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "exchange_contract",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "base_token",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "asset_token",
+        "indexed": true
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "initialize_factory",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "_fee_rate"
+      },
+      {
+        "type": "address",
+        "name": "_exchange_template"
+      },
+      {
+        "type": "address",
+        "name": "_erc20_dividend_template"
+      },
+      {
+        "type": "address",
+        "name": "_ifex_token_contract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 142431
+  },
+  {
+    "name": "create_exchange",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "base_token"
+      },
+      {
+        "type": "address",
+        "name": "asset_token"
+      },
+      {
+        "type": "uint256",
+        "name": "base_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "asset_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "ifex_token_amount"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 891349
+  },
+  {
+    "name": "exchange_template",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1211
+  },
+  {
+    "name": "erc20_dividend_template",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1241
+  },
+  {
+    "name": "ifex_token_contract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1271
+  },
+  {
+    "name": "pair_to_exchange",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      },
+      {
+        "type": "address",
+        "name": "arg1"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1731
+  },
+  {
+    "name": "exchange_to_pair",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      },
+      {
+        "type": "uint256",
+        "name": "arg1"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1655
+  },
+  {
+    "name": "exchange_count",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1361
+  },
+  {
+    "name": "id_to_exchange",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1506
+  },
+  {
+    "name": "fee_rate",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1421
+  }
+]

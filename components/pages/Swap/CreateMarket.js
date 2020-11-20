@@ -31,15 +31,6 @@ export const CreateMarket = () => {
         );
         
         await approveFactory();
-        
-        console.log(baseToken.address, 
-            assetToken.address,
-            ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
-            ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
-            ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),);
-
-            // return;
-
             
         addTransactionNotification({
             content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,

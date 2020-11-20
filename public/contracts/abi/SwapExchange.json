@@ -1,0 +1,308 @@
+[
+  {
+    "name": "MintLiquidity",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "base_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "asset_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "liquidity_tokens_minted",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "BurnLiquidity",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "base_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "asset_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "liquidity_tokens_burned",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "Swap",
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "base_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "asset_token_amount",
+        "indexed": false
+      },
+      {
+        "type": "bool",
+        "name": "is_buy",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "initialize_exchange",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_base_token"
+      },
+      {
+        "type": "address",
+        "name": "_asset_token"
+      },
+      {
+        "type": "uint256",
+        "name": "_fee_rate"
+      },
+      {
+        "type": "address",
+        "name": "_erc20_dividend_template"
+      },
+      {
+        "type": "address",
+        "name": "_factory_contract"
+      },
+      {
+        "type": "address",
+        "name": "_ifex_token_contract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 287960
+  },
+  {
+    "name": "mint_liquidity",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "base_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "min_asset_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "max_asset_token_amount"
+      },
+      {
+        "type": "address",
+        "name": "recipient"
+      },
+      {
+        "type": "uint256",
+        "name": "deadline"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 42096
+  },
+  {
+    "name": "burn_liquidity",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "liquidity_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "deadline"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 21954
+  },
+  {
+    "name": "getInputToOutputAmount",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "input_token"
+      },
+      {
+        "type": "uint256",
+        "name": "input_token_amount"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 8234
+  },
+  {
+    "name": "swap",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "input_token"
+      },
+      {
+        "type": "uint256",
+        "name": "input_token_amount"
+      },
+      {
+        "type": "address",
+        "name": "recipient"
+      },
+      {
+        "type": "uint256",
+        "name": "min_output_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "max_output_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "deadline"
+      },
+      {
+        "type": "address",
+        "name": "referral"
+      },
+      {
+        "type": "bool",
+        "name": "useIfex"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 45266
+  },
+  {
+    "name": "base_token",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1331
+  },
+  {
+    "name": "asset_token",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1361
+  },
+  {
+    "name": "liquidity_token",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1391
+  },
+  {
+    "name": "ifex_token_contract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1421
+  },
+  {
+    "name": "factory_contract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1451
+  },
+  {
+    "name": "fee_rate",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1481
+  }
+]
