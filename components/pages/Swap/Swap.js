@@ -19,13 +19,16 @@ import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
 import styled from "styled-components";
 import { add } from "lodash";
+import { TokenAndLogo } from "../../core/TokenAndLogo";
+import { SwitchInput } from "../../core/SwitchInput";
+import { useMarginTrading } from "./Margin/hooks";
+import { MarginProvider } from "./Margin/Margin";
 
 export const SwapContext = createContext();
 
 const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')));
 
 const SwapContainer = styled.div`
-    margin-top: ${PIXEL_SIZING.medium}; 
     display: grid; 
     grid-template-columns: 1fr auto; 
     column-gap: ${PIXEL_SIZING.large};
@@ -39,11 +42,10 @@ const SwapContainer = styled.div`
 `;
 
 export const Swap = () => {
-    const { provider, contracts: { factoryContract, exchangeContractAbi, dividendErc20ContractAbi }} = useContext(EthersContext);
+    const { provider, signer, contracts: { SwapFactory, getAbi, }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
-    const { signer } = useContext(EthersContext);
     const { address } = useContext(AccountContext);
-    const [marketExists, setMarketExists] = useState(true);
+    const [marketExists, setMarketExists] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [exchangeContract, setExchangeContract] = useState();
     const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState();
@@ -53,6 +55,7 @@ export const Swap = () => {
     const [factoryAllowances, setFactoryAllowances] = useState();
     const [exchangeAllowances, setExchangeAllowances] = useState();
     const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState();
+    const { isMarginEnabled, setIsMarginEnabled } = useMarginTrading({ assetToken, baseToken, swapMarketExists: marketExists });
 
     const updateExchangeAllowances = useCallback(async () => {
         if (address && (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v))) {
@@ -86,9 +89,9 @@ export const Swap = () => {
     const updateFactoryAllowances = useCallback(async () => {
         if ((assetToken && baseToken && address) && (!factoryAllowances || Object.values(factoryAllowances).some(v => !v))) {
             Promise.all([
-                assetToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                baseToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
-                ifexToken.contract.allowance(address, factoryContract.address, { gasLimit: 1000000 }),
+                assetToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
+                baseToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
+                ifexToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
             ]).then(([assetAllowance, baseAllowance, ifexAllowance]) =>
                 setFactoryAllowances({
                     hasAssetTokenAllowance: hasAllowance(assetAllowance),
@@ -97,36 +100,37 @@ export const Swap = () => {
                 })
             );
         }
-    }, [factoryContract, assetToken, baseToken, address]);
+    }, [SwapFactory, assetToken, baseToken, address]);
 
     const approveFactory = useCallback(async () => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
 
         if (!hasAssetTokenAllowance)
-            await assetToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
+            await assetToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
 
         if (!hasBaseTokenAllowance)
-            await baseToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
+            await baseToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
 
         if (!hasIfexTokenAllowance)
-            await ifexToken.contract.approve(factoryContract.address, ethers.constants.MaxUint256,);
-    }, [factoryContract, assetToken, baseToken, ifexToken, factoryAllowances]);
+            await ifexToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
+    }, [SwapFactory, assetToken, baseToken, ifexToken, factoryAllowances]);
 
     // Check swap market exists and update contract and liquidity token
     useEffect(() => {
         setIsLoading(true);
 
         if (baseToken && assetToken) {
-            factoryContract.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
+            SwapFactory.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
+                console.log(exchangeAddress)
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
     
                 if (marketExists) {
-                    const exchangeContract = new ethers.Contract(exchangeAddress, exchangeContractAbi, signer || provider);
+                    const exchangeContract = new ethers.Contract(exchangeAddress, getAbi("SwapExchange"), signer || provider);
                     setExchangeContract(exchangeContract);
     
                     const liquidityTokenAddress = await exchangeContract.liquidity_token({ gasLimit: 1000000 });
-                    const liquidityToken = new ethers.Contract(liquidityTokenAddress, dividendErc20ContractAbi, signer || provider);
+                    const liquidityToken = new ethers.Contract(liquidityTokenAddress, getAbi("DividendERC20"), signer || provider);
                     setLiquidityToken(liquidityToken);
                 }
     
@@ -137,12 +141,12 @@ export const Swap = () => {
 
     useEffect(() => {
         updateFactoryAllowances();
-    }, [baseToken, assetToken, ifexToken, factoryContract]);
+    }, [baseToken, assetToken, ifexToken, SwapFactory]);
 
     const updateExchangeInfo = useCallback(async () => {
         const [exchangeAssetTokenBalance, exchangeBaseTokenBalance] = await Promise.all([
-            assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 }),
-            baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 10000000 })
+            assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 }),
+            baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 })
         ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
             return [humanizeTokenAmount(assetTokenBalance, assetToken), humanizeTokenAmount(baseTokenBalance, baseToken)];
         });
@@ -155,7 +159,7 @@ export const Swap = () => {
             
             // Update the liquidity for the user and the total liquidity
             const accountLiquidityPromise = Promise.all([
-                liquidityToken.totalSupply({ gasLimit: 10000000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
+                liquidityToken.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
                 liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
                 setAccount(old => ({
@@ -211,46 +215,66 @@ export const Swap = () => {
                     liquidityToken,
                 }}
             >
-                {
-                    isLoading ? 
-                        <Spinner
-                            style={{ 
-                                position: "absolute", 
-                                left: "50%", 
-                                top: 300, 
-                                transform: "translate(-50%, -50%)" 
-                            }}
-                        />
-                    : 
-                        marketExists ?
-                            <SwapContainer>
-                                <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
-                                    <TradeInfoChart/>
-                                    <HistoricalTrades/>
-                                </div>
-                                
-                                <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
-                                    <TradePortal/>
-                                    <YourLiquidity/>
-                                </div>
-                            </SwapContainer>
-                        :
-                            <div 
+                <MarginProvider>     
+                    {
+                        isLoading ? 
+                            <Spinner
                                 style={{ 
-                                    marginTop: PIXEL_SIZING.larger, 
-                                    display: "grid",
-                                    justifyItems: "center",
-                                    rowGap: PIXEL_SIZING.medium,
+                                    position: "absolute", 
+                                    left: "50%", 
+                                    top: 300, 
+                                    transform: "translate(-50%, -50%)" 
                                 }}
-                            >
-                                <div style={{ textAlign: "center", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
-                                    <Text secondary>This swap market does not exist yet.</Text>
-                                    <Text secondary>Deposit liquidity to create it.</Text>
-                                </div>
+                            />
+                        : 
+                            marketExists ?
+                                <div style={{ marginTop: PIXEL_SIZING.large, }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%", alignItems: "end" }}>
+                                        <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.small }}>
+                                            <TokenAndLogo token={assetToken} primary/>
+                                            <Text primary bold>/</Text>
+                                            <TokenAndLogo token={baseToken} primary/>
+                                        </div>
 
-                                <CreateMarket/>
-                            </div>
-                }
+                                        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", columnGap: PIXEL_SIZING.tiny }}>
+                                            <Text bold>Enable Margin Trading</Text>
+                                            <SwitchInput
+                                                value={isMarginEnabled}
+                                                onChange={e => setIsMarginEnabled(e)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <SwapContainer style={{ marginTop: PIXEL_SIZING.large }}>
+                                        <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
+                                            <TradeInfoChart/>
+                                            <HistoricalTrades/>
+                                        </div>
+                                        
+                                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
+                                            <TradePortal/>
+                                            <YourLiquidity/>
+                                        </div>
+                                    </SwapContainer>
+                                </div>
+                            :
+                                <div 
+                                    style={{ 
+                                        marginTop: PIXEL_SIZING.larger, 
+                                        display: "grid",
+                                        justifyItems: "center",
+                                        rowGap: PIXEL_SIZING.medium,
+                                    }}
+                                >
+                                    <div style={{ textAlign: "center", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
+                                        <Text secondary>This swap market does not exist yet.</Text>
+                                        <Text secondary>Deposit liquidity to create it.</Text>
+                                    </div>
+
+                                    <CreateMarket/>
+                                </div>
+                    }
+                </MarginProvider>
             </SwapContext.Provider>
         </Layout>
     );

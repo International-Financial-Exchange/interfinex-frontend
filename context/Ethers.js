@@ -1,12 +1,22 @@
 import { ethers, } from "ethers";
 import { createContext, useState, useEffect, useMemo, } from "react";
-
-import FactoryContract from "../public/contracts/Factory.json";
-import ExchangeContract from "../public/contracts/Exchange.json";
-import ERC20Contract from "../public/contracts/ERC20.json";
-import DividendERC20Contract from "../public/contracts/DividendERC20.json";
-import IfexToken from "../public/contracts/IFEXToken.json";
 import { ETH_NODE_URL } from "../ENV";
+import CONTRACTS from "../public/contracts/contracts.json";
+import DividendERC20Abi from "../public/contracts/abi/DividendERC20.json";
+import ERC20Abi from "../public/contracts/abi/ERC20.json";
+import MarginFactoryAbi from "../public/contracts/abi/MarginFactory.json";
+import MarginMarketAbi from "../public/contracts/abi/MarginFactory.json";
+import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
+import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
+
+const ABI = {
+    DividendERC20: DividendERC20Abi,
+    ERC20: ERC20Abi,
+    MarginFactory: MarginFactoryAbi,
+    MarginMarket: MarginMarketAbi,
+    SwapExchange: SwapExchangeAbi,
+    SwapFactory: SwapFactoryAbi,
+};
 
 export const EthersContext = createContext();
 
@@ -14,23 +24,30 @@ export const EthersProvider = ({ children }) => {
     console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState();
+    const [networkInfo, setNetworkInfo] = useState({ name: "localhost" });
 
-    // There will only ever be 1 instance of the factory contract so 
-    // we can return a fully fledged "instance" of that contract;
-    // Every other contract returned will just be the ABI file that has to
-    // be instantiated as a contract in the code with the relevant address.
-    const [factoryContract,  ifexTokenContract, erc20ContractAbi, exchangeContractAbi, dividendErc20ContractAbi] = useMemo(() => {
-        return (
-            [
-                new ethers.Contract(FactoryContract.address, FactoryContract.abi, signer || provider),
-                new ethers.Contract(IfexToken.address, DividendERC20Contract.abi, signer || provider),
-                ERC20Contract.abi,
-                ExchangeContract.abi,
-                DividendERC20Contract.abi,
-            ]
-        );
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["localhost"];
+    const getAbi = abiName => ABI[abiName];
+
+    const { 
+        IfexToken, 
+        SwapFactory,  
+        MarginFactory,
+    } = useMemo(() => {
+        return {
+            IfexToken: new ethers.Contract(contracts.IfexToken.address, getAbi("DividendERC20"), signer || provider),
+            SwapFactory: new ethers.Contract(contracts.SwapFactory.address, getAbi("SwapFactory"), signer || provider),
+            MarginFactory: new ethers.Contract(contracts.MarginFactory.address, getAbi("MarginFactory"), signer || provider),
+        }
     }, [networkInfo, signer]);
+
+    const TestnetTokens = Array(4).fill().map((_, i) => ({
+        name: `Token${i}`,
+        symbol: `T${i}`,
+        decimals: 18,
+        address: contracts[`Token${i}`].address,
+        logoURI: "/metamask-logo.png"
+    }))
 
     useEffect(() => { 
         provider?.getNetwork().then(network => setNetworkInfo(network));
@@ -44,13 +61,15 @@ export const EthersProvider = ({ children }) => {
                 setSigner,
                 setProvider,
                 networkInfo,
+                TestnetTokens,
                 contracts: {
-                    factoryContract,
-                    ifexTokenContract,
-                    erc20ContractAbi,
-                    exchangeContractAbi,
-                    dividendErc20ContractAbi
-                }
+                    IfexToken,
+                    SwapFactory,
+                    MarginFactory,
+                    getAbi,
+                    createContract: (address, abiName) => 
+                        new ethers.Contract(address, getAbi(abiName), signer || provider)
+                },
             }}
         >
             { children }

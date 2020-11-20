@@ -449,6 +449,7 @@ const TradeTab = ({ isBuy }) => {
                                     parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
                                     0,
                                     ethers.constants.AddressZero, 
+                                    false,
                                     { gasLimit: 500_000 },
                                 ),
                             });

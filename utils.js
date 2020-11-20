@@ -26,6 +26,10 @@ export const CONTAINER_SIZING = {
     huge: '1597px',
 };
 
+export const sizingToInt = size => {
+    return parseInt(size.slice(0, size.length - 2));
+};
+
 export const useDocument = () => {
     const [_document, setDocument] = useState();
 

@@ -14,7 +14,7 @@ import { SwapContext } from "./Swap"
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, ifexTokenBalance } = useContext(AccountContext);
-    const { contracts: { factoryContract }} = useContext(EthersContext);
+    const { contracts: { SwapFactory }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const { approveFactory } = useContext(SwapContext);
 
@@ -34,7 +34,7 @@ export const CreateMarket = () => {
             
         addTransactionNotification({
             content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
-            transactionPromise: factoryContract.create_exchange(
+            transactionPromise: SwapFactory.create_exchange(
                 baseToken.address, 
                 assetToken.address,
                 ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
