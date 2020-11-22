@@ -1,6 +1,6 @@
 import { TradePortal } from "./TradePortal"
 import { Layout } from "../../layout/Layout";
-import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { useContext, useEffect, useState, createContext, useCallback } from "react";
@@ -18,28 +18,16 @@ import { CreateMarket } from "./CreateMarket";
 import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
 import styled from "styled-components";
-import { add } from "lodash";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
 import { SwitchInput } from "../../core/SwitchInput";
 import { useMarginTrading } from "./Margin/hooks";
-import { MarginProvider } from "./Margin/Margin";
+import { CreateMarginMarket } from "./Margin/CreateMarginMarket";
+import { TabNav } from "../../core/TabNav";
+import { TradeTab } from "./TradeTab";
+import { FundingTab } from "./Margin/Funding/FundingTab";
 
 export const SwapContext = createContext();
-
-const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')));
-
-const SwapContainer = styled.div`
-    display: grid; 
-    grid-template-columns: 1fr auto; 
-    column-gap: ${PIXEL_SIZING.large};
-
-    @media (max-width: 600px) {
-        width: 100%;
-        grid-template-columns: 1fr;
-        column-gap: 0px;
-        row-gap: ${PIXEL_SIZING.large};
-    }
-`;
+export const MarginContext = createContext();
 
 export const Swap = () => {
     const { provider, signer, contracts: { SwapFactory, getAbi, }} = useContext(EthersContext);
@@ -55,7 +43,15 @@ export const Swap = () => {
     const [factoryAllowances, setFactoryAllowances] = useState();
     const [exchangeAllowances, setExchangeAllowances] = useState();
     const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState();
-    const { isMarginEnabled, setIsMarginEnabled } = useMarginTrading({ assetToken, baseToken, swapMarketExists: marketExists });
+    const [selectedTab, setSelectedTab] = useState();
+    const { 
+        isMarginEnabled, 
+        setIsMarginEnabled, 
+        isLoading: marginIsLoading, 
+        showCreateMarginMarket, 
+        setShowCreateMarginMarket,
+        ...marginContextState
+    } = useMarginTrading({ assetToken, baseToken, swapMarketExists: marketExists });
 
     const updateExchangeAllowances = useCallback(async () => {
         if (address && (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v))) {
@@ -215,9 +211,13 @@ export const Swap = () => {
                     liquidityToken,
                 }}
             >
-                <MarginProvider>     
+                <MarginContext.Provider value={marginContextState}>     
                     {
-                        isLoading ? 
+                        showCreateMarginMarket &&
+                            <CreateMarginMarket closeCreateMarginMarket={() => setShowCreateMarginMarket(false)}/>
+                    }
+                    {
+                        isLoading || marginIsLoading ? 
                             <Spinner
                                 style={{ 
                                     position: "absolute", 
@@ -228,8 +228,8 @@ export const Swap = () => {
                             />
                         : 
                             marketExists ?
-                                <div style={{ marginTop: PIXEL_SIZING.large, }}>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%", alignItems: "end" }}>
+                                <div style={{ paddingTop: PIXEL_SIZING.medium, }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%", alignItems: "end", marginTop: PIXEL_SIZING.medium }}>
                                         <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.small }}>
                                             <TokenAndLogo token={assetToken} primary/>
                                             <Text primary bold>/</Text>
@@ -245,17 +245,29 @@ export const Swap = () => {
                                         </div>
                                     </div>
 
-                                    <SwapContainer style={{ marginTop: PIXEL_SIZING.large }}>
-                                        <div style={{ display: "grid", height: "fit-content", rowGap: PIXEL_SIZING.large }}>
-                                            <TradeInfoChart/>
-                                            <HistoricalTrades/>
-                                        </div>
-                                        
-                                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
-                                            <TradePortal/>
-                                            <YourLiquidity/>
-                                        </div>
-                                    </SwapContainer>
+                                    {
+                                        isMarginEnabled &&
+                                            <TabNav
+                                                onChange={selected => setSelectedTab(selected)}
+                                                style={{ marginTop: PIXEL_SIZING.medium }}
+                                                items={[
+                                                    { label: "Trade", value: "trade" }, 
+                                                    { label: "Funding", value: "funding" }, 
+                                                    { label: "Liquidator", value: "liquidator" },
+                                                    { label: "Vote", value: "vote" },
+                                                ]}
+                                            />
+                                    }
+
+                                    <div style={{ marginTop: PIXEL_SIZING.large, }}>
+                                        <TradeTab isSelected={!selectedTab || selectedTab === "trade"}/>
+                                        {
+                                            isMarginEnabled &&
+                                                <>
+                                                    <FundingTab isSelected={selectedTab === "funding"}/>
+                                                </>
+                                        }
+                                    </div>
                                 </div>
                             :
                                 <div 
@@ -274,7 +286,7 @@ export const Swap = () => {
                                     <CreateMarket/>
                                 </div>
                     }
-                </MarginProvider>
+                </MarginContext.Provider>
             </SwapContext.Provider>
         </Layout>
     );

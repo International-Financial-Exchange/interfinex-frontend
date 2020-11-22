@@ -16,6 +16,7 @@ const Container = styled.div`
     background-color: ${({ theme }) => theme.colors.invert};
     box-shadow: ${({ theme }) => theme.colors.boxShadow};
     height: fit-content;
+    position: relative;
 `;
 
 

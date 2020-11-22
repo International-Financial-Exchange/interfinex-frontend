@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { keyframes } from "styled-components";
 import { ethers, BigNumber } from "ethers";
 import { SERVER_URL } from "./ENV";
+import { AccountContext } from "./context/Account";
+import { EthersContext } from "./context/Ethers";
+import { add } from "lodash";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -30,6 +33,8 @@ export const sizingToInt = size => {
     return parseInt(size.slice(0, size.length - 2));
 };
 
+export const hasAllowance = allowance => allowance.gte(ethers.constants.MaxUint256.div(BigNumber.from('100')));
+
 export const useDocument = () => {
     const [_document, setDocument] = useState();
 
@@ -39,6 +44,9 @@ export const useDocument = () => {
 
     return _document;
 };
+
+export const isZeroAddress = address => 
+    address === ethers.constants.AddressZero;
 
 export const useWindow = () => {
     const [_window, setWindow] = useState();
@@ -162,3 +170,62 @@ export const TIMEFRAMES = {
 
 
 export const FEE_RATE = 0.001;
+
+export const useContractApproval = (contract, propTokens = []) => {
+    const { address } = useContext(AccountContext);
+    const { signer, contracts: { createContract }} = useContext(EthersContext);
+    const [allowances, setAllowances] = useState();
+    const [tokens, setTokens] = useState();
+
+    useEffect(() => {
+        if (!tokens && propTokens.every(v => v)) {
+            Promise.all(
+                propTokens.map(async token => {
+                    if (typeof token?.then !== 'function') {
+                        return token;
+                    }
+                    
+                    const tokenAddress = await token;
+                    return {
+                        address: tokenAddress,
+                        contract: createContract(tokenAddress, "ERC20"),
+                    };
+                })
+            ).then(tokens => setTokens(tokens));
+        }
+    }, [propTokens, address]);
+
+    const updateAllowances = useCallback(async () => {
+        if (contract && address && tokens) {
+            const allowances = await Promise.all(
+                tokens.map(async token => ({
+                    address: token.address,
+                    hasAllowance: hasAllowance(await token.contract.allowance(
+                        address, 
+                        contract.address, 
+                        { gasLimit: 1000000 }
+                    ))
+                }))
+            );
+            
+            setAllowances(allowances);
+        }
+    }, [contract, address, tokens]);
+
+    const approveContract = useCallback(async (...tokensToApprove) => {
+        if (tokensToApprove.length === 0) tokensToApprove = tokens;
+        await Promise.all(
+            tokensToApprove.map(async token => {
+                const { hasAllowance } = allowances.find(({ address }) => address === token.address);
+                if (!hasAllowance) 
+                    await token.contract.connect(signer).approve(contract.address, ethers.constants.MaxUint256,);
+            })
+        );
+    }, [tokens, allowances, signer,]);
+
+    useEffect(() => {
+        updateAllowances();
+    }, [contract, address, tokens]);
+
+    return { approveContract };
+};

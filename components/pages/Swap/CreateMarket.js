@@ -23,13 +23,6 @@ export const CreateMarket = () => {
     const [ifexTokenAmount, setIfexTokenAmount] = useState();
 
     const onSubmit = async () => {
-        console.log(
-            "contracts",
-            token0.address,
-            token1.address,
-            ifexToken.address
-        );
-        
         await approveFactory();
             
         addTransactionNotification({

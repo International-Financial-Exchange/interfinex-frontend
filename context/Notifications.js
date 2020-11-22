@@ -55,7 +55,8 @@ export const NotificationsProvider = ({ children }) => {
                     </TextButton>
                 </div>,
             });
-        } catch {
+        } catch (e) {
+            console.log(e);
             addNotification({
                 type: NOTIFICATION_TYPES.error,
                 content: <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>

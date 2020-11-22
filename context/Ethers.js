@@ -5,7 +5,7 @@ import CONTRACTS from "../public/contracts/contracts.json";
 import DividendERC20Abi from "../public/contracts/abi/DividendERC20.json";
 import ERC20Abi from "../public/contracts/abi/ERC20.json";
 import MarginFactoryAbi from "../public/contracts/abi/MarginFactory.json";
-import MarginMarketAbi from "../public/contracts/abi/MarginFactory.json";
+import MarginMarketAbi from "../public/contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
 

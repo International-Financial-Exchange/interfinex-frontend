@@ -7,4 +7,4 @@ export const ModalCard = styled.div`
     width: fit-content;
     height: fit-content;
     border-radius: ${PIXEL_SIZING.miniscule};
-`
+`;

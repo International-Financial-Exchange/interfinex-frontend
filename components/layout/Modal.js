@@ -10,9 +10,6 @@ export const MODAL_ID = "MODAL";
 export const Modal = ({ isOpen, onClose = _.noop, children }) => {
     const document = useDocument();
 
-    console.log("show", isOpen && document);
-    console.log("open", isOpen);
-
     return (
         isOpen && document ? 
             ReactDOM.createPortal(
@@ -35,7 +32,6 @@ export const Modal = ({ isOpen, onClose = _.noop, children }) => {
                             onClick={e => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                console.log("hello")
                             }}
                         >
                             {_.isFunction(children) ? children(onClose) : children}
