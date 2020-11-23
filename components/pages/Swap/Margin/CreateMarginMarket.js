@@ -17,7 +17,7 @@ export const CreateMarginMarket = ({ closeCreateMarginMarket }) => {
     const onSubmit = async () => {
         await addTransactionNotification({
             content: `Create margin market for ${assetToken.name} and ${baseToken.name}`,
-            transactionPromise: MarginFactory.createMarketPair(assetToken.address, baseToken.address),
+            transactionPromise: MarginFactory.createMarketPair(assetToken.address, baseToken.address, { gasLimit: 2_000_000 }),
         });
         closeCreateMarginMarket();
     };

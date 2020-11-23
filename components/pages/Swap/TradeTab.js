@@ -2,8 +2,11 @@ import { PIXEL_SIZING } from "../../../utils";
 import styled from "styled-components";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
-import { TradePortal } from "./TradePortal";
+import { TradePortal } from "./TradePortal/TradePortal";
 import { YourLiquidity } from "./YourLiquidity";
+import { MarginContext, SwapContext } from "./Swap";
+import { YourPositions } from "./Margin/YourPositions";
+import { useContext } from "react";
 
 const Container = styled.div`
     display: grid; 
@@ -20,6 +23,8 @@ const Container = styled.div`
 
 
 export const TradeTab = ({ isSelected }) => {
+    const { isMarginEnabled } = useContext(SwapContext);
+
     return (
         <div style={{ display: !isSelected ? "none" : "" }}>
             <Container>
@@ -30,6 +35,10 @@ export const TradeTab = ({ isSelected }) => {
                 
                 <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
                     <TradePortal/>
+                    {
+                        isMarginEnabled &&
+                            <YourPositions/>
+                    }
                     <YourLiquidity/>
                 </div>
             </Container>

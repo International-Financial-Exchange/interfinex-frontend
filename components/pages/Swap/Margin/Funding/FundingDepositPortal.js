@@ -32,14 +32,10 @@ export const FundingDepositPortal = () => {
     const isAssetToken = selectedToken.address === assetToken.address;
 
     const MarginMarket = marginMarkets[selectedToken.address];
-    console.log("2liquidity token", _liquidityToken);
     const liquidityToken = _liquidityToken[selectedToken.address];
-    console.log("liquidity token", liquidityToken);
     const approveMarginMarket = _approveMarginMarket[selectedToken.address];
     const account = _account[selectedToken.address];
     const totalValue = stats[MarginMarket.address].totalValue;
-
-    // TODO: Get the user's liquidity token balance
 
     return (
         <Container>
@@ -56,7 +52,7 @@ export const FundingDepositPortal = () => {
                 <TextButton
                     requiresWallet
                     onClick={() => {
-                        setTokenAmount(totalValue * account.liquidityTokenBalance / liquidityToken.totalSupply)
+                        setTokenAmount(account.assetTokenDeposited)
                     }}
                 >
                     Max Withdraw
@@ -104,7 +100,6 @@ export const FundingDepositPortal = () => {
                     try {
                         await approveMarginMarket(liquidityToken);
 
-                        console.log("supply", liquidityToken.totalSupply)
                         const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
                         await addTransactionNotification({
                             content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,

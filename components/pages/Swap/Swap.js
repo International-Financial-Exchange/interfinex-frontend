@@ -1,4 +1,4 @@
-import { TradePortal } from "./TradePortal"
+import { TradePortal } from "./TradePortal/TradePortal"
 import { Layout } from "../../layout/Layout";
 import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
@@ -206,6 +206,7 @@ export const Swap = () => {
                     exchangeBaseTokenBalance,
                     approveFactory,
                     approveExchange,
+                    isMarginEnabled,
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
                     account,
                     liquidityToken,

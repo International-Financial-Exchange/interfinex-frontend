@@ -7,16 +7,19 @@ import { FundingStats } from "./FundingStats";
 import styled from "styled-components";
 import { MarginContext } from "../../Swap";
 import { FundingDepositPortal } from "./FundingDepositPortal";
+import { FundingHistory } from "./FundingHistory";
+import { YourFunding } from "./YourFunding";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
     display: grid;
     grid-template-rows: auto 1fr;
     grid-template-columns: 1fr auto;
-    row-gap: ${PIXEL_SIZING.medium};
+    row-gap: ${PIXEL_SIZING.large};
+    column-gap: ${PIXEL_SIZING.large};
     grid-template-areas: 
-        "stats  stats"
-        "chart  deposit-portal"
+        "stats      stats"
+        "history    account-info"
     ;
 `;
 
@@ -51,12 +54,13 @@ export const FundingTab = ({ isSelected }) => {
                         <FundingStats/>
                     </div>
 
-                    <div style={{ gridArea: "chart" }}>
-                        hello
+                    <div style={{ gridArea: "history", }}>
+                        <FundingHistory/>
                     </div>
 
-                    <div style={{ gridArea: "deposit-portal"}}>
+                    <div style={{ gridArea: "account-info", display: "grid", rowGap: PIXEL_SIZING.large }}>
                         <FundingDepositPortal/>
+                        <YourFunding/>
                     </div>
                 </Container>
             </div>

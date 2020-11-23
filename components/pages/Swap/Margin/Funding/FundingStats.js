@@ -25,20 +25,22 @@ export const FundingStats = () => {
 
                 <tr>
                     <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
-                        <Text primary bold style={{ color: theme.colors.positive }}>{stats.interestRate}%</Text>
+                        <Text primary bold style={{ color: theme.colors.positive }}>{(stats.interestRate * 100).toFixed(4)}%</Text>
                     </td>
                     <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
                         <Text primary bold>
                             {
-                                Number.isNaN(stats.totalBorrowed / stats.totalReserved) ? 0 : stats.totalBorrowed / stats.totalReserved
+                                Number.isNaN(stats.totalBorrowed / stats.totalReserved) ? 
+                                    0 
+                                    : (stats.totalBorrowed / stats.totalReserved * 100).toFixed(4)
                             }%
                         </Text>
                     </td>
                     <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
-                        <Text primary bold>{stats.totalBorrowed}</Text>
+                        <Text primary bold>{stats.totalBorrowed.toFixed(4)}</Text>
                     </td>
                     <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
-                        <Text primary bold>{stats.totalReserved}</Text>
+                        <Text primary bold>{stats.totalReserved.toFixed(4)}</Text>
                     </td>
                 </tr>
             </table>

@@ -4,7 +4,7 @@ import { EthersContext } from "../../../../../context/Ethers";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { humanizeTokenAmount } from "../../../../../utils";
 
-export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket }) => {
+export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const { contracts: { MarginFactory, createContract }} = useContext(EthersContext);
@@ -48,11 +48,13 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket }) =>
             [assetToken.address]: { 
                 contract: assetLiquidityToken, 
                 address: assetLiquidityToken.address,
+                MarginMarket: AssetTokenMarginMarket,
                 totalSupply: humanizeTokenAmount(await assetLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
             },
             [baseToken.address]: { 
                 contract: baseLiquidityToken, 
                 address: baseLiquidityToken.address,
+                MarginMarket: BaseTokenMarginMarket,
                 totalSupply: humanizeTokenAmount(await baseLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
             },
         });
@@ -62,10 +64,13 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket }) =>
         if (address) {
             _.entries(liquidityToken).map(async ([assetTokenAddress, liquidityToken]) => {
                 const liquidityTokenBalance = humanizeTokenAmount(await liquidityToken.contract.balanceOf(address, { gasLimit: 1_000_000 }), { decimals: 18 });
-                console.log("total suply", humanizeTokenAmount(await liquidityToken.contract.totalSupply({ gasLimit: 1_000_000 }), {decimals: 18}))
+                const assetTokenDeposited = liquidityTokenBalance / liquidityToken.totalSupply * stats[liquidityToken.MarginMarket.address].totalValue;
                 setAccount(oldState => {
                     const newState = _.cloneDeep(oldState);
-                    newState[assetTokenAddress] = { liquidityTokenBalance, };
+                    newState[assetTokenAddress] = { 
+                        liquidityTokenBalance, 
+                        assetTokenDeposited: Number.isNaN(assetTokenDeposited) ? 0 : assetTokenDeposited,
+                    };
                     return newState;
                 });
             });
@@ -82,8 +87,6 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket }) =>
     useEffect(() => {
         if (liquidityToken) updateAccount();
     }, [liquidityToken])
-
-    console.log("account", account);
 
     return { stats, liquidityToken, account };
 };
