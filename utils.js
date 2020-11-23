@@ -138,8 +138,7 @@ export const shade = (col, light)=> {
 }
 
 export const parseTokenAmount = (amount, token) => {
-    const truncatedAmount = parseFloat(amount).toFixed(token.decimals);
-    return ethers.utils.parseUnits(truncatedAmount.toString(), token.decimals).toString();
+    return ethers.utils.parseUnits(amount.toString(), token.decimals).toString();
 };
 
 export const humanizeTokenAmount = (amount, token) => parseFloat(ethers.utils.formatUnits(amount.toString(), token.decimals));

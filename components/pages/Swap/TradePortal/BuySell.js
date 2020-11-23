@@ -25,7 +25,7 @@ export const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, fe
 
 // I want 10 tokens, how much do i have to pay for them?
 const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate) => {
-    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) / ((parseFloat(outputBalance) - parseFloat(outputAmount)) * (1 - feeRate));
+    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) * (1 - feeRate) / ((parseFloat(outputBalance) - parseFloat(outputAmount)) * (1 - feeRate));
     return amount >= 0 ? amount : Infinity;
 }
 
@@ -55,9 +55,15 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const [leverage, setLeverage] = useState(0);
     const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
     
-    const cost = (assetTokenAmount / (leverage + 1)).toFixed(4);
-    const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE).toFixed(4);
-    const inverseCost = (inverseAmount / (leverage + 1)).toFixed(4);
+    const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
+    const initialMargin = isBuy ? 
+        inverseAmount / (leverage + 1) 
+        : assetTokenAmount / (leverage + 1);
+    const borrowAmount = isBuy ?
+        inverseAmount - initialMargin
+        : assetTokenAmount - initialMargin;
+    const maintenanceMargin = borrowAmount * parameters?.maintenanceMarginRate;
+    const totalMargin = initialMargin + maintenanceMargin;
 
     const spotTrade = async () => {
         setIsLoading(true);
@@ -101,28 +107,21 @@ export const BuySell = ({ isBuy, isMargin }) => {
             const [sendToken, receiveToken] = isBuy ? [baseToken, assetToken] : [assetToken, baseToken];
             const MarginMarket = marginMarkets[sendToken.address];
             const approve = approveMarginMarket[sendToken.address];
-            
-            const positionSize = isBuy ? inverseAmount : assetTokenAmount;
-            const cost = isBuy ? inverseCost : cost;
-            const borrowAmount = positionSize - cost;
 
             const receiveAmount = isBuy ? 
-                assetTokenAmount - assetTokenAmount * parameters.maintenanceMarginRate
-                : inputToOutputAmount(assetTokenAmount - assetToken * parameters.maintenanceMarginRate, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
-
-            console.log(
-                "inputs",
-                parseTokenAmount(cost, sendToken),
-                parseTokenAmount(borrowAmount, sendToken), 
-                parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
-            );
-
+                assetTokenAmount
+                : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
+            
+            console.log("total margin", initialMargin + maintenanceMargin);
+            console.log("initial margin", initialMargin);
+            console.log("maintenance margin", maintenanceMargin);
+            console.log("borrow amount", borrowAmount);
+            
             await approve(sendToken);
             await addTransactionNotification({
-                content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? positionSize : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                 transactionPromise: MarginMarket.increasePosition(
-                    parseTokenAmount(cost, sendToken),
+                    parseTokenAmount(initialMargin + maintenanceMargin, sendToken),
                     parseTokenAmount(borrowAmount, sendToken), 
                     parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
                     parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
@@ -234,7 +233,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     }
                     onClick={() => {
                         if (isMargin) marginTrade();
-                        // else spotTrade();
+                        else spotTrade();
                     }}    
                 >
                     <Text primary style={{ color: "white", fontSize: 15 }}>
@@ -246,7 +245,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     {
                         isMargin ?
                             <Text secondary>
-                                Cost {isBuy ? inverseCost : cost} {isBuy ? baseToken.symbol : assetToken.symbol}
+                                Cost {totalMargin.toFixed(4)} {isBuy ? baseToken.symbol : assetToken.symbol}
                             </Text>
                             : <Text secondary>
                                 {isBuy ? "Cost" : "Receive"}: {

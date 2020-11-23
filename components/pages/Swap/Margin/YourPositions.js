@@ -44,7 +44,7 @@ export const YourPositions = () => {
             <Card style={{ width: "100%" }}>
                 <div style={{ width: "100%", display: "grid", rowGap: PIXEL_SIZING.small }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center" }}>
-                        <TokenAndLogo token={baseToken}>
+                        <TokenAndLogo token={borrowToken}>
                             Position Value
                         </TokenAndLogo>
 
@@ -61,7 +61,7 @@ export const YourPositions = () => {
                                         ).toFixed(4)
                                     }
                                     
-                                    {" " + baseToken.symbol}
+                                    {" " + borrowToken.symbol}
                                 </Text>
                         }
                     </div>
