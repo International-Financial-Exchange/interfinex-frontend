@@ -4,7 +4,7 @@
     "inputs": [
       {
         "type": "address",
-        "name": "sender",
+        "name": "user",
         "indexed": true
       },
       {
@@ -21,7 +21,7 @@
     "inputs": [
       {
         "type": "address",
-        "name": "sender",
+        "name": "user",
         "indexed": true
       },
       {

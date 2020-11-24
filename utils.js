@@ -137,6 +137,7 @@ export const shade = (col, light)=> {
     return color(r, g, b);
 }
 
+// removed truncation here as it broke small amounts - may need to add back in properly
 export const parseTokenAmount = (amount, token) => {
     return ethers.utils.parseUnits(amount.toString(), token.decimals).toString();
 };

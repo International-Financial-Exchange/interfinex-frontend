@@ -21,3 +21,7 @@ export const getCandles = async ({ from, to, baseTokenAddress, assetTokenAddress
 
     return candles;
 };
+
+export const getFundingHistory = ({ from, to, marginMarketContract, limit, user }) => {
+    return getRequest("/marginMarket/fundingHistory", { from, to, marginMarketContract, limit, user });
+};
