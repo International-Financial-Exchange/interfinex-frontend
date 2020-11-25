@@ -69,7 +69,7 @@ export const Swap = () => {
                 })
             );
         }
-    }, [exchangeContract, assetToken, baseToken, liquidityToken, address]);
+    }, [exchangeContract?.address, assetToken, baseToken, liquidityToken, address]);
 
     const approveExchange = useCallback(async (...tokensToApprove) => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasLiquidityTokenAllowance } = exchangeAllowances;
@@ -82,7 +82,7 @@ export const Swap = () => {
 
         if (!hasLiquidityTokenAllowance && tokensToApprove.some(({ address }) => address === liquidityToken.address))
             await liquidityToken.approve(exchangeContract.address, ethers.constants.MaxUint256,);
-    }, [exchangeContract, assetToken, baseToken, liquidityToken, exchangeAllowances,]);
+    }, [exchangeContract?.address, assetToken, baseToken, liquidityToken, exchangeAllowances,]);
 
     const updateFactoryAllowances = useCallback(async () => {
         if ((assetToken && baseToken && address) && (!factoryAllowances || Object.values(factoryAllowances).some(v => !v))) {
@@ -98,7 +98,7 @@ export const Swap = () => {
                 })
             );
         }
-    }, [SwapFactory, assetToken, baseToken, address]);
+    }, [SwapFactory.address, assetToken, baseToken, address]);
 
     const approveFactory = useCallback(async () => {
         const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
@@ -111,7 +111,7 @@ export const Swap = () => {
 
         if (!hasIfexTokenAllowance)
             await ifexToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
-    }, [SwapFactory, assetToken, baseToken, ifexToken, factoryAllowances]);
+    }, [SwapFactory.address, assetToken, baseToken, ifexToken, factoryAllowances]);
 
     // Check swap market exists and update contract and liquidity token
     useEffect(() => {
@@ -119,7 +119,6 @@ export const Swap = () => {
 
         if (baseToken && assetToken) {
             SwapFactory.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
-                console.log(exchangeAddress)
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
     
@@ -135,7 +134,7 @@ export const Swap = () => {
                 setIsLoading(false);
             });
         }
-    }, [provider, baseToken, assetToken]);
+    }, [baseToken?.address, assetToken?.address]);
 
     useEffect(() => {
         updateFactoryAllowances();
@@ -172,7 +171,7 @@ export const Swap = () => {
         }
 
         return;
-    }, [exchangeContract, liquidityToken, signer, address]);
+    }, [exchangeContract?.address, liquidityToken?.address, signer]);
 
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
@@ -196,7 +195,7 @@ export const Swap = () => {
         }
         
         return () => exchangeContract?.removeAllListeners();
-    }, [exchangeContract, signer, liquidityToken, updateExchangeInfo]);
+    }, [exchangeContract?.address, signer, liquidityToken?.address]);
 
     return (
         <Layout>
@@ -220,7 +219,8 @@ export const Swap = () => {
                             <CreateMarginMarket closeCreateMarginMarket={() => setShowCreateMarginMarket(false)}/>
                     }
                     {
-                        isLoading || marginIsLoading ? 
+                        // isLoading || marginIsLoading ? 
+                        isLoading ?
                             <Spinner
                                 style={{ 
                                     position: "absolute", 

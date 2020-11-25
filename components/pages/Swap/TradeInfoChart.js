@@ -1,5 +1,5 @@
 import { Chart } from "../../core/Chart";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useMemo } from "react";
 import { getCandles } from "./networkRequests";
 import { TokenPairContext } from "../../../context/TokenPair";
 import { TIMEFRAMES } from "../../../utils";
@@ -42,19 +42,23 @@ export const TradeInfoChart = () => {
                     .catch(e => console.log(e));
             })
         }
-    }, [assetToken, baseToken]);
+    }, [assetToken?.address, baseToken?.address]);
+
+    const chartData = useMemo(() => {
+        return ([
+            { 
+                label: "Price", 
+                value: "PRICE", 
+                currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
+                suffix: baseToken.symbol,
+                data: candles ?? {},
+            }
+        ])
+    }, [assetToken?.address, baseToken?.address, candles, exchangeAssetTokenBalance, exchangeBaseTokenBalance])
 
     return (
         <Chart
-            options={[
-                { 
-                    label: "Price", 
-                    value: "PRICE", 
-                    currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
-                    suffix: baseToken.symbol,
-                    data: candles ?? {},
-                }
-            ]}
+            options={chartData}
         />
     );
 };
