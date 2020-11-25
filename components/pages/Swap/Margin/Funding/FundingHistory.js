@@ -7,6 +7,7 @@ import { getFundingHistory } from "../../networkRequests";
 import { FundingContext } from "./FundingTab";
 import InfiniteScroll from "react-infinite-scroller";
 import { Spinner } from "../../../../core/Spinner";
+import Skeleton from "react-loading-skeleton";
 
 const Row = styled.tr`
     background-color: ${({ theme, positive }) => shade(positive ? theme.colors.positive : theme.colors.negative, 0.9)};
@@ -46,7 +47,7 @@ const useFundingHistory = ({ marginMarketContract }) => {
     const [oldestEventTimestamp, setOldestEventTimestamp] = useState();
     const [isLoading, setIsLoading] = useState();
 
-    const getMoreFundingEvents = async () => {
+    const _getMoreFundingEvents = async () => {
         if (isLoading || gotAllFundingEvents || !marginMarketContract) return;
 
         setIsLoading(true);
@@ -63,10 +64,20 @@ const useFundingHistory = ({ marginMarketContract }) => {
         }
     }
 
-    useEffect(() => {
+    const getMoreFundingEvents = async () => {
+        if (isLoading || gotAllFundingEvents || !marginMarketContract) return;
+        await _getMoreFundingEvents();
+    }
+
+    const refreshFundingEvents = () => {
         setFundingEvents([]);
-        getMoreFundingEvents();
-    }, [marginMarketContract]);
+        setGotAllFundingEvents(false);
+        _getMoreFundingEvents();
+    }
+
+    useEffect(() => {
+        refreshFundingEvents();
+    }, [marginMarketContract])
 
     return [fundingEvents, isLoading, getMoreFundingEvents, gotAllFundingEvents];
 };
@@ -83,7 +94,7 @@ export const FundingHistory = () => {
                 hasMore={!gotAllFundingEvents}
                 useWindow={false}
             >
-                <table style={{ borderCollapse: "separate", borderSpacing: `0 ${PIXEL_SIZING.tiny}`, width: "100%" }}>
+                <table style={{ borderCollapse: "separate", borderSpacing: `0 ${PIXEL_SIZING.tiny}`, width: "100%", position: "relative" }}>
                     <tr>
                         <th style={{ padding: PIXEL_SIZING.small }}>
                             <Text secondary>Event</Text>
@@ -100,31 +111,31 @@ export const FundingHistory = () => {
                     </tr>
 
                     {
-                        fundingEvents.map(({ isDeposit, assetTokenAmount, timestamp, user, txId }) =>
-                            <Row 
-                                positive={isDeposit}
-                                key={txId}
-                                onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
-                            >
-                                <td>{isDeposit ? "Deposit" : "Withdraw"}</td>
-                                <td>{humanizeTokenAmount(assetTokenAmount, selectedToken).toFixed(4)}</td>
-                                <td>{new Date(timestamp).toLocaleTimeString()}</td>
-                                <td>{user}</td>
-                            </Row>
-                        )
+                        (!fundingEvents || fundingEvents.length === 0) && !isLoading ?
+                            <Text secondary style={{ top: CONTAINER_SIZING.tiny }} className={"center-absolute"}>No events to show</Text>
+                            : fundingEvents.map(({ isDeposit, assetTokenAmount, timestamp, user, txId }) =>
+                                <Row 
+                                    positive={isDeposit}
+                                    key={txId}
+                                    onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
+                                >
+                                    <td>{isDeposit ? "Deposit" : "Withdraw"}</td>
+                                    <td>{humanizeTokenAmount(assetTokenAmount, selectedToken).toFixed(4)}</td>
+                                    <td>{new Date(timestamp).toLocaleTimeString()}</td>
+                                    <td>{user}</td>
+                                </Row>
+                            )
                     }
                 </table>
 
                 {
                     isLoading &&
-                        <Spinner 
-                            style={{ 
-                                marginTop: PIXEL_SIZING.medium, 
-                                marginBottom: PIXEL_SIZING.medium, 
-                                marginLeft: "50%", 
-                                transform: "translateX(-12px)" 
-                            }}
-                        />
+                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny }}>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                        </div>
                 }
             </InfiniteScroll>
         </Card>

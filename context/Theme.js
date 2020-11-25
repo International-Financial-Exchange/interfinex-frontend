@@ -15,6 +15,7 @@ export const THEMES = {
         negative: "#f00f30",
         warn: "#ff9900",
         grey: "#d4d4d4",
+        blue: "#3182DD",
         boxShadow: "10px 7px 55px -22px rgba(0,0,0,0.15)",
         primaryBoxShadow: "-1px 42px 97px 41px rgba(230,230,230,0.7)",
     },

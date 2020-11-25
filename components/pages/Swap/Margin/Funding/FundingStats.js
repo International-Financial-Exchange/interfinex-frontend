@@ -8,7 +8,7 @@ import { MarginContext } from "../../Swap";
 import { FundingContext } from "./FundingTab";
 
 export const FundingStats = () => {
-    const { MarginMarket } = useContext(FundingContext)
+    const { MarginMarket } = useContext(FundingContext);
     const { funding: { stats: _stats }} = useContext(MarginContext);
     const stats = _stats[MarginMarket.address];
     const theme = useContext(ThemeContext);

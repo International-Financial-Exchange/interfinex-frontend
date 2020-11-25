@@ -10,7 +10,7 @@ import { useFunding } from "./Funding/hooks";
 
 export const useMarginTrading = ({ swapMarketExists }) => {
     const { contracts: { MarginFactory, createContract }} = useContext(EthersContext);
-    const { assetToken, baseToken, } = useContext(TokenPairContext);
+    const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const [isLoading, setIsLoading] = useState();
     const [isMarginEnabled, _setIsMarginEnabled] = useState();
@@ -26,11 +26,11 @@ export const useMarginTrading = ({ swapMarketExists }) => {
     const funding = useFunding({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets });
     const { approveContract: approveAssetTokenMarket } = useContractApproval(
         AssetTokenMarginMarket, 
-        [assetToken, AssetTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })]
+        [assetToken, ifexToken, AssetTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })]
     );
     const { approveContract: approveBaseTokenMarket } = useContractApproval(
         BaseTokenMarginMarket, 
-        [baseToken, BaseTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })
+        [baseToken, ifexToken, BaseTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })
     ]);
     
     useEffect(() => {

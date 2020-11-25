@@ -205,7 +205,7 @@ export const HistoricalTrades = () => {
                                     >
                                         <div>{price.toFixed(6)}</div>
                                         <div>{volume.toFixed(6)}</div>
-                                        <div>{ new Date(timestamp).toLocaleTimeString()}</div>
+                                        <div>{new Date(timestamp).toLocaleTimeString()}</div>
                                         <div>{user}</div>
                                         <div>{txId}</div>
                                     </TradeRowContainer>

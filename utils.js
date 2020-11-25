@@ -153,6 +153,7 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
     );
 
     const url = `${SERVER_URL}${endpoint}?${urlParams}`;
+    console.log(url);
 
     if (isJSON) 
         return fetch(url).then(res => res.json());
@@ -214,6 +215,7 @@ export const useContractApproval = (contract, propTokens = []) => {
 
     const approveContract = useCallback(async (...tokensToApprove) => {
         if (tokensToApprove.length === 0) tokensToApprove = tokens;
+        console.log("allowances", allowances);
         await Promise.all(
             tokensToApprove.map(async token => {
                 const { hasAllowance } = allowances.find(({ address }) => address === token.address);

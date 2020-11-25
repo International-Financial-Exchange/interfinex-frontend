@@ -34,6 +34,87 @@
     "type": "event"
   },
   {
+    "name": "IncreasePosition",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "borrowedAmount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "collateralToken",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "maintenanceMargin",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "DecreasePosition",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "borrowedAmount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "collateralToken",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "maintenanceMargin",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "LiquidatePosition",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "user",
+        "indexed": true
+      },
+      {
+        "type": "uint256",
+        "name": "borrowedAmount",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "collateralToken",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "maintenanceMargin",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "initialize",
     "outputs": [],
     "inputs": [
@@ -60,7 +141,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 535010
+    "gas": 605022
   },
   {
     "name": "pureAccrueInterest",
@@ -189,7 +270,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 514367
+    "gas": 517267
   },
   {
     "name": "decreasePosition",
@@ -218,7 +299,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 710515
+    "gas": 713497
   },
   {
     "name": "closePosition",
@@ -243,7 +324,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 714336
+    "gas": 717318
   },
   {
     "name": "liquidatePosition",
@@ -256,7 +337,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 454556
+    "gas": 551899
   },
   {
     "name": "depositVote",
@@ -277,7 +358,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 318992
+    "gas": 318432
   },
   {
     "name": "withdrawVote",
@@ -286,15 +367,11 @@
       {
         "type": "uint256",
         "name": "proposalId"
-      },
-      {
-        "type": "uint256",
-        "name": "voteOption"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 135822
+    "gas": 135447
   },
   {
     "name": "getWinningOption",
@@ -329,7 +406,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 461390
+    "gas": 515990
   },
   {
     "name": "collateralToken",
@@ -540,6 +617,58 @@
     "gas": 2321
   },
   {
+    "name": "maxLiquidateVolume",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2351
+  },
+  {
+    "name": "liquidateVolume",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2381
+  },
+  {
+    "name": "lastLiquidateBlock",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2411
+  },
+  {
+    "name": "votingDuration",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2441
+  },
+  {
     "name": "isInitialized",
     "outputs": [
       {
@@ -550,7 +679,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2351
+    "gas": 2471
   },
   {
     "name": "account_to_position",
@@ -580,7 +709,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 5794
+    "gas": 5914
   },
   {
     "name": "proposalVotes",
@@ -602,7 +731,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2641
+    "gas": 2761
   },
   {
     "name": "proposalVoteOptions",
@@ -620,7 +749,25 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2556
+    "gas": 2676
+  },
+  {
+    "name": "proposalBaselineVote",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2706
   },
   {
     "name": "proposalFinalisationDate",
@@ -638,7 +785,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2586
+    "gas": 2736
   },
   {
     "name": "userVotes",
@@ -656,15 +803,11 @@
       {
         "type": "uint256",
         "name": "arg1"
-      },
-      {
-        "type": "uint256",
-        "name": "arg2"
       }
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2946
+    "gas": 2981
   },
   {
     "name": "userLastVote",
@@ -686,7 +829,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2861
+    "gas": 3011
   },
   {
     "name": "userDeposits",
@@ -704,6 +847,6 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2776
+    "gas": 2926
   }
 ]

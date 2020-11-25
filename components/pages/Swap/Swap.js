@@ -25,6 +25,8 @@ import { CreateMarginMarket } from "./Margin/CreateMarginMarket";
 import { TabNav } from "../../core/TabNav";
 import { TradeTab } from "./TradeTab";
 import { FundingTab } from "./Margin/Funding/FundingTab";
+import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
+import { VoteTab } from "./Margin/Vote/VoteTab";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();
@@ -266,6 +268,8 @@ export const Swap = () => {
                                             isMarginEnabled &&
                                                 <>
                                                     <FundingTab isSelected={selectedTab === "funding"}/>
+                                                    <LiquidatorTab isSelected={selectedTab === "liquidator"}/>
+                                                    <VoteTab isSelected={selectedTab === "vote"}/>
                                                 </>
                                         }
                                     </div>
