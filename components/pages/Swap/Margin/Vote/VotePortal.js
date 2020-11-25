@@ -68,7 +68,8 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
     }
 
     useEffect(() => {
-        updateAccount();
+        if (address)
+            updateAccount();
     }, [MarginMarket.address, address, finishDate]);
 
     const depositVote = async (voteOption, amount) => {

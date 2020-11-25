@@ -9,7 +9,7 @@ import { FundingContext } from "./FundingTab";
 
 export const YourFunding = () => {
     const { selectedToken, account: _account } = useContext(FundingContext);
-    const account = _account[selectedToken.address];
+    const account = _account?.[selectedToken.address];
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small, height: "fit-content", width: "100%" }}>
@@ -23,7 +23,7 @@ export const YourFunding = () => {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center" }}>
                         <TokenAndLogo token={selectedToken}/>
                         {
-                            account?.assetTokenDeposited === undefined ?
+                            !account || _account.isLoading ?
                                 <Skeleton width={CONTAINER_SIZING.miniscule}/>
                                 : <Text secondary bold>{account.assetTokenDeposited.toFixed(4)} {selectedToken.symbol}</Text>
                         }

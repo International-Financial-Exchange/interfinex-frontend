@@ -35,6 +35,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
     
     useEffect(() => {
         if (swapMarketExists) {
+            setIsLoading(true);
             Promise.all([
                 MarginFactory.pair_to_margin_market(assetToken.address, baseToken.address),
                 MarginFactory.pair_to_margin_market(baseToken.address, assetToken.address)

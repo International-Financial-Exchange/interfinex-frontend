@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { max } from "lodash";
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../../context/Account";
@@ -52,7 +53,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
     // Margin trading variables
     const { parameters: _parameters, marginMarkets, approveMarginMarket } = useContext(MarginContext);
     const parameters = _parameters?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
-    const [leverage, setLeverage] = useState(0);
+    const [leverage, setLeverage] = useState(0.1);
     const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
     
     const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
@@ -134,7 +135,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
             setIsLoading(false);
         }
     };
-    
+
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu
@@ -215,10 +216,12 @@ export const BuySell = ({ isBuy, isMargin }) => {
                             <Text>Leverage: {leverage}x</Text>
                             <SliderInput 
                                 valueLabelFormat={value => `${value}x`}
+                                defaultValue={leverage}
                                 step={0.1}
+                                min={0.1}
                                 onChange={(_, value) => setLeverage(value)}
-                                max={maxLeverage}
-                                marks={[{ value: 0, label: "0x",}, { value: 100, label: "100x",}]} 
+                                max={parseFloat(maxLeverage)}
+                                marks={[{ value: 0.1, label: "0.1x",}, { value: maxLeverage, label: `${maxLeverage}x`,}]} 
                             />
                         </div>
                 }
