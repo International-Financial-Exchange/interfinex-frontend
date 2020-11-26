@@ -1,5 +1,9 @@
 [
   {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
     "name": "initialize",
     "outputs": [],
     "inputs": [
@@ -18,7 +22,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 118323
+    "gas": 118353
   },
   {
     "name": "create_exchange",
@@ -39,7 +43,57 @@
     ],
     "stateMutability": "payable",
     "type": "function",
-    "gas": 62569
+    "gas": 62599
+  },
+  {
+    "name": "mint_liquidity",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "assetTokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "minAssetTokenAmount"
+      },
+      {
+        "type": "uint256",
+        "name": "maxAssetTokenAmount"
+      },
+      {
+        "type": "address",
+        "name": "recipient"
+      },
+      {
+        "type": "uint256",
+        "name": "deadline"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "gas": 64639
+  },
+  {
+    "name": "burn_liquidity",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "assetTokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "liquidityTokenAmount"
+      },
+      {
+        "type": "uint256",
+        "name": "deadline"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "gas": 59038
   },
   {
     "name": "wrappedEtherContract",
@@ -52,7 +106,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1271
+    "gas": 1361
   },
   {
     "name": "swapFactoryContract",
@@ -65,7 +119,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1301
+    "gas": 1391
   },
   {
     "name": "ifexTokenContract",
@@ -78,6 +132,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1331
+    "gas": 1421
   }
 ]

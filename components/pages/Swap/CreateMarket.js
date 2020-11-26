@@ -25,13 +25,12 @@ export const CreateMarket = () => {
 
     const onSubmit = async () => {
         if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
-            console.log("Sending to eth router");
-            await approveRouter();
-            
             const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
             const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
                 [baseTokenAmount, assetTokenAmount] 
                 : [assetTokenAmount, baseTokenAmount];
+            
+            await approveRouter(sendToken, ifexToken);
 
             addTransactionNotification({
                 content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,

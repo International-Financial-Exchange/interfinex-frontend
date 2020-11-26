@@ -9,6 +9,8 @@ import MarginMarketAbi from "../public/contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
 import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
+import { humanizeTokenAmount } from "../utils";
+import { formatEther, parseEther } from "ethers/lib/utils";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,
@@ -72,6 +74,15 @@ export const EthersProvider = ({ children }) => {
     useEffect(() => { 
         provider?.getNetwork().then(network => setNetworkInfo(network));
     }, [provider]);
+
+    useEffect(() => {
+        if (signer) {
+            console.log("fetching");
+            provider.getBalance("0x9D3999af03458c11C78F7e6C0fAE712b455D4e33", "latest").then(res => {
+                console.log("signer", formatEther(res))
+            });
+        }
+    }, [signer]);
 
     return (
         <EthersContext.Provider 

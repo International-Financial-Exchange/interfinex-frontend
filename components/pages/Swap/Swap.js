@@ -63,7 +63,7 @@ export const Swap = () => {
     );
     const { approveContract: approveRouter } = useContractApproval(
         SwapEthRouter, 
-        [assetToken, baseToken, ifexToken,]
+        [assetToken, baseToken, ifexToken, liquidityToken]
     );
 
     console.log("original", [assetToken, baseToken, ifexToken])

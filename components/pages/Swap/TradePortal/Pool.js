@@ -1,6 +1,8 @@
+import { parseEther } from "ethers/lib/utils";
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../../context/Account";
+import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
 import { parseTokenAmount, PIXEL_SIZING } from "../../../../utils";
@@ -15,6 +17,7 @@ import { SwapContext } from "../Swap";
 export const Pool = () => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0, token1 } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
+    const { contracts: { SwapEthRouter }} = useContext(EthersContext);
     const { 
         exchangeContract, 
         price,
@@ -22,6 +25,7 @@ export const Pool = () => {
         approveExchange,
         exchangeBaseTokenBalance,
         exchangeAssetTokenBalance,
+        approveRouter,
         liquidityToken,
         account,
     } = useContext(SwapContext);
@@ -100,25 +104,48 @@ export const Pool = () => {
                     onClick={async () => {
                         setIsDepositLoading(true);
                         try {
-                            const [token0Amount, token1Amount] = baseToken.address === token0.address ?
-                                [baseTokenAmount, assetTokenAmount]
-                                : [assetTokenAmount, baseTokenAmount];
+                            if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+                                const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+                                const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
+                                    [baseTokenAmount, assetTokenAmount] 
+                                    : [assetTokenAmount, baseTokenAmount];
     
-                            await approveExchange(baseToken, assetToken);
+                                await approveRouter(sendToken);
 
-                            const slippagePercentage = slippageValue / 100;
+                                const slippagePercentage = slippageValue / 100;
 
-                            await addTransactionNotification({
-                                content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
-                                transactionPromise: exchangeContract.mint_liquidity(
-                                    parseTokenAmount(token0Amount, token0),
-                                    parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
-                                    parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
-                                    address,
-                                    0,
-                                    { gasLimit: 450_000 }
-                                )
-                            });
+                                await addTransactionNotification({
+                                    content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
+                                    transactionPromise: SwapEthRouter.mint_liquidity(
+                                        sendToken?.address,
+                                        parseTokenAmount(sendTokenAmount * (1 - slippagePercentage), sendToken),
+                                        parseTokenAmount(sendTokenAmount * (1 + slippagePercentage), sendToken),
+                                        address,
+                                        0,
+                                        { gasLimit: 450_000, value: parseEther(etherTokenAmount.toString()) }
+                                    )
+                                });
+                            } else {
+                                const [token0Amount, token1Amount] = baseToken.address === token0.address ?
+                                    [baseTokenAmount, assetTokenAmount]
+                                    : [assetTokenAmount, baseTokenAmount];
+        
+                                await approveExchange(baseToken, assetToken);
+    
+                                const slippagePercentage = slippageValue / 100;
+    
+                                await addTransactionNotification({
+                                    content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
+                                    transactionPromise: exchangeContract.mint_liquidity(
+                                        parseTokenAmount(token0Amount, token0),
+                                        parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
+                                        parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
+                                        address,
+                                        0,
+                                        { gasLimit: 450_000 }
+                                    )
+                                });
+                            }
                         } finally {
                             setIsDepositLoading(false);
                         }
@@ -137,17 +164,34 @@ export const Pool = () => {
                     onClick={async () => {
                         setIsWithdrawLoading(true);
                         try {
-                            await approveExchange(liquidityToken);
-    
-                            const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
-                            await addTransactionNotification({
-                                content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
-                                transactionPromise: exchangeContract.burn_liquidity(
-                                    parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
-                                    0,
-                                    { gasLimit: 350_000 }
-                                )
-                            });
+                            if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+                                const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+                                const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+
+                                await approveRouter(liquidityToken);
+
+                                await addTransactionNotification({
+                                    content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                                    transactionPromise: SwapEthRouter.burn_liquidity(
+                                        sendToken.address,
+                                        parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                                        0,
+                                        { gasLimit: 550_000 }
+                                    )
+                                });
+                            } else {
+                                await approveExchange(liquidityToken);
+        
+                                const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                                await addTransactionNotification({
+                                    content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                                    transactionPromise: exchangeContract.burn_liquidity(
+                                        parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                                        0,
+                                        { gasLimit: 350_000 }
+                                    )
+                                });
+                            }
                         } finally {
                             setIsWithdrawLoading(false);
                         }
