@@ -242,6 +242,7 @@ const PositionRow = ({
             <td>
                 <Button 
                     style={{ width: "100%" }}
+                    requiresWallet
                     onClick={async () => {
                         addTransactionNotification({
                             content: `Attempt to liquidate ${user} in ${selectedToken.symbol}-${collateralToken.symbol} margin market`,

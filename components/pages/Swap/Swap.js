@@ -1,6 +1,6 @@
 import { TradePortal } from "./TradePortal/TradePortal"
 import { Layout } from "../../layout/Layout";
-import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance } from "../../../utils";
+import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance, useContractApproval } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { useContext, useEffect, useState, createContext, useCallback } from "react";
@@ -27,6 +27,7 @@ import { TradeTab } from "./TradeTab";
 import { FundingTab } from "./Margin/Funding/FundingTab";
 import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
 import { VoteTab } from "./Margin/Vote/VoteTab";
+import { add } from "lodash";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();
@@ -42,8 +43,6 @@ export const Swap = () => {
     const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
-    const [factoryAllowances, setFactoryAllowances] = useState();
-    const [exchangeAllowances, setExchangeAllowances] = useState();
     const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState();
     const [selectedTab, setSelectedTab] = useState();
     const { 
@@ -54,64 +53,16 @@ export const Swap = () => {
         setShowCreateMarginMarket,
         ...marginContextState
     } = useMarginTrading({ assetToken, baseToken, swapMarketExists: marketExists });
+    const { approveContract: approveExchange } = useContractApproval(
+        exchangeContract, 
+        [assetToken, baseToken, ifexToken, liquidityToken]
+    );
+    const { approveContract: approveFactory } = useContractApproval(
+        SwapFactory, 
+        [assetToken, baseToken, ifexToken]
+    );
 
-    const updateExchangeAllowances = useCallback(async () => {
-        if (address && (!exchangeAllowances || Object.values(exchangeAllowances).some(v => !v))) {
-            await Promise.all([
-                assetToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-                baseToken.contract.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-                liquidityToken.allowance(address, exchangeContract.address, { gasLimit: 1000000 }),
-            ]).then(([assetAllowance, baseAllowance, liquidityAllowance]) =>
-                setExchangeAllowances({
-                    hasAssetTokenAllowance: hasAllowance(assetAllowance),
-                    hasBaseTokenAllowance: hasAllowance(baseAllowance),
-                    hasLiquidityTokenAllowance: hasAllowance(liquidityAllowance),
-                })
-            );
-        }
-    }, [exchangeContract?.address, assetToken, baseToken, liquidityToken, address]);
-
-    const approveExchange = useCallback(async (...tokensToApprove) => {
-        const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasLiquidityTokenAllowance } = exchangeAllowances;
-
-        if (!hasAssetTokenAllowance && tokensToApprove.some(({ address }) => address === assetToken.address))
-            await assetToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,);
-
-        if (!hasBaseTokenAllowance && tokensToApprove.some(({ address }) => address === baseToken.address))
-            await baseToken.contract.approve(exchangeContract.address, ethers.constants.MaxUint256,);
-
-        if (!hasLiquidityTokenAllowance && tokensToApprove.some(({ address }) => address === liquidityToken.address))
-            await liquidityToken.approve(exchangeContract.address, ethers.constants.MaxUint256,);
-    }, [exchangeContract?.address, assetToken, baseToken, liquidityToken, exchangeAllowances,]);
-
-    const updateFactoryAllowances = useCallback(async () => {
-        if ((assetToken && baseToken && address) && (!factoryAllowances || Object.values(factoryAllowances).some(v => !v))) {
-            Promise.all([
-                assetToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
-                baseToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
-                ifexToken.contract.allowance(address, SwapFactory.address, { gasLimit: 1000000 }),
-            ]).then(([assetAllowance, baseAllowance, ifexAllowance]) =>
-                setFactoryAllowances({
-                    hasAssetTokenAllowance: hasAllowance(assetAllowance),
-                    hasBaseTokenAllowance: hasAllowance(baseAllowance),
-                    hasIfexTokenAllowance: hasAllowance(ifexAllowance),
-                })
-            );
-        }
-    }, [SwapFactory.address, assetToken, baseToken, address]);
-
-    const approveFactory = useCallback(async () => {
-        const { hasAssetTokenAllowance, hasBaseTokenAllowance, hasIfexTokenAllowance } = factoryAllowances;
-
-        if (!hasAssetTokenAllowance)
-            await assetToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
-
-        if (!hasBaseTokenAllowance)
-            await baseToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
-
-        if (!hasIfexTokenAllowance)
-            await ifexToken.contract.approve(SwapFactory.address, ethers.constants.MaxUint256,);
-    }, [SwapFactory.address, assetToken, baseToken, ifexToken, factoryAllowances]);
+    console.log("original", [assetToken, baseToken, ifexToken])
 
     // Check swap market exists and update contract and liquidity token
     useEffect(() => {
@@ -137,8 +88,11 @@ export const Swap = () => {
     }, [baseToken?.address, assetToken?.address]);
 
     useEffect(() => {
-        updateFactoryAllowances();
-    }, [baseToken, assetToken, ifexToken, SwapFactory]);
+        if (exchangeContract && liquidityToken) {
+            setExchangeContract(new ethers.Contract(exchangeContract.address, getAbi("SwapExchange"), signer || provider));
+            setLiquidityToken(new ethers.Contract(liquidityToken.address, getAbi("DividendERC20"), signer || provider));
+        }
+    }, [signer, provider]);
 
     const updateExchangeInfo = useCallback(async () => {
         const [exchangeAssetTokenBalance, exchangeBaseTokenBalance] = await Promise.all([
@@ -151,11 +105,11 @@ export const Swap = () => {
         setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
         setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
 
+        console.log("checking", signer, liquidityToken, address)
         if (signer && liquidityToken && address) {
-            const exchangeAllowancePromise = updateExchangeAllowances();
             
             // Update the liquidity for the user and the total liquidity
-            const accountLiquidityPromise = Promise.all([
+            await Promise.all([
                 liquidityToken.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
                 liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
@@ -166,12 +120,10 @@ export const Swap = () => {
                     depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
                 }));
             });
-
-            return Promise.all([exchangeAllowancePromise, accountLiquidityPromise]);
         }
 
         return;
-    }, [exchangeContract?.address, liquidityToken?.address, signer]);
+    }, [exchangeContract?.address, liquidityToken?.address, address]);
 
     // On exchange update, check the new exchange balance, the exchange allowance and the current liquidity balance of the user
     useEffect(() => {
@@ -182,6 +134,7 @@ export const Swap = () => {
             });
 
             exchangeContract.on("Swap", () => {
+                console.log("new swap event")
                 updateExchangeInfo();
             });
 
@@ -195,7 +148,7 @@ export const Swap = () => {
         }
         
         return () => exchangeContract?.removeAllListeners();
-    }, [exchangeContract?.address, signer, liquidityToken?.address]);
+    }, [exchangeContract?.address, address, liquidityToken?.address]);
 
     return (
         <Layout>
@@ -219,8 +172,7 @@ export const Swap = () => {
                             <CreateMarginMarket closeCreateMarginMarket={() => setShowCreateMarginMarket(false)}/>
                     }
                     {
-                        // isLoading || marginIsLoading ? 
-                        isLoading ?
+                        isLoading || (isMarginEnabled && marginIsLoading) ? 
                             <Spinner
                                 style={{ 
                                     position: "absolute", 

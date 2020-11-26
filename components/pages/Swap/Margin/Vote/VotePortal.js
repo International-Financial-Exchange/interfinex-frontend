@@ -59,11 +59,13 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
     }, [MarginMarket.address]);
 
     const updateAccount = async () => {
+        setAccount();
         const votesDeposited = humanizeTokenAmount(await MarginMarket.userVotes(address, proposalId), ifexToken);
         const userLastVote = humanizeTokenAmount(await MarginMarket.userLastVote(address, proposalId), { decimals: 0 }) * 1000;
         setAccount({
             votesDeposited,
             isVoting: userLastVote === finishDate,
+            isLoading: false,
         });
     }
 
@@ -283,7 +285,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                     </div>
 
                     {
-                        account.votesDeposited > 0 ?
+                        account?.votesDeposited > 0 ?
                             <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
                                 <InfoBubble>
                                     You have voted with {account.votesDeposited} IFEX. You can withdraw your IFEX after the vote you participated in has been finalised and a consensus has been reached. 
@@ -304,7 +306,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                         : 
                             <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%" }}>
-                                    <Text secondary bold>Cast Your vote</Text>
+                                    <Text secondary bold>Cast Your Vote</Text>
                                     <TextButton
                                         onClick={() => setVoteAmount(ifexTokenBalance)}
                                     >

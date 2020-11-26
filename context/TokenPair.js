@@ -12,7 +12,7 @@ export const TokenPairContext = createContext();
 export const TokenPairProvider = ({ children }) => {
     const router = useRouter();
     const [tokens, setTokens] = useState();
-    const { signer, networkInfo, provider, contracts: { getAbi, IfexToken, }, TestnetTokens } = useContext(EthersContext);
+    const { signer, networkInfo, provider, contracts: { getAbi, IfexToken, }, TestnetTokens, ETHEREUM_TOKEN } = useContext(EthersContext);
 
     const [assetToken, setAssetToken] = useState();
     const [baseToken, setBaseToken] = useState();
@@ -39,10 +39,10 @@ export const TokenPairProvider = ({ children }) => {
                             token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
                             return token;
                         });
-                        setTokens([IFEX_TOKEN].concat(newTokens));
+                        setTokens([IFEX_TOKEN, ETHEREUM_TOKEN].concat(newTokens));
                     });
             } else {
-                const tokens = [IFEX_TOKEN].concat(TestnetTokens);
+                const tokens = [IFEX_TOKEN, ETHEREUM_TOKEN].concat(TestnetTokens);
                 setTokens(tokens);
             }
         }

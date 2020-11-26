@@ -26,12 +26,12 @@ export const useMarginTrading = ({ swapMarketExists }) => {
     const funding = useFunding({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets });
     const { approveContract: approveAssetTokenMarket } = useContractApproval(
         AssetTokenMarginMarket, 
-        [assetToken, ifexToken, AssetTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })]
+        [assetToken, ifexToken, AssetTokenMarginMarket?.liquidityToken]
     );
     const { approveContract: approveBaseTokenMarket } = useContractApproval(
         BaseTokenMarginMarket, 
-        [baseToken, ifexToken, BaseTokenMarginMarket?.liquidityToken({ gasLimit: 1_000_000 })
-    ]);
+        [baseToken, ifexToken, BaseTokenMarginMarket?.liquidityToken]
+    );
     
     useEffect(() => {
         if (swapMarketExists) {
@@ -39,7 +39,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
             Promise.all([
                 MarginFactory.pair_to_margin_market(assetToken.address, baseToken.address),
                 MarginFactory.pair_to_margin_market(baseToken.address, assetToken.address)
-            ]).then(([assetTokenMarketAddress, baseTokenMarketAddress]) => {
+            ]).then(async ([assetTokenMarketAddress, baseTokenMarketAddress]) => {
                 const marginMarketExists = !isZeroAddress(assetTokenMarketAddress) && !isZeroAddress(baseTokenMarketAddress);
                 setMarginMarketExists(marginMarketExists);
 
@@ -50,10 +50,24 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                     const BaseTokenMarginMarket = createContract(baseTokenMarketAddress, "MarginMarket");
                     setBaseTokenMarginMarket(BaseTokenMarginMarket);
 
-                    setMarginMarkets({
-                        [assetToken.address]: AssetTokenMarginMarket,
-                        [baseToken.address]: BaseTokenMarginMarket
-                    });
+                    const [assetLiquidityToken, baseLiquidityToken] = await Promise.all([
+                        AssetTokenMarginMarket.liquidityToken({ gasLimit: 1_000_000 }),
+                        BaseTokenMarginMarket.liquidityToken({ gasLimit: 1_000_000 }),
+                    ]);
+
+                    const marginMarkets = {
+                        [assetToken.address]: { 
+                            ...AssetTokenMarginMarket, 
+                            liquidityToken: createContract(assetLiquidityToken, "DividendERC20"), 
+                        },
+                        [baseToken.address]: { 
+                            ...BaseTokenMarginMarket, 
+                            liquidityToken: createContract(baseLiquidityToken, "DividendERC20"), 
+                        },
+                    };
+
+                    setMarginMarkets(marginMarkets);
+                    await updateParameters(marginMarkets);
                 }
 
                 setIsLoading(false);
@@ -71,7 +85,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
         }
     };
 
-    const updateParameters = async () => {
+    const updateParameters = async marginMarkets => {
         await Promise.all(
             _.values(marginMarkets).map(async MarginMarket => {
                 const [
@@ -99,12 +113,6 @@ export const useMarginTrading = ({ swapMarketExists }) => {
             })
         );
     };
-
-    useEffect(() => {
-        if (marginMarkets) {
-            updateParameters();
-        }
-    }, [marginMarkets]);
 
     const updateAccount = async () => {
         setAccount({ isLoading: true });

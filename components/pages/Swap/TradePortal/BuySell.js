@@ -216,7 +216,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                             <Text>Leverage: {leverage}x</Text>
                             <SliderInput 
                                 valueLabelFormat={value => `${value}x`}
-                                defaultValue={leverage}
+                                defaultValue={maxLeverage / 2}
                                 step={0.1}
                                 min={0.1}
                                 onChange={(_, value) => setLeverage(value)}

@@ -1,0 +1,133 @@
+[
+  {
+    "name": "deposit",
+    "outputs": [],
+    "inputs": [],
+    "stateMutability": "payable",
+    "type": "function",
+    "gas": 36320
+  },
+  {
+    "name": "withdraw",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "wad"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 72290
+  },
+  {
+    "name": "approve",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "guy"
+      },
+      {
+        "type": "uint256",
+        "name": "wad"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 35746
+  },
+  {
+    "name": "transfer",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "dst"
+      },
+      {
+        "type": "uint256",
+        "name": "wad"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 1568
+  },
+  {
+    "name": "transferFrom",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "src"
+      },
+      {
+        "type": "address",
+        "name": "dst"
+      },
+      {
+        "type": "uint256",
+        "name": "wad"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 112384
+  },
+  {
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1516
+  },
+  {
+    "name": "allowance",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      },
+      {
+        "type": "address",
+        "name": "arg1"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1761
+  }
+]

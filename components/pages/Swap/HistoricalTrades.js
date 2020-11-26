@@ -105,6 +105,8 @@ const useHistoricalTrades = query => {
                 to: oldestTradeTimestamp,
                 from: 0,  
             });
+
+            console.log("fetched", trades);
             
             setTrades(existing => existing.concat(trades));
             setOldestTradeTimestamp(trades.last()?.timestamp)

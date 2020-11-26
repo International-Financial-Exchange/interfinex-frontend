@@ -172,31 +172,13 @@ export const TIMEFRAMES = {
 
 export const FEE_RATE = 0.001;
 
-export const useContractApproval = (contract, propTokens = []) => {
+// TODO: Memoize these functions - IMPORTANT!
+export const useContractApproval = (contract, tokens = []) => {
     const { address } = useContext(AccountContext);
     const { signer, contracts: { createContract }} = useContext(EthersContext);
     const [allowances, setAllowances] = useState();
-    const [tokens, setTokens] = useState();
 
-    useEffect(() => {
-        if (!tokens && propTokens.every(v => v)) {
-            Promise.all(
-                propTokens.map(async token => {
-                    if (typeof token?.then !== 'function') {
-                        return token;
-                    }
-                    
-                    const tokenAddress = await token;
-                    return {
-                        address: tokenAddress,
-                        contract: createContract(tokenAddress, "ERC20"),
-                    };
-                })
-            ).then(tokens => setTokens(tokens));
-        }
-    }, [propTokens, address]);
-
-    const updateAllowances = useCallback(async () => {
+    const updateAllowances = async () => {
         if (contract && address && tokens) {
             const allowances = await Promise.all(
                 tokens.map(async token => ({
@@ -211,23 +193,24 @@ export const useContractApproval = (contract, propTokens = []) => {
             
             setAllowances(allowances);
         }
-    }, [contract, address, tokens]);
+    };
 
-    const approveContract = useCallback(async (...tokensToApprove) => {
+    const approveContract = async (...tokensToApprove) => {
         if (tokensToApprove.length === 0) tokensToApprove = tokens;
-        console.log("allowances", allowances);
+
         await Promise.all(
             tokensToApprove.map(async token => {
                 const { hasAllowance } = allowances.find(({ address }) => address === token.address);
+                console.log("token", token, hasAllowance)
                 if (!hasAllowance) 
                     await token.contract.connect(signer).approve(contract.address, ethers.constants.MaxUint256,);
             })
         );
-    }, [tokens, allowances, signer,]);
+    };
 
     useEffect(() => {
         updateAllowances();
-    }, [contract, address, tokens]);
+    }, [contract, address]);
 
     return { approveContract };
 };

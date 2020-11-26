@@ -1,0 +1,83 @@
+[
+  {
+    "name": "initialize",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_wrappedEtherContract"
+      },
+      {
+        "type": "address",
+        "name": "_swapFactoryContract"
+      },
+      {
+        "type": "address",
+        "name": "_ifexTokenContract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 118323
+  },
+  {
+    "name": "create_exchange",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "assetTokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "assetTokenAmount"
+      },
+      {
+        "type": "uint256",
+        "name": "ifexTokenAmount"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "gas": 62569
+  },
+  {
+    "name": "wrappedEtherContract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1271
+  },
+  {
+    "name": "swapFactoryContract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1301
+  },
+  {
+    "name": "ifexTokenContract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1331
+  }
+]

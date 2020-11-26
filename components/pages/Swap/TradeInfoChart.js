@@ -54,7 +54,7 @@ export const TradeInfoChart = () => {
                 data: candles ?? {},
             }
         ])
-    }, [assetToken?.address, baseToken?.address, candles, exchangeAssetTokenBalance, exchangeBaseTokenBalance])
+    }, [assetToken?.address, baseToken?.address, candles, exchangeAssetTokenBalance, exchangeBaseTokenBalance, isExchangeInfoLoading])
 
     return (
         <Chart

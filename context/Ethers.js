@@ -47,7 +47,23 @@ export const EthersProvider = ({ children }) => {
         decimals: 18,
         address: contracts[`Token${i}`].address,
         logoURI: "/metamask-logo.png"
-    }))
+    })).concat({
+        name: `WrappedEther`,
+        symbol: `WETH`,
+        decimals: 18,
+        address: contracts[`WrappedEther`].address,
+        logoURI: "/metamask-logo.png"
+    });
+
+    const ETHEREUM_TOKEN = useMemo(() => {
+        return {
+            address: contracts[`WrappedEther`].address,
+            name: "Ethereum",
+            decimals: 18,
+            symbol: "ETH",
+            logoURI: "/logo.png",
+        }
+    }, [contracts]);
 
     useEffect(() => { 
         provider?.getNetwork().then(network => setNetworkInfo(network));
@@ -62,6 +78,7 @@ export const EthersProvider = ({ children }) => {
                 setProvider,
                 networkInfo,
                 TestnetTokens,
+                ETHEREUM_TOKEN,
                 contracts: {
                     IfexToken,
                     SwapFactory,

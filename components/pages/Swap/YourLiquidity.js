@@ -32,7 +32,7 @@ export const YourLiquidity = () => {
                 setIsDividendsLoading(false);
             });
         }
-    }, [liquidityToken]);
+    }, [liquidityToken?.address, address]);
 
     const isLoading = !account || isExchangeInfoLoading || isDividendsLoading;
 
