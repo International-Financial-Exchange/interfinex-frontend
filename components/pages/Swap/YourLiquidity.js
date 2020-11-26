@@ -26,7 +26,7 @@ export const YourLiquidity = () => {
     useEffect(() => {
         if (liquidityToken && address) {
             setIsDividendsLoading(true);
-            liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
+            liquidityToken.contract.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
                 setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
             }).then(() => {
                 setIsDividendsLoading(false);
@@ -81,7 +81,7 @@ export const YourLiquidity = () => {
                             requiresWallet
                             onClick={async () => {
                                 setIsClaimEarningsLoading(true);
-                                const transactionPromise = liquidityToken.claimDividends({ gasLimit: 1000000 });
+                                const transactionPromise = liquidityToken.contract.claimDividends({ gasLimit: 1000000 });
                                 addTransactionNotification({
                                     content: `Claim Interfinex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
                                     transactionPromise,

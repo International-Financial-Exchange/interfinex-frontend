@@ -8,6 +8,7 @@ import MarginFactoryAbi from "../public/contracts/abi/MarginFactory.json";
 import MarginMarketAbi from "../public/contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
+import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,
@@ -16,6 +17,7 @@ const ABI = {
     MarginMarket: MarginMarketAbi,
     SwapExchange: SwapExchangeAbi,
     SwapFactory: SwapFactoryAbi,
+    SwapEthRouter: SwapEthRouterAbi
 };
 
 export const EthersContext = createContext();
@@ -24,20 +26,22 @@ export const EthersProvider = ({ children }) => {
     console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState({ name: "ganache" });
+    const [networkInfo, setNetworkInfo] = useState({ name: "localhost" });
 
-    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["ganache"];
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["localhost"];
     const getAbi = abiName => ABI[abiName];
 
     const { 
         IfexToken, 
         SwapFactory,  
         MarginFactory,
+        SwapEthRouter,
     } = useMemo(() => {
         return {
             IfexToken: new ethers.Contract(contracts.IfexToken.address, getAbi("DividendERC20"), signer || provider),
             SwapFactory: new ethers.Contract(contracts.SwapFactory.address, getAbi("SwapFactory"), signer || provider),
             MarginFactory: new ethers.Contract(contracts.MarginFactory.address, getAbi("MarginFactory"), signer || provider),
+            SwapEthRouter: new ethers.Contract(contracts.SwapEthRouter.address, getAbi("SwapEthRouter"), signer || provider),
         }
     }, [networkInfo, signer]);
 
@@ -83,6 +87,7 @@ export const EthersProvider = ({ children }) => {
                     IfexToken,
                     SwapFactory,
                     MarginFactory,
+                    SwapEthRouter,
                     getAbi,
                     createContract: (address, abiName) => 
                         new ethers.Contract(address, getAbi(abiName), signer || provider)

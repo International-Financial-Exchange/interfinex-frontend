@@ -33,7 +33,7 @@ export const SwapContext = createContext();
 export const MarginContext = createContext();
 
 export const Swap = () => {
-    const { provider, signer, contracts: { SwapFactory, getAbi, }} = useContext(EthersContext);
+    const { provider, signer, contracts: { SwapFactory, getAbi, SwapEthRouter }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const [marketExists, setMarketExists] = useState(false);
@@ -61,6 +61,10 @@ export const Swap = () => {
         SwapFactory, 
         [assetToken, baseToken, ifexToken]
     );
+    const { approveContract: approveRouter } = useContractApproval(
+        SwapEthRouter, 
+        [assetToken, baseToken, ifexToken,]
+    );
 
     console.log("original", [assetToken, baseToken, ifexToken])
 
@@ -79,7 +83,7 @@ export const Swap = () => {
     
                     const liquidityTokenAddress = await exchangeContract.liquidity_token({ gasLimit: 1000000 });
                     const liquidityToken = new ethers.Contract(liquidityTokenAddress, getAbi("DividendERC20"), signer || provider);
-                    setLiquidityToken(liquidityToken);
+                    setLiquidityToken({ address: liquidityToken.address, contract: liquidityToken });
                 }
     
                 setIsLoading(false);
@@ -90,7 +94,10 @@ export const Swap = () => {
     useEffect(() => {
         if (exchangeContract && liquidityToken) {
             setExchangeContract(new ethers.Contract(exchangeContract.address, getAbi("SwapExchange"), signer || provider));
-            setLiquidityToken(new ethers.Contract(liquidityToken.address, getAbi("DividendERC20"), signer || provider));
+            setLiquidityToken({
+                ...liquidityToken,
+                contract: new ethers.Contract(liquidityToken.address, getAbi("DividendERC20"), signer || provider),
+            });
         }
     }, [signer, provider]);
 
@@ -110,9 +117,10 @@ export const Swap = () => {
             
             // Update the liquidity for the user and the total liquidity
             await Promise.all([
-                liquidityToken.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
-                liquidityToken.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
+                liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
+                liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
+                console.log("liquidity token balance", liquidityTokenTotalSupply);
                 setAccount(old => ({
                     ...old,
                     liquidityTokenBalance,
@@ -161,6 +169,7 @@ export const Swap = () => {
                     approveFactory,
                     approveExchange,
                     isMarginEnabled,
+                    approveRouter,
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
                     account,
                     liquidityToken,

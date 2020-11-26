@@ -10,32 +10,53 @@ import { EthersContext } from "../../../context/Ethers"
 import ethers from "ethers";
 import { NotificationsContext } from "../../../context/Notifications"
 import { SwapContext } from "./Swap"
+import { parseEther } from "ethers/lib/utils"
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, ifexTokenBalance } = useContext(AccountContext);
-    const { contracts: { SwapFactory }} = useContext(EthersContext);
+    const { contracts: { SwapFactory, SwapEthRouter }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
-    const { approveFactory } = useContext(SwapContext);
+    const { approveFactory, approveRouter } = useContext(SwapContext);
 
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
     const [ifexTokenAmount, setIfexTokenAmount] = useState();
 
     const onSubmit = async () => {
-        await approveFactory();
+        if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+            console.log("Sending to eth router");
+            await approveRouter();
             
-        addTransactionNotification({
-            content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
-            transactionPromise: SwapFactory.create_exchange(
-                baseToken.address, 
-                assetToken.address,
-                ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
-                ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
-                ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
-                { gasLimit: 4_500_000 }
-            ),
-        });
+            const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+            const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
+                [baseTokenAmount, assetTokenAmount] 
+                : [assetTokenAmount, baseTokenAmount];
+
+            addTransactionNotification({
+                content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                transactionPromise: SwapEthRouter.create_exchange(
+                    sendToken.address, 
+                    ethers.utils.parseUnits(sendTokenAmount.toString(), sendToken.decimals).toString(),
+                    ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                    { gasLimit: 4_500_000, value: parseEther(etherTokenAmount.toString()) }
+                ),
+            });
+        } else {
+            await approveFactory();
+
+            addTransactionNotification({
+                content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                transactionPromise: SwapFactory.create_exchange(
+                    baseToken.address, 
+                    assetToken.address,
+                    ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
+                    ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
+                    ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                    { gasLimit: 4_500_000 }
+                ),
+            });
+        }
     };
 
     return (

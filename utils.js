@@ -4,7 +4,7 @@ import { ethers, BigNumber } from "ethers";
 import { SERVER_URL } from "./ENV";
 import { AccountContext } from "./context/Account";
 import { EthersContext } from "./context/Ethers";
-import { add } from "lodash";
+import { add, update } from "lodash";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -173,44 +173,55 @@ export const TIMEFRAMES = {
 export const FEE_RATE = 0.001;
 
 // TODO: Memoize these functions - IMPORTANT!
-export const useContractApproval = (contract, tokens = []) => {
+export const useContractApproval = (contract, propTokens = []) => {
     const { address } = useContext(AccountContext);
     const { signer, contracts: { createContract }} = useContext(EthersContext);
     const [allowances, setAllowances] = useState();
-
-    const updateAllowances = async () => {
-        if (contract && address && tokens) {
-            const allowances = await Promise.all(
-                tokens.map(async token => ({
-                    address: token.address,
-                    hasAllowance: hasAllowance(await token.contract.allowance(
-                        address, 
-                        contract.address, 
-                        { gasLimit: 1000000 }
-                    ))
-                }))
-            );
-            
-            setAllowances(allowances);
-        }
-    };
+    const [tokens, setTokens] = useState([]);
 
     const approveContract = async (...tokensToApprove) => {
-        if (tokensToApprove.length === 0) tokensToApprove = tokens;
+        if (tokensToApprove.length === 0) 
+            tokensToApprove = tokens;
 
         await Promise.all(
             tokensToApprove.map(async token => {
-                const { hasAllowance } = allowances.find(({ address }) => address === token.address);
-                console.log("token", token, hasAllowance)
+                if (!tokensToApprove.every(v => v)) 
+                    throw Error("Tokens have not loaded", tokensToApprove);
+
+                if (token.name === "Ethereum") return;
+
+                const { hasAllowance } = allowances[token.address];
                 if (!hasAllowance) 
                     await token.contract.connect(signer).approve(contract.address, ethers.constants.MaxUint256,);
             })
         );
     };
 
+    const updateAllowances = async () => {
+        setAllowances({});
+        await Promise.all(tokens.map(async token => {
+            const _hasAllowance = hasAllowance(await token.contract.balanceOf(contract.address));
+            
+            setAllowances(oldState => {
+                const newState = _.cloneDeep(oldState);
+                newState[token.address] = _hasAllowance;
+                return newState;
+            });
+        }))
+    };
+
     useEffect(() => {
-        updateAllowances();
-    }, [contract, address]);
+        if (contract && address && tokens.every(v => v)) {
+            updateAllowances();
+        }
+    }, [contract?.address, address, tokens]);
+
+    useEffect(() => {
+        // If prop tokens contains a new token
+        if (!propTokens.every(propToken => tokens.some(token => propToken?.address === token?.address))) {
+            setTokens(propTokens);
+        }
+    }, [propTokens]);
 
     return { approveContract };
 };
