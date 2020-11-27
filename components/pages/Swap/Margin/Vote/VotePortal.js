@@ -248,8 +248,26 @@ export const VotePortal = ({ proposalId, MarginMarket }) => {
 const VoteDetailsContainer = styled.div`
     padding: ${PIXEL_SIZING.medium};
     width: ${CONTAINER_SIZING.large};
+    min-width: ${CONTAINER_SIZING.medium};
     display: grid;
     row-gap: ${PIXEL_SIZING.large};
+
+    #vote-details-buttons {
+        display: grid; 
+        grid-template-columns: 1fr 1fr 1fr; 
+        width: 100%; 
+        column-gap: ${PIXEL_SIZING.small};
+    }
+
+    @media (max-width: 750px) {
+        height: 100%;
+        width: 100%;
+
+        #vote-details-buttons {
+            grid-template-columns: 1fr; 
+            row-gap: ${PIXEL_SIZING.small};
+        }
+    }
 `;
 
 const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCast, depositVote, account, withdrawVote }) => {
@@ -265,7 +283,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
     console.log("account", account);
 
     return (
-        <Modal isOpen onClose={onClose}>
+        <Modal isOpen onClose={onClose} style={{ width: "100%", height: "100%" }}>
             <ModalCard>
                 <VoteDetailsContainer>
                     <div>
@@ -328,7 +346,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                                     onChange={e => setVoteAmount(e.target.value)}
                                 />
                                 
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", width: "100%", columnGap: PIXEL_SIZING.small }}>
+                                <div id={"vote-details-buttons"}>
                                     <Button 
                                         style={{ width: "100%", backgroundColor: theme.colors.positive }}
                                         onClick={() => {

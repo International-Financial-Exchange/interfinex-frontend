@@ -41,6 +41,19 @@ const Row = styled.tr`
     }
 `;
 
+const StyledTable = styled.table`
+    border-collapse: separate;
+    border-spacing: 0 ${PIXEL_SIZING.tiny};
+    width: 100%;
+    position: relative;
+
+    @media (max-width: 1000px) {
+        th:nth-child(4), td:nth-child(4) {
+            display:none;
+        }
+    }
+`;
+
 const useFundingHistory = ({ marginMarketContract }) => {
     const [fundingEvents, setFundingEvents] = useState([]);
     const [gotAllFundingEvents, setGotAllFundingEvents] = useState(false);
@@ -94,7 +107,7 @@ export const FundingHistory = () => {
                 hasMore={!gotAllFundingEvents}
                 useWindow={false}
             >
-                <table style={{ borderCollapse: "separate", borderSpacing: `0 ${PIXEL_SIZING.tiny}`, width: "100%", position: "relative" }}>
+                <StyledTable>
                     <tr>
                         <th style={{ padding: PIXEL_SIZING.small }}>
                             <Text secondary>Event</Text>
@@ -126,7 +139,7 @@ export const FundingHistory = () => {
                                 </Row>
                             )
                     }
-                </table>
+                </StyledTable>
 
                 {
                     isLoading &&

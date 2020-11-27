@@ -30,9 +30,9 @@ export const EthersProvider = ({ children }) => {
     console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState({ name: "localhost" });
+    const [networkInfo, setNetworkInfo] = useState({ name: "ganache" });
 
-    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["localhost"];
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["ganache"];
     const getAbi = abiName => ABI[abiName];
 
     const { 

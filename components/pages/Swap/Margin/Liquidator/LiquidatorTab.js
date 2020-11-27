@@ -114,6 +114,30 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
     return [positions, isLoading, getMorePositions, gotAllPositions];
 };
 
+const StyledTable = styled.table`
+    width: 100%; 
+    border-spacing: ${PIXEL_SIZING.small}; 
+    position: relative;
+
+    @media (max-width: 1100px) {
+        th:nth-child(5), td:nth-child(5) {
+            display:none;
+        }
+    }
+
+    @media (max-width: 900px) {
+        th:nth-child(3), td:nth-child(3) {
+            display:none;
+        }
+    }
+
+    @media (max-width: 700px) {
+        th:nth-child(4), td:nth-child(4) {
+            display:none;
+        }
+    }
+`;
+
 export const LiquidatorTab = ({ isSelected }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
     const { marginMarkets, } = useContext(MarginContext);
@@ -149,13 +173,13 @@ export const LiquidatorTab = ({ isSelected }) => {
                         <Text primary>Positions</Text>
                     </div>
 
-                    <div style={{ maxHeight: CONTAINER_SIZING.huge, minHeight: CONTAINER_SIZING.medium, overflow: "scroll", padding: `0 ${PIXEL_SIZING.medium}` }}>
+                    <div style={{ maxHeight: CONTAINER_SIZING.huge, minHeight: CONTAINER_SIZING.medium, overflow: "scroll", padding: `0 ${PIXEL_SIZING.small}` }}>
                         <InfiniteScroll
                             loadMore={getMorePositions}
                             hasMore={!gotAllPositions}
                             useWindow={false}
                         >
-                            <table style={{ width: "100%", borderSpacing: PIXEL_SIZING.small, position: "relative" }}>
+                            <StyledTable>
                                 <tr>
                                     <th><Text secondary>Liquidation Ratio</Text></th>
                                     <th><Text secondary>Position Size</Text></th>
@@ -174,7 +198,7 @@ export const LiquidatorTab = ({ isSelected }) => {
                                             <PositionRow {...position} key={position.user}/>
                                         )
                                 }
-                            </table>
+                            </StyledTable>
 
                             {
                                 isLoading &&

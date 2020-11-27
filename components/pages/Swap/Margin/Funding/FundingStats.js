@@ -7,6 +7,23 @@ import { Card } from "../../../../core/Card";
 import Text from "../../../../core/Text";
 import { MarginContext } from "../../Swap";
 import { FundingContext } from "./FundingTab";
+import styled from "styled-components";
+
+const StyledTable = styled.table`
+    width: 100%;
+
+    @media (max-width: 750px) {
+        th:nth-child(4), td:nth-child(4) {
+            display:none;
+        }
+    }
+
+    @media (max-width: 500px) {
+        th:nth-child(2), td:nth-child(2) {
+            display:none;
+        }
+    }
+`;
 
 export const FundingStats = () => {
     const { MarginMarket } = useContext(FundingContext);
@@ -15,8 +32,8 @@ export const FundingStats = () => {
     const theme = useContext(ThemeContext);
 
     return (
-        <Card style={{ width: "100%" }}>
-            <table style={{ width: "100%" }}>
+        <Card style={{ width: "100%", }}>
+            <StyledTable>
                 <tr>
                     <th><Text secondary>Interest Rate (Yield)</Text></th>
                     <th><Text secondary>Utilisation Rate</Text></th>
@@ -64,7 +81,7 @@ export const FundingStats = () => {
                             </>
                     }
                 </tr>
-            </table>
+            </StyledTable>
         </Card>
     );
 }

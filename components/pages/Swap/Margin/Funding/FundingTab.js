@@ -17,10 +17,20 @@ const Container = styled.div`
     grid-template-columns: 1fr auto;
     row-gap: ${PIXEL_SIZING.large};
     column-gap: ${PIXEL_SIZING.large};
-    grid-template-areas: 
-        "stats      stats"
-        "history    account-info"
-    ;
+
+    #funding-stats {
+        grid-column: 1 / 3;
+    }
+
+    @media (max-width: 800px) {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+
+        #funding-stats {
+            grid-column: auto;
+        }
+    }
 `;
 
 export const FundingContext = createContext();
@@ -50,15 +60,15 @@ export const FundingTab = ({ isSelected }) => {
                 />
 
                 <Container>
-                    <div style={{ gridArea: "stats" }}>
+                    <div id={"funding-stats"}>
                         <FundingStats/>
                     </div>
 
-                    <div style={{ gridArea: "history", }}>
+                    <div>
                         <FundingHistory/>
                     </div>
 
-                    <div style={{ gridArea: "account-info", display: "grid", rowGap: PIXEL_SIZING.large }}>
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.large }}>
                         <FundingDepositPortal/>
                         <YourFunding/>
                     </div>

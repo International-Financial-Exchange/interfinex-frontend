@@ -32,6 +32,25 @@ import { add } from "lodash";
 export const SwapContext = createContext();
 export const MarginContext = createContext();
 
+const TitleContainer = styled.div`
+    display: grid;
+    grid-template-columns: 1fr auto;
+    width: 100%;
+    align-items: end;
+    margin-top: ${PIXEL_SIZING.medium};
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+        row-gap: ${PIXEL_SIZING.medium};
+
+        #enable-margin-trading {
+            justify-items: left;
+            grid-template-columns: auto 1fr;
+            width: fit-content;
+        }
+    }
+`;
+
 export const Swap = () => {
     const { provider, signer, contracts: { SwapFactory, getAbi, SwapEthRouter, MarginEthRouter }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
@@ -65,11 +84,6 @@ export const Swap = () => {
         SwapEthRouter, 
         [assetToken, baseToken, ifexToken, liquidityToken]
     );
-    const { approveContract: approveMarginRouter } = useContractApproval(
-        MarginEthRouter, 
-        [assetToken, baseToken, ifexToken, liquidityToken]
-    );
-
 
     console.log("original", [assetToken, baseToken, ifexToken])
 
@@ -178,7 +192,6 @@ export const Swap = () => {
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
                     account,
                     liquidityToken,
-                    approveMarginRouter,
                 }}
             >
                 <MarginContext.Provider value={marginContextState}>     
@@ -199,21 +212,24 @@ export const Swap = () => {
                         : 
                             marketExists ?
                                 <div style={{ paddingTop: PIXEL_SIZING.medium, }}>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%", alignItems: "end", marginTop: PIXEL_SIZING.medium }}>
+                                    <TitleContainer>
                                         <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.small }}>
                                             <TokenAndLogo token={assetToken} primary/>
                                             <Text primary bold>/</Text>
                                             <TokenAndLogo token={baseToken} primary/>
                                         </div>
 
-                                        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", columnGap: PIXEL_SIZING.tiny }}>
+                                        <div 
+                                            id={"enable-margin-trading"} 
+                                            style={{ display: "grid", gridTemplateColumns: "1fr auto", alignItems: "center", columnGap: PIXEL_SIZING.tiny, }}
+                                        >
                                             <Text bold>Enable Margin Trading</Text>
                                             <SwitchInput
                                                 value={isMarginEnabled}
                                                 onChange={e => setIsMarginEnabled(e)}
                                             />
                                         </div>
-                                    </div>
+                                    </TitleContainer>
 
                                     {
                                         isMarginEnabled &&
