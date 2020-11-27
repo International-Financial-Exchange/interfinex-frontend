@@ -202,12 +202,10 @@ export const useContractApproval = (contract, propTokens = []) => {
 
                 if (token.name === "Ethereum") return;
 
-                console.log(token.name);
-                console.log(allowances);
-
-                const { hasAllowance } = allowances[token.address];
-                if (!hasAllowance) 
+                const hasAllowance = allowances[token.address];
+                if (!hasAllowance) {
                     await token.contract.connect(signer).approve(contract.address, ethers.constants.MaxUint256,);
+                }
             })
         );
     };
@@ -216,7 +214,8 @@ export const useContractApproval = (contract, propTokens = []) => {
         setAllowances({});
         await Promise.all(tokens.map(async token => {
             if (!token) return;
-            const _hasAllowance = hasAllowance(await token.contract.balanceOf(contract.address));
+
+            const _hasAllowance = hasAllowance(await token.contract.allowance(address, contract.address));
             
             setAllowances(oldState => {
                 const newState = _.cloneDeep(oldState);
