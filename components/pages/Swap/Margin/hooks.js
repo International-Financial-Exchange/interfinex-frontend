@@ -43,7 +43,6 @@ export const useMarginTrading = ({ swapMarketExists }) => {
         ]
     );
 
-
     useEffect(() => {
         if (swapMarketExists) {
             setIsLoading(true);
@@ -90,7 +89,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                 setIsLoading(false);
             });
         }
-    }, [swapMarketExists, assetToken, baseToken]);
+    }, [swapMarketExists, assetToken?.address, baseToken?.address]);
 
     const setIsMarginEnabled = value => {
         if (!value) return _setIsMarginEnabled(value);
