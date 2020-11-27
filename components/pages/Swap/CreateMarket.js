@@ -23,38 +23,45 @@ export const CreateMarket = () => {
     const [baseTokenAmount, setBaseTokenAmount] = useState();
     const [ifexTokenAmount, setIfexTokenAmount] = useState();
 
+    const [isLoading, setIsLoading] = useState();
+
     const onSubmit = async () => {
-        if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
-            const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
-            const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
-                [baseTokenAmount, assetTokenAmount] 
-                : [assetTokenAmount, baseTokenAmount];
-            
-            await approveRouter(sendToken, ifexToken);
-
-            addTransactionNotification({
-                content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
-                transactionPromise: SwapEthRouter.create_exchange(
-                    sendToken.address, 
-                    ethers.utils.parseUnits(sendTokenAmount.toString(), sendToken.decimals).toString(),
-                    ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
-                    { gasLimit: 4_500_000, value: parseEther(etherTokenAmount.toString()) }
-                ),
-            });
-        } else {
-            await approveFactory();
-
-            addTransactionNotification({
-                content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
-                transactionPromise: SwapFactory.create_exchange(
-                    baseToken.address, 
-                    assetToken.address,
-                    ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
-                    ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
-                    ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
-                    { gasLimit: 4_500_000 }
-                ),
-            });
+        setIsLoading(true);
+        try {
+            if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+                const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+                const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
+                    [baseTokenAmount, assetTokenAmount] 
+                    : [assetTokenAmount, baseTokenAmount];
+                
+                await approveRouter(sendToken, ifexToken);
+    
+                addTransactionNotification({
+                    content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                    transactionPromise: SwapEthRouter.create_exchange(
+                        sendToken.address, 
+                        ethers.utils.parseUnits(sendTokenAmount.toString(), sendToken.decimals).toString(),
+                        ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                        { gasLimit: 4_500_000, value: parseEther(etherTokenAmount.toString()) }
+                    ),
+                });
+            } else {
+                await approveFactory();
+    
+                addTransactionNotification({
+                    content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                    transactionPromise: SwapFactory.create_exchange(
+                        baseToken.address, 
+                        assetToken.address,
+                        ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
+                        ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
+                        ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                        { gasLimit: 4_500_000 }
+                    ),
+                });
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -103,6 +110,7 @@ export const CreateMarket = () => {
             <Button 
                 style={{ height: PIXEL_SIZING.larger, width: "100%" }}
                 requiresWallet
+                isLoading={isLoading}
                 onClick={onSubmit}
             >
                 Create Swap Market

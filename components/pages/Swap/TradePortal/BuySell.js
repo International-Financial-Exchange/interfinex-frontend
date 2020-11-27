@@ -7,7 +7,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { FEE_RATE, parseTokenAmount, PIXEL_SIZING } from "../../../../utils";
+import { FEE_RATE, parseTokenAmount, PIXEL_SIZING, useAuthorizeContract } from "../../../../utils";
 import { Button, TextButton } from "../../../core/Button";
 import { ContentAndArrow } from "../../../core/ContentAndArrow";
 import { InputAndLabel } from "../../../core/InputAndLabel";
@@ -35,7 +35,7 @@ const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate)
 export const BuySell = ({ isBuy, isMargin }) => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0 } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
-    const { contracts: { SwapEthRouter }} = useContext(EthersContext);
+    const { contracts: { SwapEthRouter, MarginEthRouter }} = useContext(EthersContext);
     const { 
         exchangeContract, 
         price, 
@@ -53,6 +53,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const [slippageValue, setSlippageValue] = useState(0.1);
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
+    // const authorizeMarginEthRouter = useAuthorizeContract();
     
     // Margin trading variables
     const { parameters: _parameters, marginMarkets, approveMarginMarket } = useContext(MarginContext);
@@ -86,12 +87,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     assetTokenAmount 
                     : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
     
-                console.log("swap router");
-
                 await approveRouter(sendToken);
 
-                console.log("router", SwapEthRouter);
-    
                 await addTransactionNotification({
                     content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: SwapEthRouter.swap(
@@ -143,10 +140,11 @@ export const BuySell = ({ isBuy, isMargin }) => {
 
     const marginTrade = async () => {
         setIsLoading(true);
-        try {   
+        try {
             const slippagePercentage = slippageValue / 100;
             const [sendToken, receiveToken] = isBuy ? [baseToken, assetToken] : [assetToken, baseToken];
             const MarginMarket = marginMarkets[sendToken.address];
+            const MarginMarket2 = marginMarkets[baseToken.address];
             const approve = approveMarginMarket[sendToken.address];
 
             const receiveAmount = isBuy ? 
@@ -157,20 +155,42 @@ export const BuySell = ({ isBuy, isMargin }) => {
             console.log("initial margin", initialMargin);
             console.log("maintenance margin", maintenanceMargin);
             console.log("borrow amount", borrowAmount);
-            
-            await approve(sendToken);
-            await addTransactionNotification({
-                content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
-                transactionPromise: MarginMarket.increasePosition(
-                    parseTokenAmount(initialMargin + maintenanceMargin, sendToken),
-                    parseTokenAmount(borrowAmount, sendToken), 
-                    parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                    parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
-                    0,
-                    false,
-                    { gasLimit: 500_000 },
-                ),
-            });
+
+            if (sendToken.name === "Ethereum") {
+                // TODO: Cache this authorization result in a hook somewhere
+                const isAuthorized = await MarginMarket.isAuthorized(address, MarginEthRouter.address);
+                if (!isAuthorized) {
+                    await MarginMarket.authorize(MarginEthRouter.address);
+                }
+
+                await addTransactionNotification({
+                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    transactionPromise: MarginEthRouter.increasePosition(
+                        receiveToken.address,
+                        parseTokenAmount(borrowAmount, sendToken), 
+                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        0,
+                        false,
+                        { gasLimit: 500_000, value: parseEther((initialMargin + maintenanceMargin).toString()) },
+                    ),
+                });
+            } else {
+                await approve(sendToken);
+                await addTransactionNotification({
+                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    transactionPromise: MarginMarket.increasePosition(
+                        parseTokenAmount(initialMargin + maintenanceMargin, sendToken),
+                        parseTokenAmount(borrowAmount, sendToken), 
+                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        0,
+                        false,
+                        address,
+                        { gasLimit: 500_000 },
+                    ),
+                });
+            }
         } finally {
             setIsLoading(false);
         }

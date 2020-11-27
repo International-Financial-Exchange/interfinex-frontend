@@ -9,7 +9,7 @@ import { MarginContext, Swap } from "../Swap";
 import { useFunding } from "./Funding/hooks";
 
 export const useMarginTrading = ({ swapMarketExists }) => {
-    const { contracts: { MarginFactory, createContract }} = useContext(EthersContext);
+    const { contracts: { MarginFactory, createContract, MarginEthRouter }} = useContext(EthersContext);
     const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const [isLoading, setIsLoading] = useState();
@@ -26,13 +26,24 @@ export const useMarginTrading = ({ swapMarketExists }) => {
     const funding = useFunding({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets });
     const { approveContract: approveAssetTokenMarket } = useContractApproval(
         AssetTokenMarginMarket, 
-        [assetToken, ifexToken, AssetTokenMarginMarket?.liquidityToken]
+        [assetToken, ifexToken, marginMarkets?.[assetToken.address]?.liquidityToken]
     );
     const { approveContract: approveBaseTokenMarket } = useContractApproval(
         BaseTokenMarginMarket, 
-        [baseToken, ifexToken, BaseTokenMarginMarket?.liquidityToken]
+        [baseToken, ifexToken, marginMarkets?.[baseToken.address]?.liquidityToken]
     );
-    
+    const { approveContract: approveMarginRouter } = useContractApproval(
+        MarginEthRouter, 
+        [
+            assetToken, 
+            baseToken, 
+            ifexToken, 
+            marginMarkets?.[baseToken.address]?.liquidityToken, 
+            marginMarkets?.[assetToken.address]?.liquidityToken
+        ]
+    );
+
+
     useEffect(() => {
         if (swapMarketExists) {
             setIsLoading(true);
@@ -58,11 +69,17 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                     const marginMarkets = {
                         [assetToken.address]: { 
                             ...AssetTokenMarginMarket, 
-                            liquidityToken: createContract(assetLiquidityToken, "DividendERC20"), 
+                            liquidityToken: { 
+                                address: assetLiquidityToken,
+                                contract: createContract(assetLiquidityToken, "DividendERC20") 
+                            }, 
                         },
                         [baseToken.address]: { 
                             ...BaseTokenMarginMarket, 
-                            liquidityToken: createContract(baseLiquidityToken, "DividendERC20"), 
+                            liquidityToken: { 
+                                address: baseLiquidityToken, 
+                                contract: createContract(baseLiquidityToken, "DividendERC20") 
+                            }, 
                         },
                     };
 
@@ -92,12 +109,12 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                     interestMultiplier, 
                     minInitialMarginRate, 
                     maintenanceMarginRate, 
-                    maxBorrowAmount
+                    maxBorrowAmountRate
                 ] = (await Promise.all([
                     MarginMarket.interestMultiplier({ gasLimit: 1_000_000 }),
                     MarginMarket.minInitialMarginRate({ gasLimit: 1_000_000 }),
                     MarginMarket.maintenanceMarginRate({ gasLimit: 1_000_000 }),
-                    MarginMarket.maxBorrowAmount({ gasLimit: 1_000_000 })
+                    MarginMarket.maxBorrowAmountRate({ gasLimit: 1_000_000 })
                 ])).map(res => humanizeTokenAmount(res, { decimals: 18 }));
 
                 setParameters((oldState = {}) => {
@@ -106,7 +123,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                         interestMultiplier,
                         minInitialMarginRate,
                         maintenanceMarginRate,
-                        maxBorrowAmount
+                        maxBorrowAmountRate
                     };
                     return newState;
                 });
@@ -161,6 +178,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
         setShowCreateMarginMarket,
         parameters,
         account,
+        approveMarginRouter,
         approveMarginMarket: {
             [assetToken?.address]: approveAssetTokenMarket,
             [baseToken?.address]: approveBaseTokenMarket,

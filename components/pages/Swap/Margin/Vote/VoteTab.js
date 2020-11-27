@@ -25,8 +25,8 @@ export const PROPOSAL_IDS = {
     initialMargin: 1,
     maintenanceMargin: 2,
     interestMultiplier: 3,
-    maxBorrowAmount: 4,  
-    liquidateVolume: 5,
+    maxBorrowAmountRate: 4,  
+    maxLiquidateVolumeRate: 5,
     votingDuration: 6,
 };
 
@@ -36,14 +36,14 @@ export const PROPOSAL_INFO = {
         description: "The minimum amount of collateral that a user must post relative to the amount borrowed.", 
         multiplier: 10, 
         contractKey: "minInitialMarginRate",
-        formatValue: value => humanizeTokenAmount(value, { decimals: 18 }).toFixed(4) + "%" 
+        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%" 
     },
     [PROPOSAL_IDS.maintenanceMargin]: { 
         name: "Maintenance Margin", 
         description: "The amount of collateral that a user must post as insurance in case their position gets liquidated.", 
         multiplier: 5, 
         contractKey: "maintenanceMarginRate",
-        formatValue: value => humanizeTokenAmount(value, { decimals: 18 }).toFixed(4) + "%"
+        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%"
     },
     [PROPOSAL_IDS.interestMultiplier]: { 
         name: "Interest Multiplier", 
@@ -52,19 +52,19 @@ export const PROPOSAL_INFO = {
         contractKey: "interestMultiplier", 
         formatValue: value => humanizeTokenAmount(value, { decimals: 18 }).toFixed(4) + "x"
     },
-    [PROPOSAL_IDS.maxBorrowAmount]: { 
+    [PROPOSAL_IDS.maxBorrowAmountRate]: { 
         name: "Max Borrow Amount", 
         description: "The maxium amount that a user can borrow in a single position.", 
-        multiplier: 20, 
-        contractKey: "maxBorrowAmount",
-        formatValue: (value, assetToken) => `${humanizeTokenAmount(value, assetToken)} ${assetToken.symbol}`,
+        multiplier: 10, 
+        contractKey: "maxBorrowAmountRate",
+        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",
     },
-    [PROPOSAL_IDS.liquidateVolume]: { 
+    [PROPOSAL_IDS.maxLiquidateVolumeRate]: { 
         name: "Max Liquidate Volume", 
         description: "The maxium amount of liquidations that can occur in a single block - if there is only one liquidation, then this value will be ignored.", 
-        multiplier: 30, 
-        contractKey: "maxLiquidateVolume",
-        formatValue: (value, assetToken) => `${humanizeTokenAmount(value, assetToken)} ${assetToken.symbol}`,
+        multiplier: 10, 
+        contractKey: "maxLiquidateVolumeRate",
+        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",
     },
     [PROPOSAL_IDS.votingDuration]: { 
         name: "Voting Duration", 

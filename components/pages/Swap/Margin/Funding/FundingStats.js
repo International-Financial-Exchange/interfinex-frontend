@@ -49,9 +49,9 @@ export const FundingStats = () => {
                                 <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
                                     <Text primary bold>
                                         {
-                                            Number.isNaN(stats.totalBorrowed / stats.totalReserved) ? 
+                                            Number.isNaN(stats.totalBorrowed / (stats.totalReserved + stats.totalBorrowed)) ? 
                                                 0 
-                                                : (stats.totalBorrowed / stats.totalReserved * 100).toFixed(4)
+                                                : (stats.totalBorrowed / (stats.totalReserved + stats.totalBorrowed) * 100).toFixed(4)
                                         }%
                                     </Text>
                                 </td>

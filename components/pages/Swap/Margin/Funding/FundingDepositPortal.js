@@ -1,7 +1,9 @@
+import { parseEther } from "ethers/lib/utils";
 import { useContext, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import styled from "styled-components";
 import { AccountContext } from "../../../../../context/Account";
+import { EthersContext } from "../../../../../context/Ethers";
 import { NotificationsContext } from "../../../../../context/Notifications";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { CONTAINER_SIZING, parseTokenAmount, PIXEL_SIZING } from "../../../../../utils";
@@ -21,14 +23,15 @@ const Container = styled(Card)`
 `;
 
 export const FundingDepositPortal = () => {
-    const { assetToken } = useContext(TokenPairContext);
+    const { assetToken, baseToken } = useContext(TokenPairContext);
     const { selectedToken, liquidityToken: _liquidityToken, account: _account, stats, isLoading } = useContext(FundingContext);
-    const { approveMarginMarket: _approveMarginMarket, marginMarkets } = useContext(MarginContext);
+    const { approveMarginMarket: _approveMarginMarket, marginMarkets, approveMarginRouter } = useContext(MarginContext);
     const [tokenAmount, setTokenAmount] = useState();
     const [isDepositLoading, setIsDepositLoading] = useState();
     const [isWithdrawLoading, setIsWithdrawLoading] = useState();
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
+    const { contracts: { MarginEthRouter }} = useContext(EthersContext);
 
     const isAssetToken = selectedToken.address === assetToken.address;
 
@@ -37,6 +40,62 @@ export const FundingDepositPortal = () => {
     const approveMarginMarket = _approveMarginMarket?.[selectedToken.address];
     const account = _account?.[selectedToken.address];
     const totalValue = stats?.[MarginMarket.address]?.totalValue;
+
+    const depositLiquidity = async () => {
+        setIsDepositLoading(true);
+        try {
+            if (selectedToken.name === "Ethereum") {
+                await addTransactionNotification({
+                    content: `Deposit ${tokenAmount} ${selectedToken.symbol} to the funding pool`,
+                    transactionPromise: MarginEthRouter.deposit(
+                        isAssetToken ? baseToken.address : assetToken.address,
+                        { value: parseEther(tokenAmount.toString()), gasLimit: 375_000 }
+                    )
+                });
+            } else {
+                await approveMarginMarket(selectedToken);
+    
+                await addTransactionNotification({
+                    content: `Deposit ${tokenAmount} ${selectedToken.symbol} to the funding pool`,
+                    transactionPromise: MarginMarket.deposit(
+                        parseTokenAmount(tokenAmount, selectedToken),
+                    )
+                });
+            }
+        } finally {
+            setIsDepositLoading(false);
+        }
+    }
+
+    const withdrawLiquidity = async () => {
+        setIsWithdrawLoading(true);
+        try {
+            if (selectedToken.name === "Ethereum") {
+                await approveMarginRouter(liquidityToken);
+    
+                const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
+                await addTransactionNotification({
+                    content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,
+                    transactionPromise: MarginEthRouter.withdraw(
+                        isAssetToken ? baseToken.address : assetToken.address,
+                        parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                    )
+                });
+            } else {
+                await approveMarginMarket(liquidityToken);
+    
+                const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
+                await addTransactionNotification({
+                    content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,
+                    transactionPromise: MarginMarket.withdraw(
+                        parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
+                    )
+                });
+            }
+        } finally {
+            setIsWithdrawLoading(false);
+        }
+    }
 
     return (
         <Container>
@@ -78,21 +137,7 @@ export const FundingDepositPortal = () => {
                             style={{ width: "100%", height: PIXEL_SIZING.larger }}
                             requiresWallet
                             isLoading={isDepositLoading}
-                            onClick={async () => {
-                                setIsDepositLoading(true);
-                                try {
-                                    await approveMarginMarket(selectedToken);
-            
-                                    await addTransactionNotification({
-                                        content: `Deposit ${tokenAmount} ${selectedToken.symbol} to the funding pool`,
-                                        transactionPromise: MarginMarket.deposit(
-                                            parseTokenAmount(tokenAmount, selectedToken),
-                                        )
-                                    });
-                                } finally {
-                                    setIsDepositLoading(false);
-                                }
-                            }}
+                            onClick={depositLiquidity}
                         >
                             <Text primary style={{ color: "white", fontSize: 15 }}>
                                 Deposit Liquidity
@@ -104,22 +149,7 @@ export const FundingDepositPortal = () => {
                             requiresWallet
                             style={{ width: "100%", height: PIXEL_SIZING.larger }}
                             isLoading={isWithdrawLoading}
-                            onClick={async () => {
-                                setIsWithdrawLoading(true);
-                                try {
-                                    await approveMarginMarket(liquidityToken);
-            
-                                    const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
-                                    await addTransactionNotification({
-                                        content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,
-                                        transactionPromise: MarginMarket.withdraw(
-                                            parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
-                                        )
-                                    });
-                                } finally {
-                                    setIsWithdrawLoading(false);
-                                }
-                            }}
+                            onClick={withdrawLiquidity}
                         >
                             <Text primary style={{ color: "white", fontSize: 15 }}>
                                 Withdraw Liquidity

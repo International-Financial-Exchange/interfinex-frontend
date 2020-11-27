@@ -9,8 +9,9 @@ import MarginMarketAbi from "../public/contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
 import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
-import { humanizeTokenAmount } from "../utils";
+import MarginEthRouterAbi from "../public/contracts/abi/MarginEthRouter.json";
 import { formatEther, parseEther } from "ethers/lib/utils";
+import { useAuthorizeContract } from "../utils";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,
@@ -19,7 +20,8 @@ const ABI = {
     MarginMarket: MarginMarketAbi,
     SwapExchange: SwapExchangeAbi,
     SwapFactory: SwapFactoryAbi,
-    SwapEthRouter: SwapEthRouterAbi
+    SwapEthRouter: SwapEthRouterAbi,
+    MarginEthRouter: MarginEthRouterAbi
 };
 
 export const EthersContext = createContext();
@@ -38,12 +40,14 @@ export const EthersProvider = ({ children }) => {
         SwapFactory,  
         MarginFactory,
         SwapEthRouter,
+        MarginEthRouter,
     } = useMemo(() => {
         return {
             IfexToken: new ethers.Contract(contracts.IfexToken.address, getAbi("DividendERC20"), signer || provider),
             SwapFactory: new ethers.Contract(contracts.SwapFactory.address, getAbi("SwapFactory"), signer || provider),
             MarginFactory: new ethers.Contract(contracts.MarginFactory.address, getAbi("MarginFactory"), signer || provider),
             SwapEthRouter: new ethers.Contract(contracts.SwapEthRouter.address, getAbi("SwapEthRouter"), signer || provider),
+            MarginEthRouter: new ethers.Contract(contracts.MarginEthRouter.address, getAbi("MarginEthRouter"), signer || provider),
         }
     }, [networkInfo, signer]);
 
@@ -99,6 +103,7 @@ export const EthersProvider = ({ children }) => {
                     SwapFactory,
                     MarginFactory,
                     SwapEthRouter,
+                    MarginEthRouter,
                     getAbi,
                     createContract: (address, abiName) => 
                         new ethers.Contract(address, getAbi(abiName), signer || provider)

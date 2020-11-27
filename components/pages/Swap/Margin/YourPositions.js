@@ -1,5 +1,7 @@
 import { useContext, useState } from "react"
 import Skeleton from "react-loading-skeleton"
+import { AccountContext } from "../../../../context/Account"
+import { EthersContext } from "../../../../context/Ethers"
 import { NotificationsContext } from "../../../../context/Notifications"
 import { TokenPairContext } from "../../../../context/TokenPair"
 import { CONTAINER_SIZING, FEE_RATE, PIXEL_SIZING } from "../../../../utils"
@@ -17,10 +19,37 @@ export const YourPositions = () => {
     const [selectedTab, setSelectedTab] = useState(TABS.longs);
     const { exchangeAssetTokenBalance, exchangeBaseTokenBalance, } = useContext(SwapContext);
     const { account: { basePosition, assetPosition, isLoading }, marginMarkets } = useContext(MarginContext);
+    const { address } = useContext(AccountContext);
+    const { contracts: { MarginEthRouter }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
 
     const position = selectedTab === TABS.longs ? basePosition : assetPosition;
     const [borrowToken, tradeToken] = selectedTab === TABS.longs ? [baseToken, assetToken] : [assetToken, baseToken];
+
+    const closePosition = async () => {
+        if (borrowToken.name === "Ethereum") {
+            const MarginMarket = marginMarkets[borrowToken.address];
+            // TODO: Cache this authorization result in a hook somewhere
+            const isAuthorized = await MarginMarket.isAuthorized(address, MarginEthRouter.address);
+            if (!isAuthorized) {
+                await MarginMarket.authorize(MarginEthRouter.address);
+            }
+
+            await addTransactionNotification({
+                content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
+                transactionPromise: MarginEthRouter.closePosition(
+                    tradeToken.address, 0, 0, 0, false,
+                    { gasLimit: 300_000 }
+                ),
+            });
+        } else {
+            const MarginMarket = marginMarkets[borrowToken.address];
+            await addTransactionNotification({
+                content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
+                transactionPromise: MarginMarket.closePosition(0, 0, 0, false, address),
+            });
+        }
+    }
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
@@ -93,13 +122,7 @@ export const YourPositions = () => {
                     <Button 
                         primary 
                         style={{ width: "100%" }}
-                        onClick={async () => {
-                            const MarginMarket = marginMarkets[borrowToken.address];
-                            await addTransactionNotification({
-                                content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
-                                transactionPromise: MarginMarket.closePosition(0, 0, 0, false),
-                            });
-                        }}
+                        onClick={closePosition}
                     >
                         Close {selectedTab === TABS.longs ? "Long" : "Short"} Position
                     </Button>

@@ -172,6 +172,18 @@ export const TIMEFRAMES = {
 
 export const FEE_RATE = 0.001;
 
+export const useAuthorizeContract = (contractsToApprove, targetContract) => {
+    const { signer, } = useContext(EthersContext);
+    const [isAuthorized, setIsAuthorized] = useState(false);
+
+    useEffect(() => {
+        if (contract && signer) {
+            // const isAuthorized = await contract.isAuthorized();
+            console.log(isAuthorized);
+        }
+    }, [signer, contract]);
+};
+
 // TODO: Memoize these functions - IMPORTANT!
 export const useContractApproval = (contract, propTokens = []) => {
     const { address } = useContext(AccountContext);

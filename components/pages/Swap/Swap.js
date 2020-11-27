@@ -33,7 +33,7 @@ export const SwapContext = createContext();
 export const MarginContext = createContext();
 
 export const Swap = () => {
-    const { provider, signer, contracts: { SwapFactory, getAbi, SwapEthRouter }} = useContext(EthersContext);
+    const { provider, signer, contracts: { SwapFactory, getAbi, SwapEthRouter, MarginEthRouter }} = useContext(EthersContext);
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { address } = useContext(AccountContext);
     const [marketExists, setMarketExists] = useState(false);
@@ -65,6 +65,11 @@ export const Swap = () => {
         SwapEthRouter, 
         [assetToken, baseToken, ifexToken, liquidityToken]
     );
+    const { approveContract: approveMarginRouter } = useContractApproval(
+        MarginEthRouter, 
+        [assetToken, baseToken, ifexToken, liquidityToken]
+    );
+
 
     console.log("original", [assetToken, baseToken, ifexToken])
 
@@ -173,6 +178,7 @@ export const Swap = () => {
                     price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
                     account,
                     liquidityToken,
+                    approveMarginRouter,
                 }}
             >
                 <MarginContext.Provider value={marginContextState}>     
