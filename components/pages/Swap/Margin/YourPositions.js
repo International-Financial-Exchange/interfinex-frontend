@@ -22,32 +22,38 @@ export const YourPositions = () => {
     const { address } = useContext(AccountContext);
     const { contracts: { MarginEthRouter }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
+    const [isSubmitLoading, setIsSubmitLoading] = useState();
 
     const position = selectedTab === TABS.longs ? basePosition : assetPosition;
     const [borrowToken, tradeToken] = selectedTab === TABS.longs ? [baseToken, assetToken] : [assetToken, baseToken];
 
     const closePosition = async () => {
-        if (borrowToken.name === "Ethereum") {
-            const MarginMarket = marginMarkets[borrowToken.address];
-            // TODO: Cache this authorization result in a hook somewhere
-            const isAuthorized = await MarginMarket.isAuthorized(address, MarginEthRouter.address);
-            if (!isAuthorized) {
-                await MarginMarket.authorize(MarginEthRouter.address);
+        setIsSubmitLoading(true);
+        try {
+            if (borrowToken.name === "Ethereum") {
+                const MarginMarket = marginMarkets[borrowToken.address];
+                // TODO: Cache this authorization result in a hook somewhere
+                const isAuthorized = await MarginMarket.isAuthorized(address, MarginEthRouter.address);
+                if (!isAuthorized) {
+                    await MarginMarket.authorize(MarginEthRouter.address);
+                }
+    
+                await addTransactionNotification({
+                    content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
+                    transactionPromise: MarginEthRouter.closePosition(
+                        tradeToken.address, 0, 0, 0, false,
+                        { gasLimit: 300_000 }
+                    ),
+                });
+            } else {
+                const MarginMarket = marginMarkets[borrowToken.address];
+                await addTransactionNotification({
+                    content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
+                    transactionPromise: MarginMarket.closePosition(0, 0, 0, false, address),
+                });
             }
-
-            await addTransactionNotification({
-                content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
-                transactionPromise: MarginEthRouter.closePosition(
-                    tradeToken.address, 0, 0, 0, false,
-                    { gasLimit: 300_000 }
-                ),
-            });
-        } else {
-            const MarginMarket = marginMarkets[borrowToken.address];
-            await addTransactionNotification({
-                content: `Close ${assetToken.symbol}-${baseToken.symbol} ${selectedTab === TABS.longs ? "long" : "short"} position`,
-                transactionPromise: MarginMarket.closePosition(0, 0, 0, false, address),
-            });
+        } finally {
+            setIsSubmitLoading(false);
         }
     }
 
@@ -123,6 +129,7 @@ export const YourPositions = () => {
                         primary 
                         style={{ width: "100%" }}
                         onClick={closePosition}
+                        isLoading={isSubmitLoading}
                     >
                         Close {selectedTab === TABS.longs ? "Long" : "Short"} Position
                     </Button>

@@ -162,6 +162,7 @@ export const VotePortal = ({ proposalId, MarginMarket }) => {
     const [showDetails, setShowDetails] = useState(false);
     const { selectedToken } = useContext(VoteContext);
     const theme = useContext(ThemeContext);
+    const [isFinalizeLoading, setIsFinalizeLoading] = useState();
 
     const castVotesValues = [
         { 
@@ -229,7 +230,11 @@ export const VotePortal = ({ proposalId, MarginMarket }) => {
                                     secondary 
                                     requiresWallet
                                     style={{ width: "100%" }} 
-                                    onClick={finalizeVote}
+                                    isLoading={isFinalizeLoading}
+                                    onClick={() => {
+                                        setIsFinalizeLoading(true);
+                                        finalizeVote().finally(() => setIsFinalizeLoading(false))
+                                    }}
                                 >
                                     Finalize Vote
                                 </Button>
@@ -253,6 +258,9 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
     const { ifexToken } = useContext(TokenPairContext);
     const { ifexTokenBalance } = useContext(AccountContext);
     const [voteAmount, setVoteAmount] = useState();
+    const [isIncreaseLoading, setIsIncreaseLoading] = useState();
+    const [isPreserveLoading, setIsPreserveLoading] = useState();
+    const [isDecreaseLoading, setIsDecreaseLoading] = useState();
 
     console.log("account", account);
 
@@ -323,7 +331,11 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", width: "100%", columnGap: PIXEL_SIZING.small }}>
                                     <Button 
                                         style={{ width: "100%", backgroundColor: theme.colors.positive }}
-                                        onClick={() => depositVote(VOTING_OPTIONS.up, voteAmount)}
+                                        onClick={() => {
+                                            setIsIncreaseLoading(true);
+                                            depositVote(VOTING_OPTIONS.up, voteAmount).finally(() => setIsIncreaseLoading(false))
+                                        }}
+                                        isLoading={isIncreaseLoading}
                                         requiresWallet
                                     >
                                         Vote Increase
@@ -331,7 +343,11 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
 
                                     <Button 
                                         style={{ width: "100%", }}
-                                        onClick={() => depositVote(VOTING_OPTIONS.preserve, voteAmount)}
+                                        onClick={() => {
+                                            setIsPreserveLoading(true);
+                                            depositVote(VOTING_OPTIONS.preserve, voteAmount).finally(() => setIsPreserveLoading(false))
+                                        }}
+                                        isLoading={isPreserveLoading}
                                         requiresWallet
                                     >
                                         Vote Preserve
@@ -339,7 +355,11 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
 
                                     <Button 
                                         style={{ width: "100%", backgroundColor: theme.colors.negative }}
-                                        onClick={() => depositVote(VOTING_OPTIONS.down, voteAmount)}
+                                        onClick={() => {
+                                            setIsDecreaseLoading(true);
+                                            depositVote(VOTING_OPTIONS.down, voteAmount).finally(() => setIsDecreaseLoading(false));
+                                        }}
+                                        isLoading={isDecreaseLoading}
                                         requiresWallet
                                     >
                                         Vote Decrease

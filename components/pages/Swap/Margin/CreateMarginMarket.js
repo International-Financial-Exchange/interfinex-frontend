@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
@@ -13,13 +13,19 @@ export const CreateMarginMarket = ({ closeCreateMarginMarket }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const { contracts: { MarginFactory }} = useContext(EthersContext);
+    const [isLoading, setIsLoading] = useState();
 
     const onSubmit = async () => {
-        await addTransactionNotification({
-            content: `Create margin market for ${assetToken.name} and ${baseToken.name}`,
-            transactionPromise: MarginFactory.createMarketPair(assetToken.address, baseToken.address, { gasLimit: 2_000_000 }),
-        });
-        closeCreateMarginMarket();
+        setIsLoading(true);
+        try {
+            await addTransactionNotification({
+                content: `Create margin market for ${assetToken.name} and ${baseToken.name}`,
+                transactionPromise: MarginFactory.createMarketPair(assetToken.address, baseToken.address, { gasLimit: 2_000_000 }),
+            });
+            closeCreateMarginMarket();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -36,6 +42,7 @@ export const CreateMarginMarket = ({ closeCreateMarginMarket }) => {
                     <Button 
                         primary
                         requiresWallet
+                        isLoading={isLoading}
                         style={{ width: "100%" }}
                         onClick={onSubmit}
                     >
