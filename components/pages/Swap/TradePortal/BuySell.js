@@ -1,8 +1,10 @@
 import { ethers } from "ethers";
+import { parseEther } from "ethers/lib/utils";
 import { max } from "lodash";
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../../context/Account";
+import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
 import { FEE_RATE, parseTokenAmount, PIXEL_SIZING } from "../../../../utils";
@@ -33,11 +35,13 @@ const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate)
 export const BuySell = ({ isBuy, isMargin }) => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0 } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
+    const { contracts: { SwapEthRouter }} = useContext(EthersContext);
     const { 
         exchangeContract, 
         price, 
         exchangeAssetTokenBalance, 
         exchangeBaseTokenBalance, 
+        approveRouter,
         exchangeHasAllowance, 
         approveExchange,
     } = useContext(SwapContext);
@@ -69,33 +73,69 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const spotTrade = async () => {
         setIsLoading(true);
         try {   
-            const slippagePercentage = slippageValue / 100;
-            const sendToken = isBuy ? baseToken : assetToken;
-            const receiveToken = isBuy ? assetToken : baseToken;
-            const sendAmount = isBuy ? 
-                outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
-                : assetTokenAmount;
+            if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+                const [etherToken, routerAssetToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+                const slippagePercentage = slippageValue / 100;
+                const sendToken = isBuy ? baseToken : assetToken;
+                const receiveToken = isBuy ? assetToken : baseToken;
+                const sendAmount = isBuy ? 
+                    outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                    : assetTokenAmount;
+    
+                const receiveAmount = isBuy ? 
+                    assetTokenAmount 
+                    : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
+    
+                console.log("swap router");
 
-            const receiveAmount = isBuy ? 
-                assetTokenAmount 
-                : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
+                await approveRouter(sendToken);
 
-            await approveExchange(sendToken);
-
-            await addTransactionNotification({
-                content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
-                transactionPromise: exchangeContract.swap(
-                    sendToken.address,
-                    parseTokenAmount(sendAmount, sendToken), 
-                    address,
-                    parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                    parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
-                    0,
-                    ethers.constants.AddressZero, 
-                    false,
-                    { gasLimit: 500_000 },
-                ),
-            });
+                console.log("router", SwapEthRouter);
+    
+                await addTransactionNotification({
+                    content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    transactionPromise: SwapEthRouter.swap(
+                        routerAssetToken.address,
+                        sendToken.address,
+                        parseTokenAmount(sendAmount, sendToken), 
+                        address,
+                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        0,
+                        ethers.constants.AddressZero, 
+                        false,
+                        { gasLimit: 500_000, value: sendToken.name === "Ethereum" ? parseEther(sendAmount.toString()) : 0 },
+                    ),
+                });
+            } else {
+                const slippagePercentage = slippageValue / 100;
+                const sendToken = isBuy ? baseToken : assetToken;
+                const receiveToken = isBuy ? assetToken : baseToken;
+                const sendAmount = isBuy ? 
+                    outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                    : assetTokenAmount;
+    
+                const receiveAmount = isBuy ? 
+                    assetTokenAmount 
+                    : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
+    
+                await approveExchange(sendToken);
+    
+                await addTransactionNotification({
+                    content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    transactionPromise: exchangeContract.swap(
+                        sendToken.address,
+                        parseTokenAmount(sendAmount, sendToken), 
+                        address,
+                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        0,
+                        ethers.constants.AddressZero, 
+                        false,
+                        { gasLimit: 500_000 },
+                    ),
+                });
+            }
         } finally {
             setIsLoading(false);
         }
