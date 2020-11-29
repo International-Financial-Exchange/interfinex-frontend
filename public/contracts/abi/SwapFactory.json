@@ -78,7 +78,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 891349
+    "gas": 891385
   },
   {
     "name": "exchange_template",

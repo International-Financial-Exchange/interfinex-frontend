@@ -5,7 +5,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { parseTokenAmount, PIXEL_SIZING } from "../../../../utils";
+import { parseTokenAmount, PIXEL_SIZING, safeParseEther } from "../../../../utils";
 import { Button, TextButton } from "../../../core/Button";
 import { InputAndLabel } from "../../../core/InputAndLabel";
 import { SlippageSelect } from "../../../core/SlippageSelect";
@@ -113,6 +113,15 @@ export const Pool = () => {
                                 await approveRouter(sendToken);
 
                                 const slippagePercentage = slippageValue / 100;
+                            
+                                console.log(
+                                    sendToken?.address,
+                                        parseTokenAmount(sendTokenAmount * (1 - slippagePercentage), sendToken),
+                                        parseTokenAmount(sendTokenAmount * (1 + slippagePercentage), sendToken),
+                                        address,
+                                        0,
+                                        { value: safeParseEther(etherTokenAmount.toString()) }
+                                );
 
                                 await addTransactionNotification({
                                     content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
@@ -122,24 +131,20 @@ export const Pool = () => {
                                         parseTokenAmount(sendTokenAmount * (1 + slippagePercentage), sendToken),
                                         address,
                                         0,
-                                        { gasLimit: 450_000, value: parseEther(etherTokenAmount.toString()) }
+                                        { gasLimit: 450_000, value: safeParseEther(etherTokenAmount.toString()) }
                                     )
                                 });
                             } else {
-                                const [token0Amount, token1Amount] = baseToken.address === token0.address ?
-                                    [baseTokenAmount, assetTokenAmount]
-                                    : [assetTokenAmount, baseTokenAmount];
-        
                                 await approveExchange(baseToken, assetToken);
     
                                 const slippagePercentage = slippageValue / 100;
-    
                                 await addTransactionNotification({
                                     content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
                                     transactionPromise: exchangeContract.mint_liquidity(
-                                        parseTokenAmount(token0Amount, token0),
-                                        parseTokenAmount(token1Amount * (1 - slippagePercentage), token1),
-                                        parseTokenAmount(token1Amount * (1 + slippagePercentage), token1),
+                                        assetToken,
+                                        parseTokenAmount(assetTokenAmount, assetToken),
+                                        parseTokenAmount(baseTokenAmount * (1 - slippagePercentage), baseToken),
+                                        parseTokenAmount(baseTokenAmount * (1 + slippagePercentage), baseToken),
                                         address,
                                         0,
                                         { gasLimit: 450_000 }

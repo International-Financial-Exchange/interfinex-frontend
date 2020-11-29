@@ -70,7 +70,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 146686
+    "gas": 146798
   },
   {
     "name": "ifexTokenContract",

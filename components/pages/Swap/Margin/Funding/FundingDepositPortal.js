@@ -6,7 +6,7 @@ import { AccountContext } from "../../../../../context/Account";
 import { EthersContext } from "../../../../../context/Ethers";
 import { NotificationsContext } from "../../../../../context/Notifications";
 import { TokenPairContext } from "../../../../../context/TokenPair";
-import { CONTAINER_SIZING, parseTokenAmount, PIXEL_SIZING } from "../../../../../utils";
+import { CONTAINER_SIZING, parseTokenAmount, PIXEL_SIZING, safeParseEther } from "../../../../../utils";
 import { Button, TextButton } from "../../../../core/Button";
 import { Card } from "../../../../core/Card";
 import Text from "../../../../core/Text";
@@ -49,7 +49,7 @@ export const FundingDepositPortal = () => {
                     content: `Deposit ${tokenAmount} ${selectedToken.symbol} to the funding pool`,
                     transactionPromise: MarginEthRouter.deposit(
                         isAssetToken ? baseToken.address : assetToken.address,
-                        { value: parseEther(tokenAmount.toString()), gasLimit: 375_000 }
+                        { value: safeParseEther(tokenAmount.toString()), gasLimit: 375_000 }
                     )
                 });
             } else {

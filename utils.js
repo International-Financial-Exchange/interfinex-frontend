@@ -4,6 +4,7 @@ import { ethers, BigNumber } from "ethers";
 import { SERVER_URL } from "./ENV";
 import { AccountContext } from "./context/Account";
 import { EthersContext } from "./context/Ethers";
+import { parseEther } from "ethers/lib/utils";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -138,8 +139,10 @@ export const shade = (col, light)=> {
 
 // removed truncation here as it broke small amounts - may need to add back in properly
 export const parseTokenAmount = (amount, token) => {
-    return ethers.utils.parseUnits(amount.toString(), token.decimals).toString();
+    return ethers.utils.parseUnits(amount.toFixed(token.decimals), token.decimals).toString();
 };
+
+export const safeParseEther = amount => parseEther(parseFloat(amount).toFixed(18));
 
 export const humanizeTokenAmount = (amount, token) => parseFloat(ethers.utils.formatUnits(amount.toString(), token.decimals));
 
@@ -201,7 +204,10 @@ export const useContractApproval = (contract, propTokens = []) => {
 
                 if (token.name === "Ethereum") return;
 
+                console.log("allowance", allowances, token)
                 const hasAllowance = allowances[token.address];
+
+                console.log("allowance", hasAllowance)
                 if (!hasAllowance) {
                     await token.contract.connect(signer).approve(contract.address, ethers.constants.MaxUint256,);
                 }

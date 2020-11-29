@@ -1,5 +1,5 @@
 import { Card } from "../../core/Card"
-import { CONTAINER_SIZING, PIXEL_SIZING, } from "../../../utils"
+import { CONTAINER_SIZING, PIXEL_SIZING, safeParseEthers, } from "../../../utils"
 import Text from "../../core/Text"
 import { TextButton, Button } from "../../core/Button"
 import { TokenAmountInput } from "../../core/TokenAmountInput"
@@ -42,7 +42,7 @@ export const CreateMarket = () => {
                         sendToken.address, 
                         ethers.utils.parseUnits(sendTokenAmount.toString(), sendToken.decimals).toString(),
                         ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
-                        { gasLimit: 4_500_000, value: parseEther(etherTokenAmount.toString()) }
+                        { gasLimit: 4_500_000, value: safeParseEther(etherTokenAmount.toString()) }
                     ),
                 });
             } else {

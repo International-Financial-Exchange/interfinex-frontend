@@ -1,13 +1,13 @@
 import { ethers } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 import { max } from "lodash";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { FEE_RATE, parseTokenAmount, PIXEL_SIZING, useAuthorizeContract } from "../../../../utils";
+import { FEE_RATE, parseTokenAmount, PIXEL_SIZING, safeParseEther, useAuthorizeContract } from "../../../../utils";
 import { Button, TextButton } from "../../../core/Button";
 import { ContentAndArrow } from "../../../core/ContentAndArrow";
 import { InputAndLabel } from "../../../core/InputAndLabel";
@@ -58,8 +58,9 @@ export const BuySell = ({ isBuy, isMargin }) => {
     // Margin trading variables
     const { parameters: _parameters, marginMarkets, approveMarginMarket } = useContext(MarginContext);
     const parameters = _parameters?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
-    const [leverage, setLeverage] = useState(0.1);
+    const [_leverage, setLeverage] = useState();
     const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
+    const leverage = _leverage ?? maxLeverage / 2;
     
     const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
     const initialMargin = isBuy ? 
@@ -89,6 +90,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
     
                 await approveRouter(sendToken);
 
+                console.log(sendAmount);
+
                 await addTransactionNotification({
                     content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: SwapEthRouter.swap(
@@ -101,7 +104,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         0,
                         ethers.constants.AddressZero, 
                         false,
-                        { gasLimit: 500_000, value: sendToken.name === "Ethereum" ? parseEther(sendAmount.toString()) : 0 },
+                        { gasLimit: 500_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
                     ),
                 });
             } else {
@@ -163,7 +166,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 }
 
                 await addTransactionNotification({
-                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage}x leverage ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: MarginEthRouter.increasePosition(
                         receiveToken.address,
                         parseTokenAmount(borrowAmount, sendToken), 
@@ -171,13 +174,13 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
                         0,
                         false,
-                        { gasLimit: 500_000, value: parseEther((initialMargin + maintenanceMargin).toString()) },
+                        { gasLimit: 500_000, value: safeParseEther((initialMargin + maintenanceMargin).toString()) },
                     ),
                 });
             } else {
                 await approve(sendToken);
                 await addTransactionNotification({
-                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage} ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage}x leverage ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: MarginMarket.increasePosition(
                         parseTokenAmount(initialMargin + maintenanceMargin, sendToken),
                         parseTokenAmount(borrowAmount, sendToken), 

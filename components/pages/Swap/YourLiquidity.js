@@ -91,10 +91,9 @@ export const YourLiquidity = () => {
                                     <Skeleton width={CONTAINER_SIZING.miniscule}/>
                                     : <Text secondary bold>
                                         {
-                                            (parseFloat(accountUnclaimedIfexEarnings)
-                                            + 
-                                            account.percentageOfPoolDeposited * (farmInfo.yieldPerBlock * (blockNumber - farmInfo.lastBlockUpdate)))
-                                                .toFixed(4)
+                                            farmInfo ?
+                                                ((parseFloat(accountUnclaimedIfexEarnings) + account.percentageOfPoolDeposited * (farmInfo.yieldPerBlock * (blockNumber - farmInfo.lastBlockUpdate)))).toFixed(4)
+                                                : parseFloat(accountUnclaimedIfexEarnings)
                                         } 
                                         {" " + ifexToken.symbol}
                                     </Text>
