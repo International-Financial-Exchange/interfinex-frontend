@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
 import { Button } from "../../../core/Button";
 import { ModalCard } from "../../../core/ModalCard";
 import Text from "../../../core/Text";

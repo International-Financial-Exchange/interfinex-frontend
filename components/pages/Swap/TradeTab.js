@@ -1,4 +1,3 @@
-import { PIXEL_SIZING } from "../../../utils";
 import styled from "styled-components";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
@@ -7,6 +6,7 @@ import { YourLiquidity } from "./YourLiquidity";
 import { MarginContext, SwapContext } from "./Swap";
 import { YourPositions } from "./Margin/YourPositions";
 import { useContext } from "react";
+import { PIXEL_SIZING } from "../../../utils/constants";
 
 const Container = styled.div`
     display: grid; 

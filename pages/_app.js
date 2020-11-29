@@ -8,7 +8,7 @@ import { TokenPairProvider } from '../context/TokenPair';
 import { AccountProvider } from '../context/Account';
 import { NotificationsProvider } from '../context/Notifications';
 import { Footer } from '../components/layout/Footer';
-import { PIXEL_SIZING } from '../utils';
+import { PIXEL_SIZING } from '../utils/constants';
 
 export default ({ Component, pageProps }) => {
     return (

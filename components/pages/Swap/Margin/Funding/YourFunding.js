@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import Skeleton from "react-loading-skeleton";
-import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
 import { Card } from "../../../../core/Card";
 import Text from "../../../../core/Text";
 import { TextOption } from "../../../../core/TextOption";

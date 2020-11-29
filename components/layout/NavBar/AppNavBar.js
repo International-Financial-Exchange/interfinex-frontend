@@ -2,7 +2,6 @@ import Text from "../../core/Text";
 import Link from "next/link";
 import { Button } from "../../core/Button";
 import Span from "../../core/Span";
-import { PIXEL_SIZING, CONTAINER_SIZING, dropinAnimation, useDocument, useWindow } from "../../../utils";
 import styled from "styled-components";
 import { useRouter } from 'next/router'
 import { useState, useEffect, useRef, useContext, createRef, useLayoutEffect, useMemo } from "react";
@@ -372,6 +371,8 @@ const Container = styled.div`
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { TabNav } from "../../core/TabNav";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
+import { useDocument, useWindow } from "../../../utils/hooks";
 
 const ConnectWallet = props => {
     const document = useDocument();

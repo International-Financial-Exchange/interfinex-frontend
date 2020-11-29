@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useContext } from "react";
 import { NotificationsContext } from "../../context/Notifications";
-import { PIXEL_SIZING } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 export const LayoutContainer = styled.div`
     max-width: 1250px;

@@ -1,11 +1,12 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { uniqueId } from "lodash";
 import ReactDOM from "react-dom";
-import { PIXEL_SIZING, shade, dropinAnimation, CONTAINER_SIZING } from "../utils";
 import styled, { ThemeContext } from "styled-components";
 import { Cross } from "../components/core/Cross";
 import Text from "../components/core/Text";
 import { TextButton } from "../components/core/Button";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../utils/constants";
+import { shade } from "../utils/utils";
 
 export const NOTIFICATION_TYPES = {
     success: "SUCCESS",

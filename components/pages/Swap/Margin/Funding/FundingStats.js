@@ -1,13 +1,12 @@
-import { startCase } from "lodash";
 import { useContext, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { ThemeContext } from "styled-components";
-import { PIXEL_SIZING } from "../../../../../utils";
 import { Card } from "../../../../core/Card";
 import Text from "../../../../core/Text";
 import { MarginContext } from "../../Swap";
 import { FundingContext } from "./FundingTab";
 import styled from "styled-components";
+import { PIXEL_SIZING } from "../../../../../utils/constants";
 
 const StyledTable = styled.table`
     width: 100%;

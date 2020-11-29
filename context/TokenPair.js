@@ -5,7 +5,6 @@ import { tokens as InchTokens } from "../public/1InchTokenList.json";
 import { EthersContext } from "./Ethers";
 import { ethers } from "ethers";
 import { AccountContext } from "./Account";
-import { getRequest } from "../utils";
 export const TokenPairContext = createContext();
 
 

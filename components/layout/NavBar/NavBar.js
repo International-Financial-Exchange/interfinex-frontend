@@ -1,5 +1,3 @@
-import { PIXEL_SIZING } from "../../../utils";
-
 import styled from "styled-components";
 import Link from "next/link";
 import { useRouter } from 'next/router'
@@ -9,6 +7,7 @@ import Span from "../../core/Span";
 import Text from "../../core/Text";
 import { AppNavBar } from "./AppNavBar";
 import HomeNavBar from "./HomeNavBar";
+import { PIXEL_SIZING } from "../../../utils/constants";
 
 
 const Container = styled.div`

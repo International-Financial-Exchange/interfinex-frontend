@@ -1,4 +1,4 @@
-import { getRequest } from "../../../utils";
+import { getRequest } from "../../../utils/network";
 
 export const getHistoricalTrades = ({ from, to, exchangeContract, limit, user }) => {
     return getRequest("/swap/tradesHistory", { from, to, exchangeContract, limit, user });

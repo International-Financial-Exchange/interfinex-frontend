@@ -1,8 +1,6 @@
 import { Card } from "../../core/Card";
 import Text from "../../core/Text";
 import { TextOption } from "../../core/TextOption";
-import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, parseTokenAmount } from "../../../utils";
-import { useYieldFarmInfo } from "../../../yieldFarmHooks";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
@@ -16,6 +14,9 @@ import { parseEther } from "ethers/lib/utils";
 import { EthersContext } from "../../../context/Ethers";
 import { InfoBubble } from "../../core/InfoBubble";
 import { ThemeContext } from "styled-components";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
+import { humanizeTokenAmount, parseTokenAmount } from "../../../utils/utils";
+// import { useYieldFarmInfo } from "./yieldFarm";
 
 export const YourLiquidity = () => {
     const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
@@ -27,7 +28,8 @@ export const YourLiquidity = () => {
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [isDividendsLoading, setIsDividendsLoading] = useState();
-    const [farmInfo, isFarmInfoLoading] = useYieldFarmInfo(liquidityToken);
+    // const [farmInfo, isFarmInfoLoading] = useYieldFarmInfo(liquidityToken, SwapContext);
+    const [farmInfo, isFarmInfoLoading] = [null, false];
     const { blockNumber } = useContext(EthersContext);
     const theme = useContext(ThemeContext);
     const [showMoreYieldInfo, setShowMoreYieldInfo] = useState(false);

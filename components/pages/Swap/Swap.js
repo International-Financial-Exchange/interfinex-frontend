@@ -1,4 +1,3 @@
-import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance, useContractApproval } from "../../../utils";
 import { TradePortal } from "./TradePortal/TradePortal"
 import { Layout } from "../../layout/Layout";
 import { TradeInfoChart } from "./TradeInfoChart";
@@ -27,6 +26,9 @@ import { TradeTab } from "./TradeTab";
 import { FundingTab } from "./Margin/Funding/FundingTab";
 import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
 import { VoteTab } from "./Margin/Vote/VoteTab";
+import { PIXEL_SIZING } from "../../../utils/constants";
+import { humanizeTokenAmount } from "../../../utils/utils";
+import { useContractApproval } from "../../../utils/hooks";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();

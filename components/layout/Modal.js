@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import ReactDOM from 'react-dom';
 import _ from "lodash";
-import { useDocument } from '../../utils';
+import { useDocument } from '../../utils/hooks';
 
 const CloseModalContext = React.createContext();
 

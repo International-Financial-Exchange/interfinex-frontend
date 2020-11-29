@@ -1,6 +1,5 @@
 import { createContext, useContext, useState } from "react";
 import { TokenPairContext } from "../../../../../context/TokenPair";
-import { PIXEL_SIZING } from "../../../../../utils";
 import { TabSquareNav } from "../../../../core/TabSquareNav"
 import { TokenAndLogo } from "../../../../core/TokenAndLogo";
 import { FundingStats } from "./FundingStats";
@@ -9,6 +8,7 @@ import { MarginContext } from "../../Swap";
 import { FundingDepositPortal } from "./FundingDepositPortal";
 import { FundingHistory } from "./FundingHistory";
 import { YourFunding } from "./YourFunding";
+import { PIXEL_SIZING } from "../../../../../utils/constants";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};

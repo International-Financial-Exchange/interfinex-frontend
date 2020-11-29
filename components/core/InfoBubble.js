@@ -1,5 +1,5 @@
-import { PIXEL_SIZING, shade } from "../../utils";
 import styled from "styled-components";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 export const InfoBubble = styled.div`
     padding: ${PIXEL_SIZING.small};

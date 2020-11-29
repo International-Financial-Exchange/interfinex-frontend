@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { TabSquareNav } from "../../../../core/TabSquareNav";
 import { TokenAndLogo } from "../../../../core/TokenAndLogo";
 import styled, { ThemeContext } from "styled-components";
-import { CONTAINER_SIZING, FEE_RATE, humanizeTokenAmount, PIXEL_SIZING } from "../../../../../utils";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { MarginContext, Swap, SwapContext } from "../../Swap";
 import Text from "../../../../core/Text";
@@ -12,6 +11,8 @@ import { inputToOutputAmount } from "../../TradePortal/BuySell";
 import InfiniteScroll from "react-infinite-scroller";
 import Skeleton from "react-loading-skeleton";
 import { NotificationsContext } from "../../../../../context/Notifications";
+import { CONTAINER_SIZING, FEE_RATE, PIXEL_SIZING } from "../../../../../utils/constants";
+import { humanizeTokenAmount } from "../../../../../utils/utils";
 
 const LiquidatorContext = createContext();
 

@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import styled, { ThemeContext } from "styled-components";
-import { CONTAINER_SIZING, humanizeTokenAmount, parseTokenAmount, PIXEL_SIZING } from "../../../../../utils";
 import { Button, TextButton } from "../../../../core/Button";
 import Text from "../../../../core/Text";
 import { PROPOSAL_INFO, VOTING_OPTIONS, VoteContext, PROPOSAL_IDS } from "./VoteTab";
@@ -15,6 +14,8 @@ import { MarginContext } from "../../Swap";
 import { AccountContext } from "../../../../../context/Account";
 import { InfoBubble } from "../../../../core/InfoBubble";
 import { add } from "lodash";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
+import { humanizeTokenAmount, parseTokenAmount } from "../../../../../utils/utils";
 
 const useVotes = ({ proposalId, MarginMarket, }) => {
     const [votesCast, setVotesCast] = useState({ up: 0, preserve: 0, down: 0 });

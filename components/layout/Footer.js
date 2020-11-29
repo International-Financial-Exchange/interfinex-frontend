@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
 import { TextButton } from "../core/Button";
 import Text from "../core/Text";
 import { LayoutContainer } from "./Layout";
@@ -10,6 +9,7 @@ import {
     TelegramIcon,
     TwitterIcon,
   } from "react-share";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 const FooterContainer = styled(LayoutContainer)`
     height: fit-content;

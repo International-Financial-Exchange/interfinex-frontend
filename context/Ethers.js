@@ -12,7 +12,6 @@ import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
 import MarginEthRouterAbi from "../public/contracts/abi/MarginEthRouter.json";
 import YieldFarmAbi from "../public/contracts/abi/YieldFarm.json";
 import { formatEther, parseEther } from "ethers/lib/utils";
-import { useAuthorizeContract } from "../utils";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,

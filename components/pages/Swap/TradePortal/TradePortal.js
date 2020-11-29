@@ -1,22 +1,13 @@
 import Text from "../../../core/Text"
-import { CONTAINER_SIZING, PIXEL_SIZING, parseTokenAmount, FEE_RATE } from "../../../../utils";
 import styled, { ThemeContext } from "styled-components";
 import { useState, useContext, useEffect } from "react";
-import { ContentAndArrow } from "../../../core/ContentAndArrow";
-import { TokenPairContext } from "../../../../context/TokenPair";
-import { TokenAndLogo } from "../../../core/TokenAndLogo";
-import { TextButton, Button } from "../../../core/Button";
-import { Input } from "../../../core/Input";
-import { InputAndLabel } from "../../../core/InputAndLabel";
-import { TokenSelectMenu } from "../../../layout/NavBar/AppNavBar";
-import { TokenAmountInput } from "../../../core/TokenAmountInput";
-import { AccountContext } from "../../../../context/Account";
 import { SwapContext } from "../Swap";
 import { NotificationsContext } from "../../../../context/Notifications";
 import ethers from "ethers";
 import { Pool } from "./Pool";
 import { SlippageSelect } from "../../../core/SlippageSelect";
 import { BuySell } from "./BuySell";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
 
 
 const Container = styled.div`

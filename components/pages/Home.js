@@ -4,8 +4,8 @@ import { ThemeContext } from 'styled-components'
 import { useContext } from 'react';
 import Text from "../core/Text";
 import { ArrowButton, Button } from '../core/Button';
-import { CONTAINER_SIZING, PIXEL_SIZING } from '../../utils';
 import Link from 'next/link';
+import { PIXEL_SIZING } from '../../utils/constants';
 
 export default function Home() {
     return (

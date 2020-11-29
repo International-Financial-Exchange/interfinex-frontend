@@ -1,9 +1,10 @@
 import ReactDOM from "react-dom";
-import { useDocument, PIXEL_SIZING, dropinAnimation } from "../../utils";
 import { ModalCard } from "../core/ModalCard";
 import styled from "styled-components";
 import { useEffect } from "react";
 import { MODAL_ID } from "./Modal";
+import { dropinAnimation, PIXEL_SIZING, } from "../../utils/constants";
+import { useDocument } from "../../utils/hooks";
 
 export const DropdownItem = styled.div`
     padding: ${PIXEL_SIZING.medium};

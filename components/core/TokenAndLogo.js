@@ -1,5 +1,5 @@
+import { PIXEL_SIZING } from "../../utils/constants";
 import Text from "./Text";
-import { PIXEL_SIZING } from "../../utils";
 
 export const TokenAndLogo = ({ token, style, isSymbol, children, primary, ...props }) => {
     return (

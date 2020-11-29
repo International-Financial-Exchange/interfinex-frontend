@@ -2,8 +2,8 @@ import { Chart } from "../../core/Chart";
 import { useEffect, useContext, useState, useMemo } from "react";
 import { getCandles } from "./networkRequests";
 import { TokenPairContext } from "../../../context/TokenPair";
-import { TIMEFRAMES } from "../../../utils";
 import { SwapContext } from "./Swap";
+import { TIMEFRAMES } from "../../../utils/constants";
 
 export const TradeInfoChart = () => {
     const CANDLES_TO_FETCH = [

@@ -1,7 +1,6 @@
 import styled from "styled-components";
-import { PIXEL_SIZING, CONTAINER_SIZING, MULTIPLIER, humanizeTokenAmount, useForceUpdate } from "../../../utils";
 import Text from "../../core/Text";
-import { shade } from "../../../utils";
+import { humanizeTokenAmount, shade } from "../../../utils/utils";
 import { TextOption } from "../../core/TextOption";
 import { useState, useEffect, useContext, useMemo } from "react";
 import { getHistoricalTrades } from "./networkRequests";
@@ -11,6 +10,7 @@ import { Spinner } from "../../core/Spinner";
 import { BigNumber as BN } from "ethers";
 import { TokenPairContext } from "../../../context/TokenPair";
 import InfiniteScroll from "react-infinite-scroller";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 
 const Container = styled.div`
     width: 100%;
@@ -90,7 +90,6 @@ const useHistoricalTrades = query => {
     const [trades, setTrades] = useState([]);
     const [gotAllTrades, setGotAllTrades] = useState(false);
     const [oldestTradeTimestamp, setOldestTradeTimestamp] = useState();
-    const forceUpdate = useForceUpdate();
     const [_isLoading, setIsLoading] = useState(false);
 
     const getMoreTrades = async () => {

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 const Container = styled.div`
     display: flex; 

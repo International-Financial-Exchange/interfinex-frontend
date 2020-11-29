@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../../../context/Account";
 import { EthersContext } from "../../../../../context/Ethers";
 import { TokenPairContext } from "../../../../../context/TokenPair";
-import { humanizeTokenAmount } from "../../../../../utils";
+import { humanizeTokenAmount } from "../../../../../utils/utils";
 
 export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);

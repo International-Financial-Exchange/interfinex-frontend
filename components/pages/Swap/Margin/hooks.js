@@ -4,7 +4,8 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { hasAllowance, humanizeTokenAmount, isZeroAddress, useContractApproval } from "../../../../utils";
+import { useContractApproval } from "../../../../utils/hooks";
+import { humanizeTokenAmount, isZeroAddress } from "../../../../utils/utils";
 import { MarginContext, Swap } from "../Swap";
 import { useFunding } from "./Funding/hooks";
 

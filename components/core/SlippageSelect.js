@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { CONTAINER_SIZING, PIXEL_SIZING } from "../../utils";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../utils/constants";
 import { Input } from "./Input";
 
 const SlippageOption = styled.div`

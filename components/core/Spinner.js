@@ -2,7 +2,7 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 import BarLoader from "react-spinners/BarLoader";
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 // Should be used in most cases
 export const Spinner = props => {

@@ -4,7 +4,7 @@ import { TokenPairContext } from "./TokenPair";
 import ethers from "ethers";
 import { NotificationsContext, NOTIFICATION_TYPES } from "./Notifications";
 import Text from "../components/core/Text";
-import { humanizeTokenAmount } from "../utils";
+import { humanizeTokenAmount } from "../utils/utils";
 
 export const AccountContext = createContext();
 

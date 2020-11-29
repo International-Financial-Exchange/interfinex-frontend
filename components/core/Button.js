@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { PIXEL_SIZING, dropinAnimation } from "../../utils";
 import { BarSpinner, Spinner } from "./Spinner";
 import { useContext, useRef, useState } from "react";
 import { AccountContext } from "../../context/Account";
 import Text from "./Text";
 import { EthersContext } from "../../context/Ethers";
 import ReactDOM from "react-dom";
+import { dropinAnimation, PIXEL_SIZING } from "../../utils/constants";
 
 const ButtonContainer = styled.div`
     border-radius: 4px;

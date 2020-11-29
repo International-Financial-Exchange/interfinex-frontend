@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import Switch from "react-switch";
 import { ThemeContext } from "styled-components";
-import { PIXEL_SIZING, sizingToInt } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
+import { sizingToInt } from "../../utils/utils";
 
 export const SwitchInput = ({ value, onChange }) => {
     const theme = useContext(ThemeContext);

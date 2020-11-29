@@ -1,7 +1,8 @@
 import { createContext, useContext, useState } from "react";
 import styled from "styled-components";
 import { TokenPairContext } from "../../../../../context/TokenPair";
-import { humanizeTokenAmount, PIXEL_SIZING } from "../../../../../utils";
+import { PIXEL_SIZING } from "../../../../../utils/constants";
+import { humanizeTokenAmount } from "../../../../../utils/utils";
 import { TabSquareNav } from "../../../../core/TabSquareNav";
 import { TokenAndLogo } from "../../../../core/TokenAndLogo";
 import { MarginContext } from "../../Swap";
