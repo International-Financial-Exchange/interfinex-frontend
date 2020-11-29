@@ -116,7 +116,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 287960
+    "gas": 287899
   },
   {
     "name": "mint_liquidity",
@@ -234,7 +234,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 39179
+    "gas": 39185
   },
   {
     "name": "base_token",

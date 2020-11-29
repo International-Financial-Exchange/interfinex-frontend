@@ -66,7 +66,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 457333
+    "gas": 598505
   },
   {
     "name": "id_count",
@@ -144,20 +144,29 @@
     "gas": 1565
   },
   {
-    "name": "margin_market_template",
+    "name": "liquidity_token_to_pair",
     "outputs": [
       {
         "type": "address",
         "name": ""
       }
     ],
-    "inputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      },
+      {
+        "type": "uint256",
+        "name": "arg1"
+      }
+    ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1271
+    "gas": 1595
   },
   {
-    "name": "dividend_erc20_template",
+    "name": "margin_market_template",
     "outputs": [
       {
         "type": "address",
@@ -170,7 +179,7 @@
     "gas": 1301
   },
   {
-    "name": "ifex_token",
+    "name": "dividend_erc20_template",
     "outputs": [
       {
         "type": "address",
@@ -183,7 +192,7 @@
     "gas": 1331
   },
   {
-    "name": "swap_factory",
+    "name": "ifex_token",
     "outputs": [
       {
         "type": "address",
@@ -196,6 +205,19 @@
     "gas": 1361
   },
   {
+    "name": "swap_factory",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1391
+  },
+  {
     "name": "is_initialized",
     "outputs": [
       {
@@ -206,6 +228,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1391
+    "gas": 1421
   }
 ]

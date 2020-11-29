@@ -16,7 +16,7 @@ import { InfoBubble } from "../../core/InfoBubble";
 import { ThemeContext } from "styled-components";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { humanizeTokenAmount, parseTokenAmount } from "../../../utils/utils";
-// import { useYieldFarmInfo } from "./yieldFarm";
+import { useYieldFarmInfo } from "../YieldFarm/hooks";
 
 export const YourLiquidity = () => {
     const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
@@ -28,8 +28,7 @@ export const YourLiquidity = () => {
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [isDividendsLoading, setIsDividendsLoading] = useState();
-    // const [farmInfo, isFarmInfoLoading] = useYieldFarmInfo(liquidityToken, SwapContext);
-    const [farmInfo, isFarmInfoLoading] = [null, false];
+    const [farmInfo, isFarmInfoLoading] = useYieldFarmInfo(liquidityToken, SwapContext);
     const { blockNumber } = useContext(EthersContext);
     const theme = useContext(ThemeContext);
     const [showMoreYieldInfo, setShowMoreYieldInfo] = useState(false);
@@ -52,7 +51,7 @@ export const YourLiquidity = () => {
     const { contracts: { YieldFarm }} = useContext(EthersContext);
     const addFarm = async () => {
         await ifexToken.contract.transfer(YieldFarm.address, parseTokenAmount(100000, { decimals: 18 }));
-        await YieldFarm.addFarm(liquidityToken.address, parseTokenAmount(10, { decimals: 18 }));
+        await YieldFarm.addFarm(liquidityToken.address, parseTokenAmount(10, { decimals: 18 }), 0);
     };
 
     return (

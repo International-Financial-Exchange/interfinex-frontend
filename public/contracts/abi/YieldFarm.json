@@ -1,5 +1,78 @@
 [
   {
+    "name": "NewFarm",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "marketType",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "UpdateFarm",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "marketType",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "DeleteFarm",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "marketType",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "Harvest",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "marketType",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "yieldAmount",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "initialize",
     "outputs": [],
     "inputs": [
@@ -23,11 +96,15 @@
       {
         "type": "uint256",
         "name": "yieldPerBlock"
+      },
+      {
+        "type": "uint256",
+        "name": "marketType"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 215809
+    "gas": 252783
   },
   {
     "name": "deleteFarm",
@@ -40,7 +117,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 105882
+    "gas": 128731
   },
   {
     "name": "updateFarm",
@@ -57,7 +134,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 180972
+    "gas": 218830
   },
   {
     "name": "harvest",
@@ -70,7 +147,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 146798
+    "gas": 185238
   },
   {
     "name": "ifexTokenContract",
@@ -129,6 +206,10 @@
       {
         "type": "uint256",
         "name": "id"
+      },
+      {
+        "type": "uint256",
+        "name": "marketType"
       }
     ],
     "inputs": [
@@ -139,7 +220,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 4744
+    "gas": 5726
   },
   {
     "name": "idToFarmTokenAddress",

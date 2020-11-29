@@ -141,7 +141,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 605022
+    "gas": 604961
   },
   {
     "name": "pureAccrueInterest",

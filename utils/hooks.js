@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/Account";
 import { EthersContext } from "../context/Ethers";
