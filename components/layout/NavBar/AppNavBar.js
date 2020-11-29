@@ -360,10 +360,23 @@ const Container = styled.div`
     display: grid; 
     grid-template-columns: auto 1fr auto; 
     align-items: center; 
+    #circle-nav {
+        display: none;
+    }
 
-    @media (max-width: 600px) {
-        #tab-nav, #nav-logo {
+    @media (max-width: 830px) {
+        #nav-logo {
             display: none;
+        }
+    }
+
+    @media (max-width: 750px) {
+        #tab-nav {
+            display: none;
+        }
+
+        #circle-nav {
+            display: unset;
         }
     }
 `;
@@ -373,6 +386,7 @@ import WalletConnectProvider from "@walletconnect/web3-provider";
 import { TabNav } from "../../core/TabNav";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { useDocument, useWindow } from "../../../utils/hooks";
+import { CircleNav } from "./CircleNav";
 
 const ConnectWallet = props => {
     const document = useDocument();
@@ -428,6 +442,16 @@ export const AppNavBar = props => {
 
     return (
         <Container>
+            <CircleNav
+                id={"circle-nav"}
+                onChange={selected => router.push(`/app/${selected}`)}
+                items={[
+                    // { label: "Dashboard", value: "dashboard" }, 
+                    { label: "Swap", value: "swap" }, 
+                    { label: "Yield Farm", value: "yieldfarm" },
+                ]}
+            />
+
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
                 <img
                     id={"nav-logo"}

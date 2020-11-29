@@ -106,6 +106,7 @@ const StyledTextButton = styled.div`
     justify-items: center;
     transition: transform 0.1s ease-out, color 0.1s ease-out;
     user-select: none;
+    font-size: ${({ primary }) => primary ? PIXEL_SIZING.large : ""};
 
     &:hover {
         cursor: pointer;
