@@ -1,6 +1,6 @@
+import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance, useContractApproval } from "../../../utils";
 import { TradePortal } from "./TradePortal/TradePortal"
 import { Layout } from "../../layout/Layout";
-import { PIXEL_SIZING, CONTAINER_SIZING, humanizeTokenAmount, hasAllowance, useContractApproval } from "../../../utils";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { useContext, useEffect, useState, createContext, useCallback } from "react";
@@ -27,7 +27,6 @@ import { TradeTab } from "./TradeTab";
 import { FundingTab } from "./Margin/Funding/FundingTab";
 import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
 import { VoteTab } from "./Margin/Vote/VoteTab";
-import { add } from "lodash";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();
@@ -62,7 +61,7 @@ export const Swap = () => {
     const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
-    const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState();
+    const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState(true);
     const [selectedTab, setSelectedTab] = useState();
     const { 
         isMarginEnabled, 
@@ -85,13 +84,12 @@ export const Swap = () => {
         [assetToken, baseToken, ifexToken, liquidityToken]
     );
 
-    console.log("original", [assetToken, baseToken, ifexToken])
-
     // Check swap market exists and update contract and liquidity token
     useEffect(() => {
         setIsLoading(true);
 
         if (baseToken && assetToken) {
+            console.log("swap", SwapFactory.address);
             SwapFactory.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
@@ -139,10 +137,10 @@ export const Swap = () => {
                 liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
                 liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
-                console.log("liquidity token balance", liquidityTokenTotalSupply);
                 setAccount(old => ({
                     ...old,
                     liquidityTokenBalance,
+                    percentageOfPoolDeposited: liquidityTokenBalance / liquidityTokenTotalSupply,
                     depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
                     depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
                 }));
@@ -176,6 +174,8 @@ export const Swap = () => {
         
         return () => exchangeContract?.removeAllListeners();
     }, [exchangeContract?.address, address, liquidityToken?.address]);
+
+    console.log("selected", selectedTab);
 
     return (
         <Layout>
@@ -226,7 +226,10 @@ export const Swap = () => {
                                             <Text bold>Enable Margin Trading</Text>
                                             <SwitchInput
                                                 value={isMarginEnabled}
-                                                onChange={e => setIsMarginEnabled(e)}
+                                                onChange={e => {
+                                                    setIsMarginEnabled(e)
+                                                    if (!e) setSelectedTab("trade")
+                                                }}
                                             />
                                         </div>
                                     </TitleContainer>

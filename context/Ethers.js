@@ -10,6 +10,7 @@ import SwapExchangeAbi from "../public/contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
 import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
 import MarginEthRouterAbi from "../public/contracts/abi/MarginEthRouter.json";
+import YieldFarmAbi from "../public/contracts/abi/YieldFarm.json";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import { useAuthorizeContract } from "../utils";
 
@@ -21,7 +22,8 @@ const ABI = {
     SwapExchange: SwapExchangeAbi,
     SwapFactory: SwapFactoryAbi,
     SwapEthRouter: SwapEthRouterAbi,
-    MarginEthRouter: MarginEthRouterAbi
+    MarginEthRouter: MarginEthRouterAbi,
+    YieldFarm: YieldFarmAbi,
 };
 
 export const EthersContext = createContext();
@@ -30,9 +32,10 @@ export const EthersProvider = ({ children }) => {
     console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState({ name: "ganache" });
+    const [networkInfo, setNetworkInfo] = useState({ name: "localhost" });
+    const [blockNumber, setBlockNumber] = useState();
 
-    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["ganache"];
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["localhost"];
     const getAbi = abiName => ABI[abiName];
 
     const { 
@@ -41,6 +44,7 @@ export const EthersProvider = ({ children }) => {
         MarginFactory,
         SwapEthRouter,
         MarginEthRouter,
+        YieldFarm,
     } = useMemo(() => {
         return {
             IfexToken: new ethers.Contract(contracts.IfexToken.address, getAbi("DividendERC20"), signer || provider),
@@ -48,6 +52,7 @@ export const EthersProvider = ({ children }) => {
             MarginFactory: new ethers.Contract(contracts.MarginFactory.address, getAbi("MarginFactory"), signer || provider),
             SwapEthRouter: new ethers.Contract(contracts.SwapEthRouter.address, getAbi("SwapEthRouter"), signer || provider),
             MarginEthRouter: new ethers.Contract(contracts.MarginEthRouter.address, getAbi("MarginEthRouter"), signer || provider),
+            YieldFarm: new ethers.Contract(contracts.YieldFarm.address, getAbi("YieldFarm"), signer || provider),
         }
     }, [networkInfo, signer]);
 
@@ -88,6 +93,12 @@ export const EthersProvider = ({ children }) => {
         }
     }, [signer]);
 
+    useEffect(() => {
+        provider.getBlockNumber().then(blockNumber => {
+            setBlockNumber(blockNumber);
+        });
+    })
+
     return (
         <EthersContext.Provider 
             value={{
@@ -98,12 +109,14 @@ export const EthersProvider = ({ children }) => {
                 networkInfo,
                 TestnetTokens,
                 ETHEREUM_TOKEN,
+                blockNumber,
                 contracts: {
                     IfexToken,
                     SwapFactory,
                     MarginFactory,
                     SwapEthRouter,
                     MarginEthRouter,
+                    YieldFarm,
                     getAbi,
                     createContract: (address, abiName) => 
                         new ethers.Contract(address, getAbi(abiName), signer || provider)

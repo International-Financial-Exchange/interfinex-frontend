@@ -17,7 +17,7 @@ import { SwapContext } from "../Swap";
 export const Pool = () => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0, token1 } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
-    const { contracts: { SwapEthRouter }} = useContext(EthersContext);
+    const { contracts: { SwapEthRouter, YieldFarm }} = useContext(EthersContext);
     const { 
         exchangeContract, 
         price,
@@ -163,6 +163,9 @@ export const Pool = () => {
                     isLoading={isWithdrawLoading}
                     onClick={async () => {
                         setIsWithdrawLoading(true);
+
+                        await YieldFarm.harvest(liquidityToken.address);
+                        
                         try {
                             if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
                                 const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];

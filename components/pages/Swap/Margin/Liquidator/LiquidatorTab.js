@@ -50,8 +50,6 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
                 originalBorrowedAmount, 
                 user 
             }) => {
-                console.log("interest", interestIndex)
-                console.log("last", lastInterestIndex)
                 const borrowedAmount = originalBorrowedAmount * interestIndex / humanizeTokenAmount(lastInterestIndex, { decimals: 18 });
                 const positionSize = inputToOutputAmount(
                     collateralAmount, 
@@ -71,9 +69,6 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
                     user,
                 }
             });
-
-            console.log("new", newPositions)
-            console.log("offset", offset)
 
             setPositions(existing => existing.concat(newPositions));
             setOffset(old => old + newPositions.length);
@@ -144,13 +139,8 @@ export const LiquidatorTab = ({ isSelected }) => {
     const [selectedToken, setSelectedToken] = useState(assetToken);
 
     const MarginMarket = marginMarkets[selectedToken.address];
-    console.log("selected", MarginMarket.address);
     const [positions, isLoading, getMorePositions, gotAllPositions] = usePositions(MarginMarket, selectedToken);
 
-    console.log(gotAllPositions);
-
-    console.log("positions", positions)
-    console.log("none", (!positions || positions.length === 0) && !isLoading);
     return (
         <LiquidatorContext.Provider value={{ MarginMarket, selectedToken, }}>
             <div style={{ display: !isSelected ? "none" : "" }}>
@@ -244,6 +234,7 @@ const PositionRow = ({
     const { selectedToken, MarginMarket } = useContext(LiquidatorContext);
     const collateralToken = selectedToken.address === assetToken.address ? baseToken : assetToken;
     const { addTransactionNotification } = useContext(NotificationsContext);
+    const [isLoading, setIsLoading] = useState();
 
     return (
         <StyledRow>
@@ -267,11 +258,17 @@ const PositionRow = ({
                 <Button 
                     style={{ width: "100%" }}
                     requiresWallet
+                    isLoading={isLoading}
                     onClick={async () => {
-                        addTransactionNotification({
-                            content: `Attempt to liquidate ${user} in ${selectedToken.symbol}-${collateralToken.symbol} margin market`,
-                            transactionPromise: MarginMarket.liquidatePosition(user),
-                        });
+                        setIsLoading(true);
+                        try {
+                            await addTransactionNotification({
+                                content: `Attempt to liquidate ${user} in ${selectedToken.symbol}-${collateralToken.symbol} margin market`,
+                                transactionPromise: MarginMarket.liquidatePosition(user),
+                            });
+                        } finally {
+                            setIsLoading(false);
+                        }
                     }}
                 >
                     Liquidate

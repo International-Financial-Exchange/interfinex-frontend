@@ -1,0 +1,175 @@
+[
+  {
+    "name": "initialize",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_ifexTokenContract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 106286
+  },
+  {
+    "name": "addFarm",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "yieldPerBlock"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 215809
+  },
+  {
+    "name": "deleteFarm",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 105882
+  },
+  {
+    "name": "updateFarm",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "yieldPerBlock"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 180972
+  },
+  {
+    "name": "harvest",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "tokenContract"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 146686
+  },
+  {
+    "name": "ifexTokenContract",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1241
+  },
+  {
+    "name": "owner",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1271
+  },
+  {
+    "name": "farmId",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1301
+  },
+  {
+    "name": "tokenToFarmInfo",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "yieldPerBlock"
+      },
+      {
+        "type": "address",
+        "name": "tokenContract"
+      },
+      {
+        "type": "uint256",
+        "name": "lastBlockUpdate"
+      },
+      {
+        "type": "uint256",
+        "name": "id"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 4744
+  },
+  {
+    "name": "idToFarmTokenAddress",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1476
+  },
+  {
+    "name": "isInitialized",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1391
+  }
+]

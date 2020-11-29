@@ -375,7 +375,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 554817
+    "gas": 554909
   },
   {
     "name": "depositVote",

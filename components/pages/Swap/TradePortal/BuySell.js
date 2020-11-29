@@ -144,7 +144,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
             const slippagePercentage = slippageValue / 100;
             const [sendToken, receiveToken] = isBuy ? [baseToken, assetToken] : [assetToken, baseToken];
             const MarginMarket = marginMarkets[sendToken.address];
-            const MarginMarket2 = marginMarkets[baseToken.address];
             const approve = approveMarginMarket[sendToken.address];
 
             const receiveAmount = isBuy ? 

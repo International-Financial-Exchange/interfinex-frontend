@@ -4,7 +4,6 @@ import { ethers, BigNumber } from "ethers";
 import { SERVER_URL } from "./ENV";
 import { AccountContext } from "./context/Account";
 import { EthersContext } from "./context/Ethers";
-import { add, update } from "lodash";
 
 export const PIXEL_SIZING = {
     microscopic: '3px',
@@ -226,7 +225,6 @@ export const useContractApproval = (contract, propTokens = []) => {
     };
 
     useEffect(() => {
-        console.log(tokens);
         if (contract && address) {
             updateAllowances();
         }

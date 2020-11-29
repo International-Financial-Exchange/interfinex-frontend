@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { PIXEL_SIZING } from "../../utils";
+import styled from "styled-components";
 
 const Container = styled.div`
     display: grid; 
