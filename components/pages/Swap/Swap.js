@@ -49,6 +49,16 @@ const TitleContainer = styled.div`
             grid-template-columns: auto 1fr;
             width: fit-content;
         }
+
+        .token-and-logo {
+            img {
+                height: ${PIXEL_SIZING.medium} !important;
+            }
+
+            .token-and-logo-text {
+                font-size: ${PIXEL_SIZING.medium};
+            }
+        }
     }
 `;
 

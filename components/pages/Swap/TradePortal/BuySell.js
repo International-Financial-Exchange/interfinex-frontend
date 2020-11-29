@@ -57,7 +57,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
     // const authorizeMarginEthRouter = useAuthorizeContract();
     
     // Margin trading variables
-    const { parameters: _parameters, marginMarkets, approveMarginMarket } = useContext(MarginContext);
+    const { parameters: _parameters, marginMarkets, approveMarginMarket, funding } = useContext(MarginContext);
     const parameters = _parameters?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
     const [_leverage, setLeverage] = useState();
     const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
@@ -72,6 +72,11 @@ export const BuySell = ({ isBuy, isMargin }) => {
         : assetTokenAmount - initialMargin;
     const maintenanceMargin = borrowAmount * parameters?.maintenanceMarginRate;
     const totalMargin = initialMargin + maintenanceMargin;
+
+    console.log("parameters", parameters);
+    console.log("stats", funding);
+
+    // Check against the max borrow amount and throw error for "insufficient funding -> Read more"
 
     const spotTrade = async () => {
         setIsLoading(true);
@@ -90,8 +95,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
     
                 await approveRouter(sendToken);
-
-                console.log(sendAmount);
 
                 await addTransactionNotification({
                     content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
