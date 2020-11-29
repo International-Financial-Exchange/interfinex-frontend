@@ -31,7 +31,7 @@ const TabUnderline = styled.div`
     bottom: 0;
 `;
 
-export const TabNav = ({ items, selected, onChange, style }) => {
+export const TabNav = ({ items, selected, onChange, style, animate = true }) => {
     const [internalSelected, setInternalSelected] = useState(items[0].value);
     const [mounted, setMounted] = useState(false);
     const optionRefs = useRef({});
@@ -71,6 +71,7 @@ export const TabNav = ({ items, selected, onChange, style }) => {
                 style={{ 
                     width: optionRefs.current[_selected]?.offsetWidth,
                     left: optionRefs.current[_selected]?.offsetLeft,
+                    transition: animate ? undefined : "none",
                     bottom: 0,
                 }}
             />

@@ -443,10 +443,11 @@ export const AppNavBar = props => {
                 <TabNav
                     selected={router.pathname.split("/app/")[1]}
                     onChange={selected => router.push(`/app/${selected}`)}
+                    animate={false}
                     items={[
                         // { label: "Dashboard", value: "dashboard" }, 
                         { label: "Swap", value: "swap" }, 
-                        // { label: "Options", value: "options" },
+                        { label: "Yield Farm", value: "yieldfarm" },
                     ]}
                 />
             </div>
