@@ -1,3 +1,4 @@
+import { SERVER_URL } from "../ENV";
 
 export const getRequest = (endpoint, params = {}, isJSON = true) => {
     const urlParams = Object.entries(params).reduce(

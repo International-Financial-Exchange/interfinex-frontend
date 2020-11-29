@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { EthersContext } from "../../../context/Ethers";
 import { TokenPairContext } from "../../../context/TokenPair";
 import { humanizeTokenAmount, isZeroAddress } from "../../../utils/utils";
+import { getYieldFarms } from "../Swap/networkRequests";
 
 export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
     const { contracts: { YieldFarm }} = useContext(EthersContext);
@@ -39,4 +40,34 @@ export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
     }, [liquidityToken?.address, isExchangeInfoLoading]);
 
     return [farmInfo, isLoading]
+};
+
+export const useYieldFarm = () => {
+    const [isLoading, setIsLoading] = useState();
+    const [farms, setFarms] = useState();
+
+    useEffect(() => {
+        setIsLoading(true);
+        getYieldFarms({ limit: 500 }).then(rawFarms => {
+            console.log("renal", rawFarms)
+            
+            const farms = rawFarms.map(({ 
+                liquidityTokenContract: tokenContract, 
+                yieldPerBlock,
+                token0Address,
+                token1Address
+            }) => ({ 
+                tokenContract,
+                yieldPerBlock: parseFloat(yieldPerBlock),
+                annualYield: parseFloat(yieldPerBlock) * 2336000,
+                token0Address,
+                token1Address
+            }));
+
+            setFarms(farms);
+            setIsLoading(false);
+        });
+    }, []);
+
+    return [farms, isLoading];
 };
