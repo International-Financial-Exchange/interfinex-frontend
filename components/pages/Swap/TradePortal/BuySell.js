@@ -57,8 +57,9 @@ export const BuySell = ({ isBuy, isMargin }) => {
     // const authorizeMarginEthRouter = useAuthorizeContract();
     
     // Margin trading variables
-    const { parameters: _parameters, marginMarkets, approveMarginMarket, funding } = useContext(MarginContext);
+    const { parameters: _parameters, marginMarkets, approveMarginMarket, funding: { stats: _stats }} = useContext(MarginContext);
     const parameters = _parameters?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
+    const fundingStats = _stats?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
     const [_leverage, setLeverage] = useState();
     const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
     const leverage = _leverage ?? maxLeverage / 2;
@@ -73,10 +74,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const maintenanceMargin = borrowAmount * parameters?.maintenanceMarginRate;
     const totalMargin = initialMargin + maintenanceMargin;
 
-    console.log("parameters", parameters);
-    console.log("stats", funding);
-
-    // Check against the max borrow amount and throw error for "insufficient funding -> Read more"
+    const hasSufficientFunding = fundingStats && parameters && assetTokenAmount > 0 ? borrowAmount <= fundingStats.totalValue * parameters.maxBorrowAmountRate : true;
 
     const spotTrade = async () => {
         setIsLoading(true);
@@ -289,6 +287,14 @@ export const BuySell = ({ isBuy, isMargin }) => {
                                 max={parseFloat(maxLeverage)}
                                 marks={[{ value: 0.1, label: "0.1x",}, { value: maxLeverage, label: `${maxLeverage}x`,}]} 
                             />
+
+                            {
+                                !hasSufficientFunding &&
+                                    <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.tiny }}>
+                                        <Text error>Insufficient funding to cover this trade:</Text>
+                                        <TextButton>Read More</TextButton>
+                                    </div>
+                            }
                         </div>
                 }
 
@@ -296,9 +302,10 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={assetTokenAmount && (isBuy ?
+                    isDisabled={assetTokenAmount && ((isBuy ?
                         parseFloat(baseTokenBalance) < outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
-                        : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount))
+                        : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount)) 
+                        || !hasSufficientFunding)
                     }
                     onClick={() => {
                         if (isMargin) marginTrade();

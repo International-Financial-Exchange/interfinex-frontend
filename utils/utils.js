@@ -49,7 +49,7 @@ export const shade = (col, light)=> {
 }
 
 export const parseTokenAmount = (amount, token) => {
-    return ethers.utils.parseUnits(amount.toFixed(token.decimals), token.decimals).toString();
+    return ethers.utils.parseUnits(parseFloat(amount).toFixed(token.decimals), token.decimals).toString();
 };
 
 export const safeParseEther = amount => parseEther(parseFloat(amount).toFixed(18));

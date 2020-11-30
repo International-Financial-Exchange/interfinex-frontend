@@ -30,6 +30,8 @@ export const FundingStats = () => {
     const stats = _stats[MarginMarket.address];
     const theme = useContext(ThemeContext);
 
+    console.log("actual stats", stats);
+
     return (
         <Card style={{ width: "100%", }}>
             <StyledTable>
@@ -60,7 +62,7 @@ export const FundingStats = () => {
                         :
                             <>
                                 <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
-                                    <Text primary bold style={{ color: theme.colors.positive }}>{(stats.interestRate * 100).toFixed(4)}%</Text>
+                                    <Text primary bold style={{ color: theme.colors.positive }}>{(stats.interestRate * 100 * 2336000).toFixed(4)}%</Text>
                                 </td>
                                 <td style={{ textAlign: "center", padding: PIXEL_SIZING.small }}>
                                     <Text primary bold>

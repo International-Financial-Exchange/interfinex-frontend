@@ -22,19 +22,13 @@ const StyledTable = styled.table`
     position: relative;
 
     @media (max-width: 1100px) {
-        th:nth-child(5), td:nth-child(5) {
+        th:nth-child(4), td:nth-child(4) {
             display:none;
         }
     }
 
     @media (max-width: 900px) {
         th:nth-child(3), td:nth-child(3) {
-            display:none;
-        }
-    }
-
-    @media (max-width: 700px) {
-        th:nth-child(4), td:nth-child(4) {
             display:none;
         }
     }
