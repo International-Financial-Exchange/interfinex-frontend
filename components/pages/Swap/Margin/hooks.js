@@ -19,7 +19,6 @@ export const useMarginTrading = ({ swapMarketExists }) => {
     const [AssetTokenMarginMarket, setAssetTokenMarginMarket] = useState();
     const [BaseTokenMarginMarket, setBaseTokenMarginMarket] = useState();
     const [showCreateMarginMarket, setShowCreateMarginMarket] = useState();
-    const [factoryAllowances, setFactoryAllowances] = useState();
     const [marginMarkets, setMarginMarkets] = useState();
     const [parameters, setParameters] = useState();
     const [account, setAccount] = useState({ isLoading: true });

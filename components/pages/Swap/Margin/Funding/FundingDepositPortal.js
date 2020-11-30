@@ -141,7 +141,7 @@ export const FundingDepositPortal = () => {
                             onClick={depositLiquidity}
                         >
                             <Text primary style={{ color: "white", fontSize: 15 }}>
-                                Deposit Liquidity
+                                Deposit Funding
                             </Text>
                         </Button>
             
@@ -153,7 +153,7 @@ export const FundingDepositPortal = () => {
                             onClick={withdrawLiquidity}
                         >
                             <Text primary style={{ color: "white", fontSize: 15 }}>
-                                Withdraw Liquidity
+                                Withdraw Funding
                             </Text>
                         </Button>
                     </>

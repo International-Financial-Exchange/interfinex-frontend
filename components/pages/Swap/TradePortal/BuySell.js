@@ -75,6 +75,18 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const totalMargin = initialMargin + maintenanceMargin;
 
     const hasSufficientFunding = fundingStats && parameters && assetTokenAmount > 0 ? borrowAmount <= fundingStats.totalValue * parameters.maxBorrowAmountRate : true;
+    const hasSufficientBalance = !assetTokenAmount || (isMargin ?
+            isBuy ?
+                parseFloat(baseTokenBalance) >= totalMargin
+                : parseFloat(assetTokenBalance) >= totalMargin
+        :
+            isBuy ?
+                parseFloat(baseTokenBalance) >= outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
+                : parseFloat(assetTokenBalance) >= parseFloat(assetTokenAmount)
+    );
+
+    console.log("balance", assetTokenBalance, totalMargin)
+
 
     const spotTrade = async () => {
         setIsLoading(true);
@@ -234,10 +246,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     <TokenAmountInput
                         token={assetToken}
                         type={"number"}
-                        isError={assetTokenAmount && (isBuy ?
-                            parseFloat(baseTokenBalance) < outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
-                            : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount))
-                        }
+                        isError={!hasSufficientBalance}
                         errorMessage={"Insufficient balance"}
                         onChange={e => setAssetTokenAmount(e.target.value)}
                         ref={input => input && input.focus()}
@@ -290,8 +299,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
 
                             {
                                 !hasSufficientFunding &&
-                                    <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.tiny }}>
-                                        <Text error>Insufficient funding to cover this trade:</Text>
+                                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny }}>
+                                        <Text error>There is insufficient funding in the market to cover this trade - Reduce the amount or leverage</Text>
                                         <TextButton>Read More</TextButton>
                                     </div>
                             }
@@ -302,11 +311,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={assetTokenAmount && ((isBuy ?
-                        parseFloat(baseTokenBalance) < outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
-                        : parseFloat(assetTokenBalance) < parseFloat(assetTokenAmount)) 
-                        || !hasSufficientFunding)
-                    }
+                    isDisabled={!hasSufficientBalance || !hasSufficientFunding}
                     onClick={() => {
                         if (isMargin) marginTrade();
                         else spotTrade();

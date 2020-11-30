@@ -158,7 +158,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 16228
+    "gas": 16431
   },
   {
     "name": "testAccrueInterest",
@@ -166,7 +166,7 @@
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 136715
+    "gas": 137121
   },
   {
     "name": "deposit",
@@ -184,7 +184,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 327990
+    "gas": 328396
   },
   {
     "name": "withdraw",
@@ -202,7 +202,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 327169
+    "gas": 327575
   },
   {
     "name": "getPosition",
@@ -232,7 +232,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 22506
+    "gas": 22709
   },
   {
     "name": "authorize",
@@ -300,7 +300,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 614023
+    "gas": 614429
   },
   {
     "name": "decreasePosition",
@@ -333,7 +333,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 715103
+    "gas": 715915
   },
   {
     "name": "closePosition",
@@ -362,7 +362,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 718929
+    "gas": 719741
   },
   {
     "name": "liquidatePosition",
@@ -375,7 +375,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 554909
+    "gas": 555315
   },
   {
     "name": "depositVote",
@@ -444,7 +444,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 516178
+    "gas": 516584
   },
   {
     "name": "collateralToken",

@@ -75,7 +75,7 @@ export const EthersProvider = ({ children }) => {
             name: "Ethereum",
             decimals: 18,
             symbol: "ETH",
-            logoURI: "/logo.png",
+            logoURI: "https://ethereum.org/static/a183661dd70e0e5c70689a0ec95ef0ba/31987/eth-diamond-purple.png",
         }
     }, [contracts]);
 
