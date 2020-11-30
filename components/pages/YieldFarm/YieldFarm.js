@@ -1,11 +1,14 @@
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import Text from "../../core/Text";
-import styled from "styled-components";
+import styled, { ThemeContext } from "styled-components";
 import { Layout } from "../../layout/Layout";
 import { Button } from "../../core/Button";
 import { useYieldFarm } from "./hooks";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
+import { humanizeTokenAmount } from "../../../utils/utils";
+import { useRouter } from "next/router";
+import Skeleton from "react-loading-skeleton";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
@@ -54,8 +57,6 @@ const StyledRow = styled.tr`
 export const YieldFarm = () => {
     const [farms, isLoading] = useYieldFarm();
 
-    console.log("farms", farms);
-
     return (
         <Layout>
             <Container>
@@ -71,24 +72,57 @@ export const YieldFarm = () => {
                     </tr>
 
                     {
-                        farms?.map(farm => 
-                            <FarmRow 
-                                key={farm.tokenContract}
-                                farm={farm}
-                            />    
-                        )
+                        ((!farms || farms.length === 0) && !isLoading) ?
+                            <Text 
+                                secondary 
+                                style={{ top: CONTAINER_SIZING.tiny }} 
+                                className={"center-absolute"}
+                            >
+                                No farms to show
+                            </Text>
+                        :
+                            farms?.map(farm => 
+                                <FarmRow 
+                                    key={farm.tokenContract}
+                                    farm={farm}
+                                />    
+                            )
                     }
                 </StyledTable>
+
+                {
+                    isLoading &&
+                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.larger, width: "100%" }}/>
+                        </div>
+                }
             </Container>
         </Layout>
     );
 };
 
 const FarmRow = ({ farm }) => {
-    const { tokenContract, yieldPerBlock, annualYield, annualAPR, token0Address, token1Address } = farm;
-    const { tokens } = useContext(TokenPairContext);
+    const { 
+        tokenContract, 
+        yieldPerBlock, 
+        annualYield, 
+        annualAPR, 
+        token0Address, 
+        token1Address,
+        marketContract
+    } = farm;
+
+    const { tokens, ifexToken } = useContext(TokenPairContext);
     const [token0, setToken0] = useState();
     const [token1, setToken1] = useState();
+    const [APR, setAPR] = useState();
+    const theme = useContext(ThemeContext);
+    const router = useRouter();
 
     useEffect(() => {
         const token0 = tokens.find(({ address }) => address === token0Address);
@@ -97,19 +131,38 @@ const FarmRow = ({ farm }) => {
         setToken0(token0);
         setToken1(token1);
 
-        // TODO: Create the contract and get the balance of the pool
-        // Use this to calculate the APR (exactly the same as in your liquidity)
+        ifexToken.contract.balanceOf(marketContract).then(rawMarketBalance => {
+            const marketBalance = humanizeTokenAmount(rawMarketBalance, ifexToken);
+            const APR = (annualYield / marketBalance * 100).toFixed(2);
+            setAPR(APR);
+        });
     }, []);
 
     return (
         <StyledRow>
             <td>{token0?.symbol}-{token1?.symbol} Swap</td>
-            <td>{annualAPR}%</td>
+            <td style={{ color: theme.colors.positive, fontWeight: "bold" }}>
+                {
+                    APR ?
+                        `${APR}%`
+                        : <Skeleton height={PIXEL_SIZING.medium} width={PIXEL_SIZING.huge}/>
+                }
+            </td>
             <td>{yieldPerBlock} IFEX</td>
             <td>{annualYield} IFEX</td>
             <td>
                 <Button
                     style={{ width: "100%" }}
+                    onClick={() => {
+                        router.push({ 
+                            pathname: "/app/swap",
+                            query: { 
+                                ...router.query,
+                                assetTokenName: token0.name,
+                                baseTokenName: token1.name,
+                            }
+                        });
+                    }}
                 >
                     Start Farming
                 </Button>

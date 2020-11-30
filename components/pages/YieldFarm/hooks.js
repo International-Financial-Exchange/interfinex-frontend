@@ -55,13 +55,15 @@ export const useYieldFarm = () => {
                 liquidityTokenContract: tokenContract, 
                 yieldPerBlock,
                 token0Address,
-                token1Address
+                token1Address,
+                marketContract
             }) => ({ 
                 tokenContract,
-                yieldPerBlock: parseFloat(yieldPerBlock),
-                annualYield: parseFloat(yieldPerBlock) * 2336000,
+                yieldPerBlock: humanizeTokenAmount(yieldPerBlock, { decimals: 18 }),
+                annualYield: humanizeTokenAmount(yieldPerBlock, { decimals: 18 }) * 2336000,
                 token0Address,
-                token1Address
+                token1Address,
+                marketContract,
             }));
 
             setFarms(farms);
