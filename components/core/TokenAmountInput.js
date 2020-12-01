@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
 import { TokenAndLogo } from "./TokenAndLogo";
 import { TextButton } from "./Button";
 import { Input } from "./Input";
 import Text from "./Text";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
     const theme = useContext(ThemeContext);

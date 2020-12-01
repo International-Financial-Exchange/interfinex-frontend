@@ -1,10 +1,10 @@
 import styled, { ThemeContext } from "styled-components";
-import { PIXEL_SIZING, CONTAINER_SIZING } from "../../utils";
 import Text from "./Text";
 import ChartJS from "chart.js";
 import { TextOption } from "../core/TextOption";
 import { useState, useRef, useEffect, useContext } from "react";
 import Skeleton from "react-loading-skeleton";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../utils/constants";
 
 const Container = styled.div`
     background-color: ${({ theme }) => theme.colors.invert};

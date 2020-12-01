@@ -4,8 +4,8 @@ import { ThemeContext } from 'styled-components'
 import { useContext } from 'react';
 import Text from "../core/Text";
 import { ArrowButton, Button } from '../core/Button';
-import { PIXEL_SIZING } from '../../utils';
 import Link from 'next/link';
+import { PIXEL_SIZING } from '../../utils/constants';
 
 export default function Home() {
     return (
@@ -25,8 +25,8 @@ export default function Home() {
                     Welcome to Interfinex
                 </Text>
 
-                <Text secondary style={{ fontSize: PIXEL_SIZING.medium, textAlign: "center" }}>
-                    The future of decentralised finance
+                <Text secondary style={{ fontSize: PIXEL_SIZING.medium, textAlign: "center", }}>
+                    Trade and loan any ERC20 token with up to 500x leverage
                 </Text>
 
                 <div style={{ display: "grid", width: "80%", rowGap: PIXEL_SIZING.small }}>

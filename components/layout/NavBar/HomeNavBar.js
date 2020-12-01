@@ -2,7 +2,7 @@ import Text from "../../core/Text";
 import Link from "next/link";
 import { Button } from "../../core/Button";
 import Span from "../../core/Span";
-import { PIXEL_SIZING } from "../../../utils";
+import { PIXEL_SIZING } from "../../../utils/constants";
 
 export default props => {
     return (

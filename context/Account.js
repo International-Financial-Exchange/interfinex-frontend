@@ -4,7 +4,8 @@ import { TokenPairContext } from "./TokenPair";
 import ethers from "ethers";
 import { NotificationsContext, NOTIFICATION_TYPES } from "./Notifications";
 import Text from "../components/core/Text";
-import { humanizeTokenAmount } from "../utils";
+import { humanizeTokenAmount } from "../utils/utils";
+import { formatEther } from "ethers/lib/utils";
 
 export const AccountContext = createContext();
 
@@ -37,13 +38,25 @@ export const AccountProvider = ({ children }) => {
 
     useEffect(() => {
         if (address) {
-            baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
-            });
+            if (baseToken.name === "Ethereum") {
+                signer.getBalance().then(balance => 
+                    setBaseTokenBalance(parseFloat(formatEther(balance)))
+                )
+            } else {
+                baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                    setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
+                });
+            }
 
-            assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                setAssetTokenBalance(humanizeTokenAmount(balance, assetToken))
-            });
+            if (assetToken.name === "Ethereum") {
+                signer.getBalance().then(balance => 
+                    setBaseTokenBalance(parseFloat(formatEther(balance)))
+                )
+            } else {
+                assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
+                    setAssetTokenBalance(humanizeTokenAmount(balance, assetToken))
+                });
+            }
 
             ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 setIfexTokenBalance(humanizeTokenAmount(balance, ifexToken))

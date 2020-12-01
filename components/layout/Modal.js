@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import ReactDOM from 'react-dom';
 import _ from "lodash";
-import { useDocument } from '../../utils';
+import { useDocument } from '../../utils/hooks';
 
 const CloseModalContext = React.createContext();
 
@@ -9,9 +9,6 @@ export const MODAL_ID = "MODAL";
 
 export const Modal = ({ isOpen, onClose = _.noop, children }) => {
     const document = useDocument();
-
-    console.log("show", isOpen && document);
-    console.log("open", isOpen);
 
     return (
         isOpen && document ? 
@@ -35,7 +32,6 @@ export const Modal = ({ isOpen, onClose = _.noop, children }) => {
                             onClick={e => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                console.log("hello")
                             }}
                         >
                             {_.isFunction(children) ? children(onClose) : children}

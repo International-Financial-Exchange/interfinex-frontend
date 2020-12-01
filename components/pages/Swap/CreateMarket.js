@@ -1,5 +1,4 @@
 import { Card } from "../../core/Card"
-import { CONTAINER_SIZING, PIXEL_SIZING, } from "../../../utils"
 import Text from "../../core/Text"
 import { TextButton, Button } from "../../core/Button"
 import { TokenAmountInput } from "../../core/TokenAmountInput"
@@ -10,48 +9,61 @@ import { EthersContext } from "../../../context/Ethers"
 import ethers from "ethers";
 import { NotificationsContext } from "../../../context/Notifications"
 import { SwapContext } from "./Swap"
+import { parseEther } from "ethers/lib/utils"
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants"
+import { safeParseEther } from "../../../utils/utils"
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, ifexTokenBalance } = useContext(AccountContext);
-    const { contracts: { factoryContract }} = useContext(EthersContext);
+    const { contracts: { SwapFactory, SwapEthRouter }} = useContext(EthersContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
-    const { approveFactory } = useContext(SwapContext);
+    const { approveFactory, approveRouter } = useContext(SwapContext);
 
     const [assetTokenAmount, setAssetTokenAmount] = useState();
     const [baseTokenAmount, setBaseTokenAmount] = useState();
     const [ifexTokenAmount, setIfexTokenAmount] = useState();
 
+    const [isLoading, setIsLoading] = useState();
+
     const onSubmit = async () => {
-        console.log(
-            "contracts",
-            token0.address,
-            token1.address,
-            ifexToken.address
-        );
-        
-        await approveFactory();
-        
-        console.log(baseToken.address, 
-            assetToken.address,
-            ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
-            ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
-            ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),);
-
-            // return;
-
-            
-        addTransactionNotification({
-            content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
-            transactionPromise: factoryContract.create_exchange(
-                baseToken.address, 
-                assetToken.address,
-                ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
-                ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
-                ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
-                { gasLimit: 4_500_000 }
-            ),
-        });
+        setIsLoading(true);
+        try {
+            if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
+                const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
+                const [etherTokenAmount, sendTokenAmount] = sendToken.address === assetToken.address ? 
+                    [baseTokenAmount, assetTokenAmount] 
+                    : [assetTokenAmount, baseTokenAmount];
+                
+                await approveRouter(sendToken, ifexToken);
+    
+                addTransactionNotification({
+                    content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                    transactionPromise: SwapEthRouter.create_exchange(
+                        sendToken.address, 
+                        ethers.utils.parseUnits(sendTokenAmount.toString(), sendToken.decimals).toString(),
+                        ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                        { gasLimit: 4_500_000, value: safeParseEther(etherTokenAmount.toString()) }
+                    ),
+                });
+            } else {
+                await approveFactory();
+    
+                addTransactionNotification({
+                    content: `Create swap market for ${assetToken.name} and ${baseToken.name}`,
+                    transactionPromise: SwapFactory.create_exchange(
+                        baseToken.address, 
+                        assetToken.address,
+                        ethers.utils.parseUnits(baseTokenAmount.toString(), baseToken.decimals).toString(),
+                        ethers.utils.parseUnits(assetTokenAmount.toString(), assetToken.decimals).toString(),
+                        ethers.utils.parseUnits(ifexTokenAmount.toString(), ifexToken.decimals).toString(),
+                        { gasLimit: 4_500_000 }
+                    ),
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -99,6 +111,7 @@ export const CreateMarket = () => {
             <Button 
                 style={{ height: PIXEL_SIZING.larger, width: "100%" }}
                 requiresWallet
+                isLoading={isLoading}
                 onClick={onSubmit}
             >
                 Create Swap Market

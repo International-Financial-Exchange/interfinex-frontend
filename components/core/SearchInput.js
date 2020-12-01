@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
 import { Cross } from "./Cross";
 import { useState } from "react";
 import { Input } from "./Input";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 export const SearchInput = ({ style, ...props }) => {
     return (
