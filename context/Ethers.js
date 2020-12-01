@@ -31,10 +31,10 @@ export const EthersProvider = ({ children }) => {
     console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.getDefaultProvider(ETH_NODE_URL));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState({ name: "kovan" });
+    const [networkInfo, setNetworkInfo] = useState({ name: "mainnet" });
     const [blockNumber, setBlockNumber] = useState();
 
-    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["kovan"];
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["mainnet"];
     const getAbi = abiName => ABI[abiName];
 
     const { 
@@ -59,13 +59,13 @@ export const EthersProvider = ({ children }) => {
         name: `Token${i}`,
         symbol: `T${i}`,
         decimals: 18,
-        address: contracts[`Token${i}`].address,
+        address: contracts[`Token${i}`]?.address,
         logoURI: "/metamask-logo.png"
     })).concat({
         name: `WrappedEther`,
         symbol: `WETH`,
         decimals: 18,
-        address: contracts[`WrappedEther`].address,
+        address: contracts[`WrappedEther`]?.address,
         logoURI: "/metamask-logo.png"
     });
 

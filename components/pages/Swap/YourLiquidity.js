@@ -41,8 +41,6 @@ export const YourLiquidity = () => {
             }).then(() => {
                 setIsDividendsLoading(false);
             });
-
-            ifexToken.contract.balanceOf(address).then(res => console.log("actual balance",  humanizeTokenAmount(res, ifexToken)));
         }
     }, [liquidityToken?.address, address]);
 
@@ -50,8 +48,8 @@ export const YourLiquidity = () => {
 
     const { contracts: { YieldFarm }} = useContext(EthersContext);
     const addFarm = async () => {
-        await ifexToken.contract.transfer(YieldFarm.address, parseTokenAmount(100000, { decimals: 18 }));
-        await YieldFarm.addFarm(liquidityToken.address, parseTokenAmount(10, { decimals: 18 }), 0);
+        await ifexToken.contract.transfer(YieldFarm.address, parseTokenAmount(1_000_000, { decimals: 18 }));
+        await YieldFarm.addFarm(liquidityToken.address, parseTokenAmount(1000, { decimals: 18 }), 0);
     };
 
     return (
@@ -126,10 +124,6 @@ export const YourLiquidity = () => {
                         </TextButton>
                     </div>
                 </div>
-
-                {/* <Button onClick={addFarm}>
-                    Add Farm
-                </Button> */}
             </Card>
             
             {

@@ -150,20 +150,15 @@
     "gas": 185238
   },
   {
-    "name": "ifexTokenContract",
-    "outputs": [
-      {
-        "type": "address",
-        "name": ""
-      }
-    ],
+    "name": "withdraw",
+    "outputs": [],
     "inputs": [],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 1241
+    "gas": 5448
   },
   {
-    "name": "owner",
+    "name": "ifexTokenContract",
     "outputs": [
       {
         "type": "address",
@@ -176,6 +171,19 @@
     "gas": 1271
   },
   {
+    "name": "owner",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1301
+  },
+  {
     "name": "farmId",
     "outputs": [
       {
@@ -186,7 +194,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1301
+    "gas": 1331
   },
   {
     "name": "tokenToFarmInfo",
@@ -220,7 +228,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 5726
+    "gas": 5756
   },
   {
     "name": "idToFarmTokenAddress",
@@ -238,7 +246,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1476
+    "gas": 1506
   },
   {
     "name": "isInitialized",
@@ -251,6 +259,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1391
+    "gas": 1421
   }
 ]

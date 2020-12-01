@@ -118,7 +118,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         0,
                         ethers.constants.AddressZero, 
                         false,
-                        { gasLimit: 500_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
+                        { gasLimit: 175_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
                     ),
                 });
             } else {
@@ -146,7 +146,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         0,
                         ethers.constants.AddressZero, 
                         false,
-                        { gasLimit: 500_000 },
                     ),
                 });
             }
@@ -212,7 +211,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
         }
     };
 
-    console.log("cost", outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
 
     return (
         showTokenSelectMenu ?
@@ -237,11 +235,11 @@ export const BuySell = ({ isBuy, isMargin }) => {
                             onClick={() => {
                                 const maxAssetAmount = isMargin ?
                                     isBuy ? 
-                                        inputToOutputAmount(baseTokenBalance + baseTokenBalance * leverage, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
-                                        : assetTokenBalance + assetTokenBalance * leverage
+                                        inputToOutputAmount((baseTokenBalance * leverage), exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        : (assetTokenBalance * leverage)
                                 :
                                     isBuy ? 
-                                        inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        inputToOutputAmount(baseTokenBalance * 0.95, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                         : assetTokenBalance
 
 
@@ -321,7 +319,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={!hasSufficientBalance || !hasSufficientFunding}
+                    isDisabled={!hasSufficientBalance || (isMargin && !hasSufficientFunding)}
                     onClick={() => {
                         if (isMargin) marginTrade();
                         else spotTrade();
@@ -336,7 +334,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     {
                         isMargin ?
                             <Text secondary>
-                                Cost {totalMargin.toFixed(4)} {isBuy ? baseToken.symbol : assetToken.symbol}
+                                Cost: {totalMargin.toFixed(4)} {isBuy ? baseToken.symbol : assetToken.symbol}
                             </Text>
                             : <Text secondary>
                                 {isBuy ? "Cost" : "Receive"}: {

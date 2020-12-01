@@ -111,7 +111,7 @@ export const TokenPairProvider = ({ children }) => {
                     });
                 }
             } else {
-                const baseTokenDefault = tokens.find(({ name }) => name === "Tether") || tokens[1];
+                const baseTokenDefault = tokens.find(({ name }) => name === "Ethereum") || tokens[1];
                 setBaseToken({
                     ...baseTokenDefault,
                     contract: new ethers.Contract(baseTokenDefault.address, getAbi("ERC20"), signer || provider),

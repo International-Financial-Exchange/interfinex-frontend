@@ -49,7 +49,7 @@ export const TradeInfoChart = () => {
             { 
                 label: "Price", 
                 value: "PRICE", 
-                currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
+                currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(8),
                 suffix: baseToken.symbol,
                 data: candles ?? {},
             }
