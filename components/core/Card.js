@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { PIXEL_SIZING, CONTAINER_SIZING } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 export const Card = styled.div`
     border-radius: ${PIXEL_SIZING.tiny};

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 const CrossContainer = styled.div`
     width: fit-content;

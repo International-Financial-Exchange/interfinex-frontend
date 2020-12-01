@@ -1,7 +1,6 @@
 import { Card } from "../../core/Card";
 import Text from "../../core/Text";
 import { TextOption } from "../../core/TextOption";
-import { PIXEL_SIZING, CONTAINER_SIZING } from "../../../utils";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
@@ -11,6 +10,13 @@ import { AccountContext } from "../../../context/Account";
 import ethers from "ethers";
 import Skeleton from "react-loading-skeleton";
 import { NotificationsContext } from "../../../context/Notifications";
+import { parseEther } from "ethers/lib/utils";
+import { EthersContext } from "../../../context/Ethers";
+import { InfoBubble } from "../../core/InfoBubble";
+import { ThemeContext } from "styled-components";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
+import { humanizeTokenAmount, parseTokenAmount } from "../../../utils/utils";
+import { useYieldFarmInfo } from "../YieldFarm/hooks";
 
 export const YourLiquidity = () => {
     const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
@@ -22,19 +28,29 @@ export const YourLiquidity = () => {
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [isDividendsLoading, setIsDividendsLoading] = useState();
+    const [farmInfo, isFarmInfoLoading] = useYieldFarmInfo(liquidityToken, SwapContext);
+    const { blockNumber } = useContext(EthersContext);
+    const theme = useContext(ThemeContext);
+    const [showMoreYieldInfo, setShowMoreYieldInfo] = useState(false);
 
     useEffect(() => {
         if (liquidityToken && address) {
             setIsDividendsLoading(true);
-            liquidityToken.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
+            liquidityToken.contract.dividendsOf(address, { gasLimit: 100000 }).then(async rawDividends => {
                 setAccountUnclaimedIfexEarnings(ethers.utils.formatUnits(rawDividends, 18));
             }).then(() => {
                 setIsDividendsLoading(false);
             });
         }
-    }, [liquidityToken]);
+    }, [liquidityToken?.address, address]);
 
-    const isLoading = !account || isExchangeInfoLoading || isDividendsLoading;
+    const isLoading = !account || isExchangeInfoLoading || isDividendsLoading || isFarmInfoLoading;
+
+    const { contracts: { YieldFarm }} = useContext(EthersContext);
+    const addFarm = async () => {
+        await ifexToken.contract.transfer(YieldFarm.address, parseTokenAmount(1_000_000, { decimals: 18 }));
+        await YieldFarm.addFarm(liquidityToken.address, parseTokenAmount(1000, { decimals: 18 }), 0);
+    };
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
@@ -72,7 +88,14 @@ export const YourLiquidity = () => {
                             {
                                 isLoading ?
                                     <Skeleton width={CONTAINER_SIZING.miniscule}/>
-                                    : <Text secondary bold>{parseFloat(accountUnclaimedIfexEarnings)?.toFixed(4)} {ifexToken.symbol}</Text>
+                                    : <Text secondary bold>
+                                        {
+                                            farmInfo ?
+                                                ((parseFloat(accountUnclaimedIfexEarnings) + account.percentageOfPoolDeposited * (farmInfo.yieldPerBlock * (blockNumber - farmInfo.lastBlockUpdate)))).toFixed(4)
+                                                : parseFloat(accountUnclaimedIfexEarnings)
+                                        } 
+                                        {" " + ifexToken.symbol}
+                                    </Text>
                             }
                         </div>
 
@@ -81,7 +104,12 @@ export const YourLiquidity = () => {
                             requiresWallet
                             onClick={async () => {
                                 setIsClaimEarningsLoading(true);
-                                const transactionPromise = liquidityToken.claimDividends({ gasLimit: 1000000 });
+                                
+                                if (farmInfo) {
+                                    await YieldFarm.harvest(liquidityToken.address);
+                                }
+
+                                const transactionPromise = liquidityToken.contract.claimDividends({ gasLimit: 1000000 });
                                 addTransactionNotification({
                                     content: `Claim Interfinex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
                                     transactionPromise,
@@ -97,6 +125,58 @@ export const YourLiquidity = () => {
                     </div>
                 </div>
             </Card>
+            
+            {
+                farmInfo &&
+                    <InfoBubble 
+                        style={{ 
+                            display: "grid", 
+                            rowGap: PIXEL_SIZING.small,
+                        }}
+                    >
+                        <div style={{ fontWeight: "bold" }}>
+                            {
+                                account?.percentageOfPoolDeposited > 0 ?
+                                    "👨‍🌾 You are Farming this liquidity pool"
+                                    : "👨‍🌾 You can Farm this liquidity pool"
+                            }
+                        </div>
+                        
+                        <div style={{ width: "75%", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "50% auto", }}>
+                                <div>Annual APR:</div> 
+                                <div style={{ color: theme.colors.positive, fontWeight: "bold" }}>
+                                    {" " + farmInfo.annualAPR}%
+                                </div>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "50% auto" }}>
+                                <div>
+                                    Annual Yield:
+                                </div> 
+                                <div style={{ fontWeight: "bold" }}>
+                                    {" " + farmInfo.annualYield} IFEX
+                                </div>
+                            </div>
+                        </div>
+
+                        <TextButton 
+                            onClick={() => setShowMoreYieldInfo(!showMoreYieldInfo)}
+                            style={{ justifySelf: "right", color: "white" }}
+                        >
+                            Show {showMoreYieldInfo ? "Less" : "More"} Info
+                        </TextButton>
+
+                        {
+                            showMoreYieldInfo &&
+                                <div>
+                                    Deposit liquidity into the pool and earn IFEX tokens every block. 
+                                    The amount you earn is directly proportional to the amount you deposit into the pool.
+                                    Happy farming!
+                                </div>
+                        }
+                    </InfoBubble>
+            }
         </div>
     );
 }

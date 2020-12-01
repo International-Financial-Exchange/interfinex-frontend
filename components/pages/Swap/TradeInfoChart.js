@@ -1,9 +1,9 @@
 import { Chart } from "../../core/Chart";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useMemo } from "react";
 import { getCandles } from "./networkRequests";
 import { TokenPairContext } from "../../../context/TokenPair";
-import { TIMEFRAMES } from "../../../utils";
 import { SwapContext } from "./Swap";
+import { TIMEFRAMES } from "../../../utils/constants";
 
 export const TradeInfoChart = () => {
     const CANDLES_TO_FETCH = [
@@ -42,19 +42,23 @@ export const TradeInfoChart = () => {
                     .catch(e => console.log(e));
             })
         }
-    }, [assetToken, baseToken]);
+    }, [assetToken?.address, baseToken?.address]);
+
+    const chartData = useMemo(() => {
+        return ([
+            { 
+                label: "Price", 
+                value: "PRICE", 
+                currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(8),
+                suffix: baseToken.symbol,
+                data: candles ?? {},
+            }
+        ])
+    }, [assetToken?.address, baseToken?.address, candles, exchangeAssetTokenBalance, exchangeBaseTokenBalance, isExchangeInfoLoading])
 
     return (
         <Chart
-            options={[
-                { 
-                    label: "Price", 
-                    value: "PRICE", 
-                    currentValue: isExchangeInfoLoading ? null : (exchangeBaseTokenBalance / exchangeAssetTokenBalance).toFixed(6),
-                    suffix: baseToken.symbol,
-                    data: candles ?? {},
-                }
-            ]}
+            options={chartData}
         />
     );
 };

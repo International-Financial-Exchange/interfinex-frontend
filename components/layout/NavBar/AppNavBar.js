@@ -2,7 +2,6 @@ import Text from "../../core/Text";
 import Link from "next/link";
 import { Button } from "../../core/Button";
 import Span from "../../core/Span";
-import { PIXEL_SIZING, CONTAINER_SIZING, dropinAnimation, useDocument, useWindow } from "../../../utils";
 import styled from "styled-components";
 import { useRouter } from 'next/router'
 import { useState, useEffect, useRef, useContext, createRef, useLayoutEffect, useMemo } from "react";
@@ -25,72 +24,6 @@ import { getDisplayName } from "next/dist/next-server/lib/utils";
 import _ from "lodash";
 import { AccountContext } from "../../../context/Account";
 import { ETH_NODE_URL } from "../../../ENV";
-
-const TabOption = styled(Text)`
-    padding: ${PIXEL_SIZING.small};
-    border-radius: ${PIXEL_SIZING.small};
-    width: fit-content;
-    color: ${({ selected, theme }) => selected ? theme.colors.primary : theme.colors.textSecondary};
-    font-weight: ${({ selected }) => selected ? "bold" : ""};
-    transition: background-color 0.07s ease-out;
-    user-select: none;
-
-    &:hover {
-        cursor: pointer;
-        background-color: ${({ theme }) => theme.colors.highlight}
-    }
-`;
-
-const TabUnderline = styled.div`
-    position: absolute;
-    background-color: ${({ theme }) => theme.colors.primary};
-    height: ${PIXEL_SIZING.microscopic};
-    border-radius: ${PIXEL_SIZING.microscopic};
-    transition: width 0.1s ease-out, left 0.1s ease-out;
-    position: absolute;
-    bottom: 0;
-`
-
-const TabNav = ({ items, selected, onChange }) => {
-    const [internalSelected, setInternalSelected] = useState(items[0].value);
-    const [mounted, setMounted] = useState(false);
-    const optionRefs = useRef({});
-
-    const _selected = selected ?? internalSelected;
-
-    // Use this so that we make sure the refs are populated;
-    // Then we can accurately calculate the TabUnderline position.
-    useLayoutEffect(() => {
-        setMounted(true);
-    }, []);
-
-    return (
-        <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", justifyItems: "center", columnGap: PIXEL_SIZING.large, position: "relative" }}>
-            {
-                items.map(({ label, value }) =>
-                    <TabOption 
-                        selected={value === _selected}
-                        onClick={() => {
-                            setInternalSelected(value);
-                            onChange(value);
-                        }}
-                        ref={e => optionRefs.current[value] = e}
-                    >
-                        {label}
-                    </TabOption>
-                )
-            }
-
-            <TabUnderline
-                style={{ 
-                    width: optionRefs.current[_selected]?.offsetWidth,
-                    left: optionRefs.current[_selected]?.offsetLeft,
-                    bottom: -14,
-                }}
-            />
-        </div>
-    );
-};
 
 const AccountQuickInfoCard = styled(Card)`
     transition: all 0.1s ease-out;
@@ -427,17 +360,33 @@ const Container = styled.div`
     display: grid; 
     grid-template-columns: auto 1fr auto; 
     align-items: center; 
-    position: relative;
+    #circle-nav {
+        display: none;
+    }
 
-    @media (max-width: 600px) {
-        #tab-nav, #nav-logo {
+    @media (max-width: 830px) {
+        #nav-logo {
             display: none;
+        }
+    }
+
+    @media (max-width: 750px) {
+        #tab-nav {
+            display: none;
+        }
+
+        #circle-nav {
+            display: unset;
         }
     }
 `;
 
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { TabNav } from "../../core/TabNav";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
+import { useDocument, useWindow } from "../../../utils/hooks";
+import { CircleNav } from "./CircleNav";
 
 const ConnectWallet = props => {
     const document = useDocument();
@@ -493,6 +442,16 @@ export const AppNavBar = props => {
 
     return (
         <Container>
+            <CircleNav
+                id={"circle-nav"}
+                onChange={selected => router.push(`/app/${selected}`)}
+                items={[
+                    // { label: "Dashboard", value: "dashboard" }, 
+                    { label: "Swap", value: "swap" }, 
+                    { label: "Yield Farm", value: "yieldfarm" },
+                ]}
+            />
+
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
                 <img
                     id={"nav-logo"}
@@ -504,19 +463,20 @@ export const AppNavBar = props => {
                 <PairSelect/>
             </div>
 
-            <div id={"tab-nav"} style={{ justifySelf: "center", }}>
+            <div id={"tab-nav"} style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)" }}>
                 <TabNav
                     selected={router.pathname.split("/app/")[1]}
                     onChange={selected => router.push(`/app/${selected}`)}
+                    animate={false}
                     items={[
                         // { label: "Dashboard", value: "dashboard" }, 
                         { label: "Swap", value: "swap" }, 
-                        // { label: "Options", value: "options" },
+                        { label: "Yield Farm", value: "yieldfarm" },
                     ]}
                 />
             </div>
 
-            <div style={{ position: "absolute", top: "50%", right: 0, transform: "translateY(-50%)", }}>
+            <div style={{ justifySelf: "right" }}>
                 {
                     signer ?
                         <div 

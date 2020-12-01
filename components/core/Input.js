@@ -1,7 +1,7 @@
 import styled, { ThemeContext } from "styled-components";
-import { PIXEL_SIZING } from "../../utils";
 import { forwardRef, useContext } from "react";
 import Text from "./Text";
+import { PIXEL_SIZING } from "../../utils/constants";
 
 const InputContainer = styled.input`
     border-radius: ${PIXEL_SIZING.miniscule};

@@ -2,34 +2,31 @@ import { useRouter } from "next/router";
 
 const { createContext, useState, useEffect, useContext, useMemo } = require("react");
 import { tokens as InchTokens } from "../public/1InchTokenList.json";
-import { tokens as LocalTokens } from "../public/contracts/local-tokens.json";
 import { EthersContext } from "./Ethers";
 import { ethers } from "ethers";
 import { AccountContext } from "./Account";
-import { getRequest } from "../utils";
 export const TokenPairContext = createContext();
 
 
 export const TokenPairProvider = ({ children }) => {
     const router = useRouter();
     const [tokens, setTokens] = useState();
-    const { signer, networkInfo, provider, contracts: { erc20ContractAbi, ifexTokenContract } } = useContext(EthersContext);
+    const { signer, networkInfo, provider, contracts: { getAbi, IfexToken, }, TestnetTokens, ETHEREUM_TOKEN } = useContext(EthersContext);
 
     const [assetToken, setAssetToken] = useState();
     const [baseToken, setBaseToken] = useState();
-    const [ifexToken, setIfexToken] = useState();
 
     const IFEX_TOKEN = useMemo(() => {
         return {
-            address: ifexTokenContract.address,
+            address: IfexToken.address,
             decimals: 18,
             name: "Interfinex Bills",
             symbol: "IFEX",
             chainId: networkInfo?.chainId,
-            contract: ifexTokenContract,
+            contract: IfexToken,
             logoURI: "/logo.png"
         }
-    }, [ifexTokenContract, networkInfo?.chainId]);
+    }, [IfexToken, networkInfo?.chainId]);
 
     useEffect(() => {
         if (networkInfo) {
@@ -41,14 +38,14 @@ export const TokenPairProvider = ({ children }) => {
                             token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
                             return token;
                         });
-                        setTokens([IFEX_TOKEN].concat(newTokens));
+                        setTokens([IFEX_TOKEN, ETHEREUM_TOKEN].concat(newTokens));
                     });
             } else {
-                const tokens = [IFEX_TOKEN].concat(LocalTokens);
+                const tokens = [IFEX_TOKEN, ETHEREUM_TOKEN].concat(TestnetTokens);
                 setTokens(tokens);
             }
         }
-    }, [networkInfo?.chainId, ifexTokenContract]);
+    }, [networkInfo?.chainId, IfexToken]);
 
     useEffect(() => {
         const {
@@ -68,7 +65,7 @@ export const TokenPairProvider = ({ children }) => {
                 if (assetToken) {
                     setAssetToken({
                         ...assetToken,
-                        contract: new ethers.Contract(assetToken.address, erc20ContractAbi, signer || provider),
+                        contract: new ethers.Contract(assetToken.address, getAbi("ERC20"), signer || provider),
                     });
                 } else if (
                     assetTokenAddress && 
@@ -79,7 +76,8 @@ export const TokenPairProvider = ({ children }) => {
                         name: assetTokenName,
                         symbol: assetTokenSymbol,
                         address: assetTokenAddress,
-                        contract: new ethers.Contract(assetTokenAddress, erc20ContractAbi, signer || provider),
+                        decimals: parseFloat(assetTokenDecimals),
+                        contract: new ethers.Contract(assetTokenAddress, getAbi("ERC20"), signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
@@ -87,7 +85,7 @@ export const TokenPairProvider = ({ children }) => {
                 const assetTokenDefault = IFEX_TOKEN;
                 setAssetToken({
                     ...assetTokenDefault,
-                    contract: new ethers.Contract(assetTokenDefault.address, erc20ContractAbi, signer || provider),
+                    contract: new ethers.Contract(assetTokenDefault.address, getAbi("ERC20"), signer || provider),
                 });
             }
     
@@ -96,7 +94,7 @@ export const TokenPairProvider = ({ children }) => {
                 if (baseToken) {
                     setBaseToken({
                         ...baseToken,
-                        contract: new ethers.Contract(baseToken.address, erc20ContractAbi, signer || provider),
+                        contract: new ethers.Contract(baseToken.address, getAbi("ERC20"), signer || provider),
                     });
                 } else if (
                     baseTokenAddress && 
@@ -107,15 +105,16 @@ export const TokenPairProvider = ({ children }) => {
                         name: baseTokenName,
                         symbol: baseTokenSymbol,
                         address: baseTokenAddress,
-                        contract: new ethers.Contract(baseTokenAddress, erc20ContractAbi, signer || provider),
+                        decimals: parseFloat(baseTokenDecimals),
+                        contract: new ethers.Contract(baseTokenAddress, getAbi("ERC20"), signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
                 }
             } else {
-                const baseTokenDefault = tokens.find(({ name }) => name === "Tether") || tokens[0];
+                const baseTokenDefault = tokens.find(({ name }) => name === "Ethereum") || tokens[1];
                 setBaseToken({
                     ...baseTokenDefault,
-                    contract: new ethers.Contract(baseTokenDefault.address, erc20ContractAbi, signer || provider),
+                    contract: new ethers.Contract(baseTokenDefault.address, getAbi("ERC20"), signer || provider),
                 });
             }
         }

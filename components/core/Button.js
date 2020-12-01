@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import { PIXEL_SIZING, dropinAnimation } from "../../utils";
 import { BarSpinner, Spinner } from "./Spinner";
 import { useContext, useRef, useState } from "react";
 import { AccountContext } from "../../context/Account";
 import Text from "./Text";
 import { EthersContext } from "../../context/Ethers";
+import ReactDOM from "react-dom";
+import { dropinAnimation, PIXEL_SIZING } from "../../utils/constants";
 
 const ButtonContainer = styled.div`
     border-radius: 4px;
@@ -50,13 +51,16 @@ const InfoBubble = ({ children, parentRef, ...props }) => {
     const { x, y, height, width } = parentRef.current?.getBoundingClientRect() ?? {};
 
     return (
-        <InfoBubbleContainer {...props} style={{ left: x, top: y + height + 8, width: props.style.width === "100%" ? width : "fit-content" }}>
-            {children}
-        </InfoBubbleContainer>
+        ReactDOM.createPortal(
+            <InfoBubbleContainer {...props} style={{ left: x, top: y + height + 8, width: props.style.width === "100%" ? width : "fit-content" }}>
+                {children}
+            </InfoBubbleContainer>,
+            document.getElementById("root"),
+        )
     );
 }
 
-export const Button = ({ children, isLoading = false, requiresWallet, ...props }) => {
+export const Button = ({ children, primary, isLoading = false, requiresWallet, ...props }) => {
     const { signer } = useContext(EthersContext);
     const buttonRef = useRef();
     const [isHovered, setIsHovered] = useState(false);
@@ -64,6 +68,10 @@ export const Button = ({ children, isLoading = false, requiresWallet, ...props }
     return (
         <ButtonContainer 
             {...props} 
+            style={{ 
+                height: primary ? PIXEL_SIZING.larger : '',
+                ...props.style,
+            }}
             ref={buttonRef} 
             onMouseOver={() => setIsHovered(true)} 
             onMouseLeave={() => setIsHovered(false)}
@@ -73,14 +81,16 @@ export const Button = ({ children, isLoading = false, requiresWallet, ...props }
             {
                 isLoading ?
                     <Spinner invert/>
-                    : children
+                    : primary ? 
+                        <Text primary style={{ color: "white", fontSize: 15 }}>{children}</Text> 
+                        : children
             }
 
             {
                 isHovered && requiresWallet && !signer &&
                     <InfoBubble style={{ width: "100%" }} parentRef={buttonRef}>
                         <Text style={{ color: "white" }}>
-                            Connect your wallet to start trading    
+                            Connect your wallet  
                         </Text>
                     </InfoBubble>
             }
@@ -96,6 +106,7 @@ const StyledTextButton = styled.div`
     justify-items: center;
     transition: transform 0.1s ease-out, color 0.1s ease-out;
     user-select: none;
+    font-size: ${({ primary }) => primary ? PIXEL_SIZING.large : ""};
 
     &:hover {
         cursor: pointer;
