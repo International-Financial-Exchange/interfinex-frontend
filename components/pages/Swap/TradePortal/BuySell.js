@@ -118,7 +118,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         0,
                         ethers.constants.AddressZero, 
                         false,
-                        { gasLimit: 175_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
+                        { gasLimit: 225_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
                     ),
                 });
             } else {
