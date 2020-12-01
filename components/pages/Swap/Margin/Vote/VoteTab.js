@@ -55,14 +55,14 @@ export const PROPOSAL_INFO = {
     },
     [PROPOSAL_IDS.maxBorrowAmountRate]: { 
         name: "Max Borrow Amount", 
-        description: "The maxium amount that a user can borrow in a single position.", 
+        description: "The maxium amount that a user can borrow in a single position relative to the total assets in the funding pool.", 
         multiplier: 10, 
         contractKey: "maxBorrowAmountRate",
         formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",
     },
     [PROPOSAL_IDS.maxLiquidateVolumeRate]: { 
         name: "Max Liquidate Volume", 
-        description: "The maxium amount of liquidations that can occur in a single block - if there is only one liquidation, then this value will be ignored.", 
+        description: "The maxium amount of liquidations that can occur in a single block relative to the total assets in the funding pool - if there is only one liquidation, then this value will be ignored.", 
         multiplier: 10, 
         contractKey: "maxLiquidateVolumeRate",
         formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",

@@ -76,6 +76,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: assetTokenName,
                         symbol: assetTokenSymbol,
                         address: assetTokenAddress,
+                        decimals: parseFloat(assetTokenDecimals),
                         contract: new ethers.Contract(assetTokenAddress, getAbi("ERC20"), signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });
@@ -104,6 +105,7 @@ export const TokenPairProvider = ({ children }) => {
                         name: baseTokenName,
                         symbol: baseTokenSymbol,
                         address: baseTokenAddress,
+                        decimals: parseFloat(baseTokenDecimals),
                         contract: new ethers.Contract(baseTokenAddress, getAbi("ERC20"), signer || provider),
                         logoURI: "/custom-token-icon-light-theme.png"
                     });

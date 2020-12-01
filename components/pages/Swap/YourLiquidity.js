@@ -127,9 +127,9 @@ export const YourLiquidity = () => {
                     </div>
                 </div>
 
-                <Button onClick={addFarm}>
+                {/* <Button onClick={addFarm}>
                     Add Farm
-                </Button>
+                </Button> */}
             </Card>
             
             {

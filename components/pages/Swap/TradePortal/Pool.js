@@ -137,12 +137,12 @@ export const Pool = () => {
                                 });
                             } else {
                                 await approveExchange(baseToken, assetToken);
-    
+                                
                                 const slippagePercentage = slippageValue / 100;
                                 await addTransactionNotification({
                                     content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
                                     transactionPromise: exchangeContract.mint_liquidity(
-                                        assetToken,
+                                        assetToken.address,
                                         parseTokenAmount(assetTokenAmount, assetToken),
                                         parseTokenAmount(baseTokenAmount * (1 - slippagePercentage), baseToken),
                                         parseTokenAmount(baseTokenAmount * (1 + slippagePercentage), baseToken),

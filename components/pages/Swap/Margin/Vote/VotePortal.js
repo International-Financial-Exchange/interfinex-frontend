@@ -28,6 +28,7 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
     const { approveMarginMarket: _approveMarginMarket } = useContext(MarginContext);
     const { selectedToken } = useContext(VoteContext);
     const { address } = useContext(AccountContext);
+    const [isWithdrawLoading, setIsWithdrawLoading] = useState();
 
     const approveMarginMarket = _approveMarginMarket[selectedToken.address];
 
@@ -84,10 +85,15 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
     };
 
     const withdrawVote = async () => {
-        await addTransactionNotification({
-            content: `Withdraw vote from margin market proposal ${PROPOSAL_INFO[proposalId].name}`,
-            transactionPromise: MarginMarket.withdrawVote(proposalId),
-        });
+        setIsWithdrawLoading(true);
+        try {
+            await addTransactionNotification({
+                content: `Withdraw vote from margin market proposal ${PROPOSAL_INFO[proposalId].name}`,
+                transactionPromise: MarginMarket.withdrawVote(proposalId),
+            });
+        } finally {
+            setIsWithdrawLoading(false);
+        }
     }
 
     const finalizeVote = async () => {

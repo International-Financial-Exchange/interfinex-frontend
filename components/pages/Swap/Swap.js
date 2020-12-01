@@ -101,10 +101,12 @@ export const Swap = () => {
         setIsLoading(true);
 
         if (baseToken && assetToken) {
-            console.log("swap", SwapFactory.address);
             SwapFactory.pair_to_exchange(baseToken.address, assetToken.address, { gasLimit: 100000 }).then(async exchangeAddress => {
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
+                
+                console.log("swap", baseToken, assetToken);
+                console.log("swap exists", marketExists)
     
                 if (marketExists) {
                     const exchangeContract = new ethers.Contract(exchangeAddress, getAbi("SwapExchange"), signer || provider);
@@ -137,6 +139,8 @@ export const Swap = () => {
         ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
             return [humanizeTokenAmount(assetTokenBalance, assetToken), humanizeTokenAmount(baseTokenBalance, baseToken)];
         });
+
+        console.log("asset amount", exchangeAssetTokenBalance)
 
         setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
         setExchangeBaseTokenBalance(exchangeBaseTokenBalance);

@@ -57,6 +57,8 @@ export const YourPositions = () => {
         }
     }
 
+    console.log("position", position);
+
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, width: "fit-content" }}>

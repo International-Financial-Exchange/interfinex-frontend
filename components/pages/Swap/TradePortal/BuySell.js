@@ -212,6 +212,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
         }
     };
 
+    console.log("cost", outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
+
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu
@@ -233,10 +235,18 @@ export const BuySell = ({ isBuy, isMargin }) => {
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             requiresWallet
                             onClick={() => {
-                                setAssetTokenAmount(isBuy ? 
-                                    inputToOutputAmount(baseTokenBalance - baseTokenBalance * 0.0001, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
-                                    : assetTokenBalance
-                                );
+                                const maxAssetAmount = isMargin ?
+                                    isBuy ? 
+                                        inputToOutputAmount(baseTokenBalance + baseTokenBalance * leverage, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        : assetTokenBalance + assetTokenBalance * leverage
+                                :
+                                    isBuy ? 
+                                        inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        : assetTokenBalance
+
+
+
+                                setAssetTokenAmount(maxAssetAmount);
                             }}
                         >
                             Max

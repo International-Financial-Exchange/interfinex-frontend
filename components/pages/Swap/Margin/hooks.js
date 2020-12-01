@@ -138,16 +138,16 @@ export const useMarginTrading = ({ swapMarketExists }) => {
         ]).then(([assetPosition, basePosition]) => {
             setAccount({
                 assetPosition: {
-                    borrowedAmount: humanizeTokenAmount(assetPosition.borrowedAmount, { decimals: 18 }),
-                    collateralAmount: humanizeTokenAmount(assetPosition.collateralAmount, { decimals: 18 }),
+                    borrowedAmount: humanizeTokenAmount(assetPosition.borrowedAmount, assetToken),
+                    collateralAmount: humanizeTokenAmount(assetPosition.collateralAmount, baseToken),
                     lastInterestIndex: humanizeTokenAmount(assetPosition.lastInterestIndex, { decimals: 18 }),
-                    maintenanceMargin: humanizeTokenAmount(assetPosition.maintenanceMargin, { decimals: 18 }),
+                    maintenanceMargin: humanizeTokenAmount(assetPosition.maintenanceMargin, assetToken),
                 },
                 basePosition: {
-                    borrowedAmount: humanizeTokenAmount(basePosition.borrowedAmount, { decimals: 18 }),
-                    collateralAmount: humanizeTokenAmount(basePosition.collateralAmount, { decimals: 18 }),
+                    borrowedAmount: humanizeTokenAmount(basePosition.borrowedAmount, baseToken),
+                    collateralAmount: humanizeTokenAmount(basePosition.collateralAmount, assetToken),
                     lastInterestIndex: humanizeTokenAmount(basePosition.lastInterestIndex, { decimals: 18 }),
-                    maintenanceMargin: humanizeTokenAmount(basePosition.maintenanceMargin, { decimals: 18 }),
+                    maintenanceMargin: humanizeTokenAmount(basePosition.maintenanceMargin, baseToken),
                 },
                 isLoading: false,
             });
