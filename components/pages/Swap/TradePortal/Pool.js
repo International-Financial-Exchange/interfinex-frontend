@@ -61,8 +61,8 @@ export const Pool = () => {
                         requiresWallet
                         style={{ marginRight: PIXEL_SIZING.tiny }}
                         onClick={() => {
-                            setBaseTokenAmount(parseFloat(baseTokenBalance));
-                            setAssetTokenAmount((price * parseFloat(baseTokenBalance)));
+                            setBaseTokenAmount(parseFloat(baseTokenBalance) * 0.9);
+                            setAssetTokenAmount((price * parseFloat(baseTokenBalance)) * 0.9);
                         }}
                     >
                         Max Deposit
