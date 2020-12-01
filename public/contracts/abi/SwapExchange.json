@@ -3,6 +3,11 @@
     "name": "MintLiquidity",
     "inputs": [
       {
+        "type": "address",
+        "name": "input_token",
+        "indexed": false
+      },
+      {
         "type": "uint256",
         "name": "base_token_amount",
         "indexed": false
@@ -111,23 +116,27 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 287960
+    "gas": 287899
   },
   {
     "name": "mint_liquidity",
     "outputs": [],
     "inputs": [
       {
-        "type": "uint256",
-        "name": "base_token_amount"
+        "type": "address",
+        "name": "input_token"
       },
       {
         "type": "uint256",
-        "name": "min_asset_token_amount"
+        "name": "input_token_amount"
       },
       {
         "type": "uint256",
-        "name": "max_asset_token_amount"
+        "name": "min_output_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "max_output_token_amount"
       },
       {
         "type": "address",
@@ -140,7 +149,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 42096
+    "gas": 42883
   },
   {
     "name": "burn_liquidity",
@@ -225,7 +234,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 45266
+    "gas": 39185
   },
   {
     "name": "base_token",
