@@ -204,8 +204,8 @@ export const HistoricalTrades = () => {
                                         key={txId} 
                                         onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
                                     >
-                                        <div>{price.toFixed(6)}</div>
-                                        <div>{volume.toFixed(6)}</div>
+                                        <div>{price.toFixed(8)}</div>
+                                        <div>{volume.toFixed(8)}</div>
                                         <div>{new Date(timestamp).toLocaleTimeString()}</div>
                                         <div>{user}</div>
                                         <div>{txId}</div>
