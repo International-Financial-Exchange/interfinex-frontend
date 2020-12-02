@@ -36,7 +36,7 @@ export const TradeInfoChart = () => {
                     .then(candles => {
                         setCandles(old => ({
                             ...old,
-                            [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(12) })),
+                            [name]: candles.map(({ openTimestamp, close }) => ({ x: openTimestamp, y: close.toFixed(8) })),
                         }))
                     })
                     .catch(e => console.log(e));

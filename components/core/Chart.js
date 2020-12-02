@@ -69,8 +69,8 @@ export const Chart = ({
     const selectedOption = options[selectedOptionIndex];
 
     useEffect(() => {
-        if (!selectedDuration && options.first()?.data) 
-            setSelectedDuration(Object.keys(options.first().data).first());
+        if (!selectedDuration && options.last()?.data) 
+            setSelectedDuration(Object.keys(options.last().data).last());
     }, [selectedOption.data]);
 
     const theme = useContext(ThemeContext);
@@ -87,7 +87,7 @@ export const Chart = ({
                     fill: false,
                     pointRadius: 0,
                     borderColor: theme.colors.primary,
-					data: selectedOption.data[selectedDuration ?? Object.keys(options.first().data).first()],
+					data: selectedOption.data[selectedDuration ?? Object.keys(options.last().data).last()],
 				}],
             },
             
