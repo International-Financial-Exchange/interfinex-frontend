@@ -309,7 +309,9 @@ export const BuySell = ({ isBuy, isMargin }) => {
                                 !hasSufficientFunding &&
                                     <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny }}>
                                         <Text error>There is insufficient funding in the market to cover this trade - Reduce the amount or leverage</Text>
-                                        <TextButton>Read More</TextButton>
+                                        <TextButton onClick={() => window.open("https://interfinexio.medium.com/introducing-500x-leveraged-margin-trading-on-every-erc20-token-1994f7fdf418")}>
+                                            Read More
+                                        </TextButton>
                                     </div>
                             }
                         </div>

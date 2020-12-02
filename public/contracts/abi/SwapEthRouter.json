@@ -22,7 +22,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 118353
+    "gas": 154264
   },
   {
     "name": "create_exchange",
@@ -183,5 +183,18 @@
     "stateMutability": "view",
     "type": "function",
     "gas": 1481
+  },
+  {
+    "name": "isInitialised",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1511
   }
 ]

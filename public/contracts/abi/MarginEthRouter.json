@@ -18,7 +18,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 70644
+    "gas": 106570
   },
   {
     "name": "deposit",
@@ -142,5 +142,18 @@
     "stateMutability": "view",
     "type": "function",
     "gas": 1451
+  },
+  {
+    "name": "isInitialised",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1481
   }
 ]
