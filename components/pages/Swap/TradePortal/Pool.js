@@ -62,11 +62,11 @@ export const Pool = () => {
                         style={{ marginRight: PIXEL_SIZING.tiny }}
                         onClick={() => {
                             if (baseTokenBalance * price < assetTokenBalance) {
-                                setBaseTokenAmount(parseFloat(baseTokenBalance) * 0.9);
-                                setAssetTokenAmount((price * parseFloat(baseTokenBalance)) * 0.9);
+                                setBaseTokenAmount(parseFloat(baseTokenBalance) * 0.95);
+                                setAssetTokenAmount((price * parseFloat(baseTokenBalance)) * 0.95);
                             } else {
-                                setBaseTokenAmount(assetTokenBalance / price);
-                                setAssetTokenAmount(assetTokenBalance);
+                                setBaseTokenAmount((assetTokenBalance * 0.95) / price);
+                                setAssetTokenAmount(assetTokenBalance * 0.95);
                             }
                         }}
                     >
