@@ -206,21 +206,21 @@
         },
         "templateMarginMarket": {
             "name": "templateMarginMarket",
-            "address": "0xBD68292f6283cb4Ae7ABB5a802d85aBCA9687644",
+            "address": "0x46B343154aF9D1dCDf8Ef77Cd439482E41c14289",
             "artifactName": "MarginMarket",
-            "deploymentTransactionHash": "0x6cb824f9b4644d847bcc7da870aa5dffda6b052dd1d307f88300248f62455ddb"
+            "deploymentTransactionHash": "0xba4b1e04975f082ec24fc9865d09e76f3ef4f82662a49f9cc2d85836b8a6ee21"
         },
         "MarginFactory": {
             "name": "MarginFactory",
-            "address": "0x6ad549B9dD7895f49BA5c1c1f2977EB3dCA315Ef",
+            "address": "0xD9a89d230081e8F767c6F1CF90a24dC7Ea2F18e7",
             "artifactName": "MarginFactory",
-            "deploymentTransactionHash": "0xf3894999e4c2f0c5dd0a434b83b613c1f1bbd4312e8345f67f0ea252272fafbe"
+            "deploymentTransactionHash": "0x343dd115253cda0f31527f6c61af91e8174f4eaa14647a12fd0825e473fdc119"
         },
         "MarginEthRouter": {
             "name": "MarginEthRouter",
-            "address": "0x922d3a454e6c09876D8c222D6b22d734f8F778b4",
+            "address": "0x729B17bbbC77aF2d2DdCb675E1f1426d5AdEe85C",
             "artifactName": "MarginEthRouter",
-            "deploymentTransactionHash": "0x63a7d0064f8c01e190710537a8a965a05c23a1ff26d8b15e6513e51f3e090a8e"
+            "deploymentTransactionHash": "0x4c66d0dc95743f0e5dd102514d33722a9663fc8d602ed87bfb182e523f687c7e"
         },
         "YieldFarm": {
             "name": "YieldFarm",
