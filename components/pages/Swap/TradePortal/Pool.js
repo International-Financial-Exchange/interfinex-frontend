@@ -137,8 +137,8 @@ export const Pool = () => {
                                     content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
                                     transactionPromise: SwapEthRouter.mint_liquidity(
                                         sendToken?.address,
-                                        parseTokenAmount(sendTokenAmount * (1 - slippagePercentage), sendToken),
-                                        parseTokenAmount(sendTokenAmount * (1 + slippagePercentage), sendToken),
+                                        parseTokenAmount(sendTokenAmount * (1 - (slippagePercentage * 2)), sendToken),
+                                        parseTokenAmount(sendTokenAmount, sendToken),
                                         address,
                                         0,
                                         { gasLimit: 450_000, value: safeParseEther(etherTokenAmount.toString()) }
@@ -153,8 +153,8 @@ export const Pool = () => {
                                     transactionPromise: exchangeContract.mint_liquidity(
                                         assetToken.address,
                                         parseTokenAmount(assetTokenAmount, assetToken),
-                                        parseTokenAmount(baseTokenAmount * (1 - slippagePercentage), baseToken),
-                                        parseTokenAmount(baseTokenAmount * (1 + slippagePercentage), baseToken),
+                                        parseTokenAmount(sendTokenAmount * (1 - (slippagePercentage * 2)), sendToken),
+                                        parseTokenAmount(baseTokenAmount, baseToken),
                                         address,
                                         0,
                                         { gasLimit: 450_000 }
