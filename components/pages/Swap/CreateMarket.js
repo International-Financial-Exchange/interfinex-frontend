@@ -84,18 +84,24 @@ export const CreateMarket = () => {
 
             <TokenAmountInput 
                 value={assetTokenAmount}
+                isError={assetTokenAmount > assetTokenBalance}
+                errorMessage={`Insufficent ${assetToken.symbol} balance`}
                 onChange={e => setAssetTokenAmount(e.target.value)}
                 token={assetToken}
             />
 
             <TokenAmountInput 
                 value={baseTokenAmount}
+                isError={baseTokenAmount > baseTokenBalance}
+                errorMessage={`Insufficent ${baseToken.symbol} balance`}
                 onChange={e => setBaseTokenAmount(e.target.value)}
                 token={baseToken}
             />
 
             <TokenAmountInput 
                 value={ifexTokenAmount}
+                isError={ifexTokenAmount > ifexTokenBalance}
+                errorMessage={`Insufficent ${ifexToken.symbol} balance`}
                 onChange={e => setIfexTokenAmount(e.target.value)}
                 token={ifexToken}
             />
