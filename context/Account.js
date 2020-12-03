@@ -50,7 +50,7 @@ export const AccountProvider = ({ children }) => {
 
             if (assetToken.name === "Ethereum") {
                 signer.getBalance().then(balance => 
-                    setBaseTokenBalance(parseFloat(formatEther(balance)))
+                    setAssetTokenBalance(parseFloat(formatEther(balance)))
                 )
             } else {
                 assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {

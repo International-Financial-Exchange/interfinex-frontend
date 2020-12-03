@@ -66,6 +66,8 @@ export const CreateMarket = () => {
         }
     };
 
+    console.log("hello")
+
     return (
         <Card style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.medium, display: "grid", rowGap: PIXEL_SIZING.small }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center" }}>
@@ -73,6 +75,8 @@ export const CreateMarket = () => {
                 <TextButton 
                     style={{ marginRight: PIXEL_SIZING.tiny }}
                     onClick={() => {
+                        console.log("hello there")
+                        console.log(assetTokenBalance, baseTokenBalance, ifexTokenBalance)
                         setAssetTokenAmount(assetTokenBalance);
                         setBaseTokenAmount(baseTokenBalance);
                         setIfexTokenAmount(ifexTokenBalance);

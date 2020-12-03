@@ -28,7 +28,6 @@ const ABI = {
 export const EthersContext = createContext();
 
 export const EthersProvider = ({ children }) => {
-    console.log("url", ETH_NODE_URL)
     const [provider, setProvider] = useState(new ethers.providers.InfuraWebSocketProvider("homestead", "f6a09cc8f51c45d2bd74137004115dbf"));
     const [signer, setSigner] = useState();
     const [networkInfo, setNetworkInfo] = useState({ name: "mainnet" });
