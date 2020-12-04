@@ -31,7 +31,7 @@ export const TokenPairProvider = ({ children }) => {
     const ETHMNY_TOKEN = useMemo(() => {
         return {
             address: "0xbf4a2ddaa16148a9d0fa2093ffac450adb7cd4aa",
-            decimals: 18,
+            decimals: 2,
             name: "Ethereum Money",
             symbol: "ETHMNY",
             logoURI: "https://pbs.twimg.com/profile_images/1309238470670299136/eflUFC8I_400x400.jpg"
