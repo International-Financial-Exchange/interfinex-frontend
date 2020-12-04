@@ -89,8 +89,6 @@ export const Pool = () => {
                             setAssetTokenAmount(e.target.value);
                             setBaseTokenAmount(e.target.value / price);
                         }}
-                        isError={assetTokenAmount > assetTokenBalance}
-                        errorMessage={`Insufficient ${assetToken.symbol} balance`}
                         value={assetTokenAmount}
                         token={assetToken}
                     />
@@ -100,8 +98,6 @@ export const Pool = () => {
                             setBaseTokenAmount(e.target.value);
                             setAssetTokenAmount(e.target.value * price);
                         }}
-                        isError={baseTokenAmount > baseTokenBalance}
-                        errorMessage={`Insufficient ${baseToken.symbol} balance`}
                         value={baseTokenAmount}
                         token={baseToken}
                     />
