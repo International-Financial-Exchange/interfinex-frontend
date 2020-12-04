@@ -85,12 +85,9 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 : parseFloat(assetTokenBalance) >= parseFloat(assetTokenAmount)
     );
 
-    console.log("balance", assetTokenBalance, totalMargin)
-
-
     const spotTrade = async () => {
         setIsLoading(true);
-        
+
         try {   
             if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
                 const [etherToken, routerAssetToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];

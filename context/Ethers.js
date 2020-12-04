@@ -83,15 +83,6 @@ export const EthersProvider = ({ children }) => {
     }, [provider]);
 
     useEffect(() => {
-        if (signer) {
-            console.log("fetching");
-            provider.getBalance("0x9D3999af03458c11C78F7e6C0fAE712b455D4e33", "latest").then(res => {
-                console.log("signer", formatEther(res))
-            });
-        }
-    }, [signer]);
-
-    useEffect(() => {
         provider.getBlockNumber().then(blockNumber => {
             setBlockNumber(blockNumber);
         });
