@@ -28,6 +28,16 @@ export const TokenPairProvider = ({ children }) => {
         }
     }, [IfexToken, networkInfo?.chainId]);
 
+    const ETHMNY_TOKEN = useMemo(() => {
+        return {
+            address: "0xbf4a2ddaa16148a9d0fa2093ffac450adb7cd4aa",
+            decimals: 18,
+            name: "Ethereum Money",
+            symbol: "ETHMNY",
+            logoURI: "https://pbs.twimg.com/profile_images/1309238470670299136/eflUFC8I_400x400.jpg"
+        };
+    }, []);
+
     useEffect(() => {
         if (networkInfo) {
             if (networkInfo.chainId === 1) {
@@ -38,7 +48,7 @@ export const TokenPairProvider = ({ children }) => {
                             token.logoURI = `https://ipfs.kleros.io/ipfs/${token.logoURI.split("ipfs://").last()}`;
                             return token;
                         });
-                        setTokens([IFEX_TOKEN, ETHEREUM_TOKEN].concat(newTokens));
+                        setTokens([IFEX_TOKEN, ETHEREUM_TOKEN].concat(newTokens).concat(ETHMNY_TOKEN));
                     });
             } else {
                 const tokens = [IFEX_TOKEN, ETHEREUM_TOKEN].concat(TestnetTokens);
