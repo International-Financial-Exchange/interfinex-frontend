@@ -159,13 +159,17 @@ export const TokenPairProvider = ({ children }) => {
     const [token0, token1] = useMemo(() => {
         if (assetToken && baseToken) {
             // token0 should always be the smaller address
-            return assetToken.address < baseToken.address ? 
+            return parseInt(assetToken.address) < parseInt(baseToken.address) ? 
                 [assetToken, baseToken] 
                 : [baseToken, assetToken];
         }
 
         return [];
     }, [assetToken, baseToken]);
+
+    console.log("tokens", token0, token1);
+    console.log("tokens", token0?.address < token1?.address);
+    console.log("tokens", token0?.address, token1?.address);
 
     return (
         <TokenPairContext.Provider 

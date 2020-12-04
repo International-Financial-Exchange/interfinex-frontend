@@ -138,6 +138,9 @@ export const HistoricalTrades = () => {
 
         return trades
             ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
+                console.log(token0, token1)
+                console.log(assetToken);
+
                 const isInverted = baseToken.address !== token0.address;
                 const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [
                     humanizeTokenAmount(baseTokenAmount, isInverted ? assetToken : baseToken), 
@@ -151,10 +154,12 @@ export const HistoricalTrades = () => {
                     user,
                     txId,
                     isBuy: isInverted ? !isBuy : isBuy,
-                }
+                };
             })
             ?.sort((a, b) => b.timestamp - a.timestamp);
     }, [historicalTrades, yourTrades, selectedTab]);
+
+    console.log("trades", historicalTrades);
 
     const isLoading = (selectedTab === TABS.historicalTrades && isHistoricalTradesLoading) 
         || (selectedTab === TABS.yourTrades && isYourTradesLoading);
