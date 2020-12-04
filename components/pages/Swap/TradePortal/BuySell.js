@@ -90,14 +90,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
 
     const spotTrade = async () => {
         setIsLoading(true);
-        const token = await exchangeContract.base_token(
-
-            {gasLimit: 1_000_000}
-        );
-        console.log("token0", token0)
-        console.log("token1", token1)
-        console.log("token", token);
-        return;
+        
         try {   
             if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
                 const [etherToken, routerAssetToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];

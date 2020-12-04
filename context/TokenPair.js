@@ -167,10 +167,6 @@ export const TokenPairProvider = ({ children }) => {
         return [];
     }, [assetToken, baseToken]);
 
-    console.log("tokens", token0, token1);
-    console.log("tokens", token0?.address < token1?.address);
-    console.log("tokens", token0?.address, token1?.address);
-
     return (
         <TokenPairContext.Provider 
             value={{ 
