@@ -137,7 +137,7 @@ export const Pool = () => {
                                         parseTokenAmount(sendTokenAmount, sendToken),
                                         address,
                                         0,
-                                        { gasLimit: 450_000, value: safeParseEther(etherTokenAmount.toString()) }
+                                        { gasLimit: 450_000, value: safeParseEther((etherTokenAmount * 0.99).toString()) }
                                     )
                                 });
                             } else {
@@ -150,7 +150,7 @@ export const Pool = () => {
                                         assetToken.address,
                                         parseTokenAmount(assetTokenAmount, assetToken),
                                         parseTokenAmount(sendTokenAmount * (1 - (slippagePercentage * 2)), sendToken),
-                                        parseTokenAmount(baseTokenAmount, baseToken),
+                                        parseTokenAmount((baseTokenAmount * 0.99), baseToken),
                                         address,
                                         0,
                                         { gasLimit: 450_000 }
