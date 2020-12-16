@@ -25,19 +25,20 @@ export const AccountProvider = ({ children }) => {
                 content: "Connect your wallet to start trading",
                 type: NOTIFICATION_TYPES.warn,
             });
-
+            setAddress();
             setDeleteWalletWarning(() => deleteWalletWarning)
         } else {
             if (deleteWalletWarning) deleteWalletWarning();
-            if (!address) signer.getAddress().then(address => {
-                console.log("settings", address)
-                setAddress(address)
-            });
+            if (!address)  {
+                signer.getAddress().then(address => {
+                    setAddress(address)
+                });
+            }
         }
     }, [signer]);
 
     useEffect(() => {
-        if (address) {
+        if (address && signer) {
             if (baseToken.name === "Ethereum") {
                 signer.getBalance().then(balance => 
                     setBaseTokenBalance(parseFloat(formatEther(balance)))

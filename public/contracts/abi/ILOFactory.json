@@ -1,0 +1,217 @@
+[
+  {
+    "name": "NewILO",
+    "inputs": [
+      {
+        "type": "address",
+        "name": "creator",
+        "indexed": true
+      },
+      {
+        "type": "address",
+        "name": "asset_token",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "ILO_type",
+        "indexed": false
+      },
+      {
+        "type": "address",
+        "name": "ILO_contract",
+        "indexed": false
+      }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "initialize",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_dividend_erc20_template"
+      },
+      {
+        "type": "address",
+        "name": "_ifex_token"
+      },
+      {
+        "type": "address",
+        "name": "_swap_factory"
+      },
+      {
+        "type": "address",
+        "name": "_fixed_price_ILO_template"
+      },
+      {
+        "type": "address",
+        "name": "_wrapped_ether"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 246752
+  },
+  {
+    "name": "createFixedPriceILO",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_asset_token"
+      },
+      {
+        "type": "uint256",
+        "name": "_asset_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "_tokens_per_eth"
+      },
+      {
+        "type": "uint256",
+        "name": "_start_date"
+      },
+      {
+        "type": "uint256",
+        "name": "_end_date"
+      },
+      {
+        "type": "uint256",
+        "name": "_soft_cap"
+      },
+      {
+        "type": "uint256",
+        "name": "_percentage_to_lock"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 133329
+  },
+  {
+    "name": "id_to_ILO",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [
+      {
+        "type": "uint256",
+        "name": "arg0"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1296
+  },
+  {
+    "name": "id_count",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1211
+  },
+  {
+    "name": "dividend_erc20_template",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1241
+  },
+  {
+    "name": "ifex_token",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1271
+  },
+  {
+    "name": "swap_factory",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1301
+  },
+  {
+    "name": "fixed_price_ILO_template",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1331
+  },
+  {
+    "name": "wrapped_ether",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1361
+  },
+  {
+    "name": "owner",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1391
+  },
+  {
+    "name": "is_initialized",
+    "outputs": [
+      {
+        "type": "bool",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1421
+  }
+]

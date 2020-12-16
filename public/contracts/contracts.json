@@ -227,6 +227,24 @@
             "address": "0x7cc1F66c313E61D44BFc1D5fec3C89C26770E827",
             "artifactName": "YieldFarm",
             "deploymentTransactionHash": "0x31acd5f459d3c6bf3f9a0f9747f346c775fb17bc35c7aacc5d9dcc4be9e0991d"
+        },
+        "TeamReservedVault": {
+            "name": "TeamReservedVault",
+            "address": "0x2ac2AeF78f52FFCB08181008F1169C045ABdf2F8",
+            "artifactName": "Vault",
+            "deploymentTransactionHash": "0xcd0dcf73814cf06eb16f34a0848ae5b70223b6b77bebfda2965356ee910a9aac"
+        },
+        "MarketingVaultContract": {
+            "name": "MarketingVaultContract",
+            "address": "0x84790B24750aF49Ab10317Fe88F84b001738D5FB",
+            "artifactName": "Vault",
+            "deploymentTransactionHash": "0x761119aabffa13fbb651f638a3693286f44ebeb66feaa36a240864a2d942b733"
+        },
+        "CommunityVault": {
+            "name": "CommunityVault",
+            "address": "0x4cFfb1e77c2EAc1E6F4697bB433cCA9Edac7Eed7",
+            "artifactName": "Vault",
+            "deploymentTransactionHash": "0x4cd5737287d15e5854cfea7b3e9c38ecd5af2ff6fddac786414f00f9cb9a74e5"
         }
     },
     "localhost": {

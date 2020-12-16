@@ -89,7 +89,6 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marg
     useEffect(() => {
         if (liquidityToken && stats && address) {
             setAccount(old => ({ ...old, isLoading: true }));
-            console.log("updating!");
             updateAccount().then(() => 
                 setAccount(old => ({ ...old, isLoading: false }))
             );
