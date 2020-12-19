@@ -105,9 +105,6 @@ export const Swap = () => {
                 const marketExists = exchangeAddress !== ethers.constants.AddressZero;
                 setMarketExists(marketExists);
                 
-                console.log("swap", baseToken, assetToken);
-                console.log("swap exists", marketExists)
-    
                 if (marketExists) {
                     const exchangeContract = new ethers.Contract(exchangeAddress, getAbi("SwapExchange"), signer || provider);
                     setExchangeContract(exchangeContract);
@@ -120,7 +117,7 @@ export const Swap = () => {
                 setIsLoading(false);
             });
         }
-    }, [baseToken?.address, assetToken?.address]);
+    }, [baseToken?.address, assetToken?.address, SwapFactory]);
 
     useEffect(() => {
         if (exchangeContract && liquidityToken) {
@@ -215,6 +212,7 @@ export const Swap = () => {
                         showCreateMarginMarket &&
                             <CreateMarginMarket closeCreateMarginMarket={() => setShowCreateMarginMarket(false)}/>
                     }
+                    
                     {
                         isLoading || (isMarginEnabled && marginIsLoading) ? 
                             <Spinner

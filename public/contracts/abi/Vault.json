@@ -35,7 +35,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 71767
+    "gas": 36758
   },
   {
     "name": "unlockDate",

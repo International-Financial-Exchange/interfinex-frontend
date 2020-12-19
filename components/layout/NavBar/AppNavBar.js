@@ -424,6 +424,15 @@ const ConnectWallet = props => {
     );
 };
 
+
+
+const MENU_ITEMS =[
+    // { label: "Dashboard", value: "dashboard" }, 
+    { label: "Swap", value: "swap", root: "swap" }, 
+    { label: "Yield Farm", value: "yieldfarm", root: "yieldfarm" },
+    { label: "ILO", value: "ilo/list", root: "ilo" },
+];
+
 export const AppNavBar = props => {
     const router = useRouter();
     const { setProvider } = useContext(EthersContext);
@@ -445,11 +454,7 @@ export const AppNavBar = props => {
             <CircleNav
                 id={"circle-nav"}
                 onChange={selected => router.push(`/app/${selected}`)}
-                items={[
-                    // { label: "Dashboard", value: "dashboard" }, 
-                    { label: "Swap", value: "swap" }, 
-                    { label: "Yield Farm", value: "yieldfarm" },
-                ]}
+                items={MENU_ITEMS}
             />
 
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
@@ -465,14 +470,10 @@ export const AppNavBar = props => {
 
             <div id={"tab-nav"} style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)" }}>
                 <TabNav
-                    selected={router.pathname.split("/app/")[1]}
+                    selected={Object.values(MENU_ITEMS).find(({ root })=> router.pathname.split("/app/")[1].includes(root))?.value}
                     onChange={selected => router.push(`/app/${selected}`)}
                     animate={false}
-                    items={[
-                        // { label: "Dashboard", value: "dashboard" }, 
-                        { label: "Swap", value: "swap" }, 
-                        { label: "Yield Farm", value: "yieldfarm" },
-                    ]}
+                    items={MENU_ITEMS}
                 />
             </div>
 

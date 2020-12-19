@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import Skeleton from "react-loading-skeleton";
 
 const Container = styled.div`
-    margin-top: ${PIXEL_SIZING.large};
+    margin-top: ${PIXEL_SIZING.larger};
     display: grid;
     row-gap: ${PIXEL_SIZING.large};
 `;
@@ -54,7 +54,7 @@ export const YieldFarm = () => {
     return (
         <Layout>
             <Container>
-                <Text primary>Liquidity Farms</Text>
+                <Text primary bold>Liquidity Farms</Text>
 
                 <StyledTable>
                     <tr>

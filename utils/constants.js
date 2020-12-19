@@ -45,17 +45,6 @@ export const TIMEFRAMES = {
     ["1d"]: 1000 * 60 * 60 * 24,
 };
 
-
 export const FEE_RATE = 0.001;
 
 export const MULTIPLIER = BigNumber.from(parseTokenAmount(1, 18));
-
-export const useDocument = () => {
-    const [_document, setDocument] = useState();
-
-    useEffect(() => {
-        setDocument(document);
-    }, []);
-
-    return _document;
-};

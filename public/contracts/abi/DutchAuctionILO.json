@@ -16,6 +16,11 @@
         "type": "uint256",
         "name": "assetTokensBought",
         "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "tokensPerEth",
+        "indexed": false
       }
     ],
     "anonymous": false,
@@ -52,7 +57,11 @@
       },
       {
         "type": "uint256",
-        "name": "_tokensPerEth"
+        "name": "_startTokensPerEth"
+      },
+      {
+        "type": "uint256",
+        "name": "_endTokensPerEth"
       },
       {
         "type": "uint256",
@@ -61,10 +70,6 @@
       {
         "type": "uint256",
         "name": "_endDate"
-      },
-      {
-        "type": "uint256",
-        "name": "_softCap"
       },
       {
         "type": "address",
@@ -97,7 +102,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 554448
+    "gas": 554420
   },
   {
     "name": "hasEnded",
@@ -113,17 +118,17 @@
     "gas": 4359
   },
   {
-    "name": "hasReachedSoftCap",
+    "name": "getCurrentTokensPerEth",
     "outputs": [
       {
-        "type": "bool",
+        "type": "uint256",
         "name": ""
       }
     ],
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2788
+    "gas": 8855
   },
   {
     "name": "invest",
@@ -131,7 +136,7 @@
     "inputs": [],
     "stateMutability": "payable",
     "type": "function",
-    "gas": 157397
+    "gas": 200685
   },
   {
     "name": "withdraw",
@@ -139,7 +144,7 @@
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 104995
+    "gas": 102666
   },
   {
     "name": "ownerWithdrawFunds",
@@ -152,7 +157,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 123662
+    "gas": 120271
   },
   {
     "name": "ownerWithdrawLiquidity",
@@ -165,7 +170,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 15496
+    "gas": 13194
   },
   {
     "name": "assetToken",
@@ -194,7 +199,7 @@
     "gas": 1571
   },
   {
-    "name": "tokensPerEth",
+    "name": "startTokensPerEth",
     "outputs": [
       {
         "type": "uint256",
@@ -207,7 +212,7 @@
     "gas": 1601
   },
   {
-    "name": "startDate",
+    "name": "endTokensPerEth",
     "outputs": [
       {
         "type": "uint256",
@@ -220,7 +225,7 @@
     "gas": 1631
   },
   {
-    "name": "endDate",
+    "name": "startDate",
     "outputs": [
       {
         "type": "uint256",
@@ -233,7 +238,7 @@
     "gas": 1661
   },
   {
-    "name": "softCap",
+    "name": "endDate",
     "outputs": [
       {
         "type": "uint256",
@@ -399,6 +404,19 @@
     "gas": 2021
   },
   {
+    "name": "etherAmountRaised",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2051
+  },
+  {
     "name": "isInitialized",
     "outputs": [
       {
@@ -409,7 +427,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2051
+    "gas": 2081
   },
   {
     "name": "hasCreatorWithdrawn",
@@ -422,6 +440,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2081
+    "gas": 2111
   }
 ]

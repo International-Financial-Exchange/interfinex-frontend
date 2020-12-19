@@ -48,12 +48,16 @@
       },
       {
         "type": "address",
+        "name": "_dutch_auction_ILO_template"
+      },
+      {
+        "type": "address",
         "name": "_wrapped_ether"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 246752
+    "gas": 281861
   },
   {
     "name": "createFixedPriceILO",
@@ -86,18 +90,91 @@
       {
         "type": "uint256",
         "name": "_percentage_to_lock"
+      },
+      {
+        "type": "uint256",
+        "name": "_liquidityUnlockDate"
+      },
+      {
+        "type": "string",
+        "name": "_name"
+      },
+      {
+        "type": "string",
+        "name": "_description"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 133329
+    "gas": 597608
+  },
+  {
+    "name": "createDutchAuctionILO",
+    "outputs": [],
+    "inputs": [
+      {
+        "type": "address",
+        "name": "_asset_token"
+      },
+      {
+        "type": "uint256",
+        "name": "_asset_token_amount"
+      },
+      {
+        "type": "uint256",
+        "name": "_start_tokens_per_eth"
+      },
+      {
+        "type": "uint256",
+        "name": "_end_tokens_per_eth"
+      },
+      {
+        "type": "uint256",
+        "name": "_start_date"
+      },
+      {
+        "type": "uint256",
+        "name": "_end_date"
+      },
+      {
+        "type": "uint256",
+        "name": "_percentage_to_lock"
+      },
+      {
+        "type": "uint256",
+        "name": "_liquidityUnlockDate"
+      },
+      {
+        "type": "string",
+        "name": "_name"
+      },
+      {
+        "type": "string",
+        "name": "_description"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "gas": 597638
   },
   {
     "name": "id_to_ILO",
     "outputs": [
       {
+        "type": "string",
+        "name": "name"
+      },
+      {
+        "type": "string",
+        "name": "description"
+      },
+      {
         "type": "address",
-        "name": ""
+        "name": "contractAddress"
+      },
+      {
+        "type": "uint256",
+        "name": "id"
       }
     ],
     "inputs": [
@@ -108,7 +185,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1296
+    "gas": 23276
   },
   {
     "name": "id_count",
@@ -121,7 +198,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1211
+    "gas": 1241
   },
   {
     "name": "dividend_erc20_template",
@@ -134,7 +211,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1241
+    "gas": 1271
   },
   {
     "name": "ifex_token",
@@ -147,7 +224,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1271
+    "gas": 1301
   },
   {
     "name": "swap_factory",
@@ -160,7 +237,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1301
+    "gas": 1331
   },
   {
     "name": "fixed_price_ILO_template",
@@ -173,23 +250,10 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1331
-  },
-  {
-    "name": "wrapped_ether",
-    "outputs": [
-      {
-        "type": "address",
-        "name": ""
-      }
-    ],
-    "inputs": [],
-    "stateMutability": "view",
-    "type": "function",
     "gas": 1361
   },
   {
-    "name": "owner",
+    "name": "dutch_auction_ILO_template",
     "outputs": [
       {
         "type": "address",
@@ -202,6 +266,32 @@
     "gas": 1391
   },
   {
+    "name": "wrapped_ether",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1421
+  },
+  {
+    "name": "owner",
+    "outputs": [
+      {
+        "type": "address",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1451
+  },
+  {
     "name": "is_initialized",
     "outputs": [
       {
@@ -212,6 +302,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1421
+    "gas": 1481
   }
 ]

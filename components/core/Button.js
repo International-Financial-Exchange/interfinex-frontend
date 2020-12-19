@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { BarSpinner, Spinner } from "./Spinner";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AccountContext } from "../../context/Account";
 import Text from "./Text";
 import { EthersContext } from "../../context/Ethers";
@@ -67,14 +67,14 @@ export const Button = ({ children, primary, isLoading = false, requiresWallet, .
 
     return (
         <ButtonContainer 
+            ref={buttonRef} 
+            onMouseOver={() => setIsHovered(true)} 
+            onMouseLeave={() => setIsHovered(false)}
             {...props} 
             style={{ 
                 height: primary ? PIXEL_SIZING.larger : '',
                 ...props.style,
             }}
-            ref={buttonRef} 
-            onMouseOver={() => setIsHovered(true)} 
-            onMouseLeave={() => setIsHovered(false)}
             onClick={(requiresWallet && !signer) || props.isDisabled ? () => {} : props.onClick}
             isDisabled={props.isDisabled || requiresWallet && !signer}
         >
@@ -171,4 +171,49 @@ export const ArrowButton = props => {
             />
         </StyledArrowButton>
     );
-}
+};
+
+export const AddButton = ({ children, ...props }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const childRef = useRef();
+    const [width, setWidth] = useState(0);
+
+    useLayoutEffect(() => {
+        setWidth(childRef.current.getBoundingClientRect().width);
+    });
+
+    return (
+        <Button 
+            {...props} 
+            onMouseOver={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ 
+                borderRadius: 1000, 
+                width: "fit-content", 
+                padding: PIXEL_SIZING.small, 
+                ...props.style, 
+            }}
+        >
+            <div style={{ width, transition: "width 0.17s ease-out", }}>
+                <div style={{ display: "flex", width: "fit-content" }} ref={childRef}>
+                    <img
+                        onLoad={() => {}}
+                        src={"/plus.svg"}
+                        style={{
+                            transform: isHovered ? "rotate(90deg)" : "",
+                            transition: "transform 0.3s ease-out",
+                        }}
+                        height={PIXEL_SIZING.medium}
+                    />
+
+                    {
+                        isHovered &&
+                            <div style={{ marginLeft: PIXEL_SIZING.small, alignSelf: "center", whiteSpace: "nowrap", marginRight: "4px" }}>
+                                {children}
+                            </div>
+                    }
+                </div>
+            </div>
+        </Button>
+    );
+};
