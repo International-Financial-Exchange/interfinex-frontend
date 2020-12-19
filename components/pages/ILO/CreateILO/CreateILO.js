@@ -21,6 +21,7 @@ import { TokenSelectInput } from "../../../core/TokenSelectInput";
 import { FixedPriceInput } from "./FixedPriceInput";
 import { xor } from "lodash";
 import { SubmitContext, useContractApproval } from "../../../../utils/hooks";
+import { DutchAuctionInput } from "./DutchAuctionInput";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
@@ -156,7 +157,9 @@ export const CreateILO = () => {
                                     (() => {
                                         switch (iloType) {
                                             case ILO_TYPES.dutchAuction:
-                                                return;
+                                                return <DutchAuctionInput
+                                                    ref={e => inputRefs[ILO_TYPES.dutchAuction] = e}
+                                                />;
                                             case ILO_TYPES.fixedPrice:
                                                 return <FixedPriceInput 
                                                     ref={e => inputRefs[ILO_TYPES.fixedPrice] = e}
@@ -214,6 +217,7 @@ export const CreateILO = () => {
                                 style={{ width: "100%" }} 
                                 onClick={onSubmit}
                                 isLoading={isLoading}
+                                requiresWallet
                             >
                                 Launch Initial Liquidity Offering
                             </Button>
