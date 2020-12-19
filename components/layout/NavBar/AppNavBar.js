@@ -139,10 +139,11 @@ const AddCustomToken = ({ onSubmit: propsOnSubmit = _.noop, isOpen, titleText, o
                                 />
                             </InputAndLabel>
 
-                            <Button style={{ width: CONTAINER_SIZING.tiny, }} onClick={onSubmit}>
+                            <Button primary style={{ width:"100%", gridColumn: "1/4" }} onClick={onSubmit}>
                                 Add Token
                             </Button>
                         </div>
+
                     </ModalCard>
             }
         </Modal>

@@ -36,11 +36,11 @@ export const ILOList = () => {
             <Container>
                 <TitleContainer>
                     <Text primary bold>Initial Liquidity Offerings</Text>
-                    <AddButton id="create-ilo-button">
-                        <Link href="/app/ilo/create">
-                            Create New ILO
-                        </Link>
-                    </AddButton>
+                    <Link href="/app/ilo/create">
+                        <AddButton id="create-ilo-button">
+                                Create New ILO
+                        </AddButton>
+                    </Link>
                 </TitleContainer>
             </Container>
         </Layout>

@@ -16,6 +16,8 @@ import { RadioInput } from "../../core/RadioInput";
 import { TokenAmountInput } from "../../core/TokenAmountInput";
 import { TokenPairContext } from "../../../context/TokenPair";
 import { ContentAndArrow } from "../../core/ContentAndArrow";
+import { DateTimeInput } from "../../core/DateTimeInput";
+import { TokenSelectInput } from "../../core/TokenSelectInput";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
@@ -76,6 +78,13 @@ export const CreateILO = () => {
                                         placeholder={"HappyCoin is a coin that makes people smile"}
                                     />
                                 </InputAndLabel>
+                                
+                                <InputAndLabel>
+                                    <Text>Token to Sell</Text>
+                                    <TokenSelectInput 
+                                        value={assetToken}
+                                    />
+                                </InputAndLabel>
 
                                 <InputAndLabel>
                                     <Text>What type of sale do you want?</Text>
@@ -85,19 +94,6 @@ export const CreateILO = () => {
                                             { value: ILO_TYPES.fixedPrice, label: "Fixed Price" }
                                         ]}
                                     />
-                                </InputAndLabel>
-                                
-                                <InputAndLabel>
-                                    <Text>Token to Sell</Text>
-                                    <ContentAndArrow
-                                        secondary
-                                        style={{ width: "fit-content" }}
-                                    >
-                                        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.medium }}>
-                                            <TokenAndLogo token={assetToken}/>
-                                            <Text secondary>(Click to Change)</Text> 
-                                        </div>
-                                    </ContentAndArrow>
                                 </InputAndLabel>
 
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.large }}>
@@ -126,6 +122,20 @@ export const CreateILO = () => {
                                     </TokenAndLogo>
                                 </div>
 
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
+                                    <InputAndLabel>
+                                        <Text>Start Date</Text>
+                                        <DateTimeInput
+                                        />
+                                    </InputAndLabel>
+
+                                    <InputAndLabel>
+                                        <Text>End Date</Text>
+                                        <DateTimeInput
+                                        />
+                                    </InputAndLabel>
+                                </div>
+
                                 <TextButton 
                                     onClick={() => setShowAdditionalOptions(!showAdditionalOptions)}
                                     style={{ justifySelf: "right" }}
@@ -143,22 +153,6 @@ export const CreateILO = () => {
                                                 />
                                             </InputAndLabel>
 
-                                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
-                                                <InputAndLabel>
-                                                    <Text>Start Date (Optional)</Text>
-                                                    <Input
-
-                                                    />
-                                                </InputAndLabel>
-
-                                                <InputAndLabel>
-                                                    <Text>End Date (Optional)</Text>
-                                                    <Input
-
-                                                    />
-                                                </InputAndLabel>
-                                            </div>
-
                                             <InputAndLabel>
                                                 <Text>Percentage of Amount Raised to Lock in Liquidity (Optional)</Text>
                                                 <SliderInput
@@ -168,8 +162,8 @@ export const CreateILO = () => {
 
                                             <InputAndLabel>
                                                 <Text>Liquidity Unlock Date (Optional)</Text>
-                                                <Input
-
+                                            
+                                                <DateTimeInput
                                                 />
                                             </InputAndLabel>
                                         </>

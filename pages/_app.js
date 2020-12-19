@@ -9,31 +9,35 @@ import { AccountProvider } from '../context/Account';
 import { NotificationsProvider } from '../context/Notifications';
 import { Footer } from '../components/layout/Footer';
 import { PIXEL_SIZING } from '../utils/constants';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 export default ({ Component, pageProps }) => {
     return (
         <Theme>
-            <NotificationsProvider>
-                <EthersProvider>
-                    <TokenPairProvider>
-                        <AccountProvider>
-                            <Head>
-                                <title>Interfinex</title>
-                                <link rel="icon" href="/logo.png" />
-                                <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-                                <meta name="description" content="Access financial products and DeFi for any ethereum token - The international financial exchange."/>
-                            </Head>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <NotificationsProvider>
+                    <EthersProvider>
+                        <TokenPairProvider>
+                            <AccountProvider>
+                                <Head>
+                                    <title>Interfinex</title>
+                                    <link rel="icon" href="/logo.png" />
+                                    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+                                    <meta name="description" content="Access financial products and DeFi for any ethereum token - The international financial exchange."/>
+                                </Head>
 
-                            <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", minHeight: "100%", marginBottom: PIXEL_SIZING.large }} id={"root"}>
-                                <NavBar/>
-                                <Component {...pageProps}/>
-                            </div>
-                            
-                            <Footer/>
-                        </AccountProvider>
-                    </TokenPairProvider>
-                </EthersProvider>
-            </NotificationsProvider>
+                                <div style={{ display: "grid", gridTemplateRows: "auto 1fr", width: "100%", minHeight: "100%", marginBottom: PIXEL_SIZING.large }} id={"root"}>
+                                    <NavBar/>
+                                    <Component {...pageProps}/>
+                                </div>
+                                
+                                <Footer/>
+                            </AccountProvider>
+                        </TokenPairProvider>
+                    </EthersProvider>
+                </NotificationsProvider>
+            </MuiPickersUtilsProvider>
         </Theme>
     );
 };

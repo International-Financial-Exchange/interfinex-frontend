@@ -177,6 +177,7 @@ export const AddButton = ({ children, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
     const childRef = useRef();
     const [width, setWidth] = useState(0);
+    const [isLoaded, setIsLoaded] = useState();
 
     useLayoutEffect(() => {
         setWidth(childRef.current.getBoundingClientRect().width);
@@ -197,7 +198,7 @@ export const AddButton = ({ children, ...props }) => {
             <div style={{ width, transition: "width 0.17s ease-out", }}>
                 <div style={{ display: "flex", width: "fit-content" }} ref={childRef}>
                     <img
-                        onLoad={() => {}}
+                        onLoad={() => setIsLoaded(true)}
                         src={"/plus.svg"}
                         style={{
                             transform: isHovered ? "rotate(90deg)" : "",
