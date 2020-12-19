@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { PIXEL_SIZING } from "../../utils/constants";
 import { shade } from "../../utils/utils";
@@ -29,17 +29,20 @@ const StyledRadioOption = styled(Card)`
     }
 `;
 
-export const RadioInput = ({ options = [], value: propsValue, ...props }) => {
+export const RadioInput = ({ options = [], value: propsValue, onChange, ...props }) => {
     const [_value, setValue] = useState(options[0]?.value);
 
     const value = propsValue ?? _value;
 
     return (
-        <Container>
+        <Container {...props}>
             {
                 options.map(({ label, value: optionValue }) => 
                     <StyledRadioOption 
-                        onClick={() => setValue(optionValue)}
+                        onClick={() => {
+                            setValue(optionValue);
+                            onChange(optionValue);
+                        }}
                         selected={value === optionValue}
                     >
                         <input 

@@ -64,19 +64,32 @@ const materialTheme = createMuiTheme({
             root: {
                 borderRadius: PIXEL_SIZING.miniscule,
             },
-
-            notchedOutline: {
-                borderColor: `${THEMES.light.highlight} !important`,
-            },
         },
+
+        MuiFormHelperText: {
+            contained: {
+                margin: "0 !important",
+            },
+            error: {
+                root: {
+                    color: THEMES.light.negative,
+                }
+            },
+            root: {
+                fontSize: "",
+                fontFamily: ""
+            }
+        }
     },
 });
   
 
-export const DateTimeInput = ({ value, onChange }) => {
+export const DateTimeInput = ({ value, onChange, ...props }) => {
     return (
         <ThemeProvider theme={materialTheme}>
             <DateTimePicker
+                {...props}
+                showTodayButton
                 inputVariant="outlined"
                 value={value}
                 onChange={onChange}

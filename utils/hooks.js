@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { AccountContext } from "../context/Account";
 import { EthersContext } from "../context/Ethers";
 import { hasAllowance } from "./utils";
@@ -13,6 +13,8 @@ export const useWindow = () => {
 
     return _window;
 };
+
+export const SubmitContext = createContext();
 
 export const useForceUpdate = () => {
     const [, setTick] = useState(0);
