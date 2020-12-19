@@ -106,7 +106,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 597608
+    "gas": 598405
   },
   {
     "name": "createDutchAuctionILO",
@@ -155,7 +155,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 597638
+    "gas": 598435
   },
   {
     "name": "id_to_ILO",

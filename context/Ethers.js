@@ -11,6 +11,7 @@ import SwapFactoryAbi from "../public/contracts/abi/SwapFactory.json";
 import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
 import MarginEthRouterAbi from "../public/contracts/abi/MarginEthRouter.json";
 import YieldFarmAbi from "../public/contracts/abi/YieldFarm.json";
+import ILOFactoryAbi from "../public/contracts/abi/ILOFactory.json";
 import { formatEther, parseEther } from "ethers/lib/utils";
 
 const ABI = {
@@ -23,6 +24,7 @@ const ABI = {
     SwapEthRouter: SwapEthRouterAbi,
     MarginEthRouter: MarginEthRouterAbi,
     YieldFarm: YieldFarmAbi,
+    ILOFactory: ILOFactoryAbi,
 };
 
 export const EthersContext = createContext();
@@ -44,6 +46,7 @@ export const EthersProvider = ({ children }) => {
         SwapEthRouter,
         MarginEthRouter,
         YieldFarm,
+        ILOFactory,
     } = useMemo(() => {
         return {
             IfexToken: new ethers.Contract(contracts.IfexToken.address, getAbi("DividendERC20"), signer || provider),
@@ -52,6 +55,7 @@ export const EthersProvider = ({ children }) => {
             SwapEthRouter: new ethers.Contract(contracts.SwapEthRouter.address, getAbi("SwapEthRouter"), signer || provider),
             MarginEthRouter: new ethers.Contract(contracts.MarginEthRouter.address, getAbi("MarginEthRouter"), signer || provider),
             YieldFarm: new ethers.Contract(contracts.YieldFarm.address, getAbi("YieldFarm"), signer || provider),
+            ILOFactory: new ethers.Contract(contracts.ILOFactory.address, getAbi("ILOFactory"), signer || provider)
         }
     }, [networkInfo, signer]);
 
@@ -107,6 +111,7 @@ export const EthersProvider = ({ children }) => {
                     SwapEthRouter,
                     MarginEthRouter,
                     YieldFarm,
+                    ILOFactory,
                     getAbi,
                     createContract: (address, abiName) => 
                         new ethers.Contract(address, getAbi(abiName), signer || provider)

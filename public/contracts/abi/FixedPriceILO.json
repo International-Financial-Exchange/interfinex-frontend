@@ -97,7 +97,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 554448
+    "gas": 554283
   },
   {
     "name": "hasEnded",
