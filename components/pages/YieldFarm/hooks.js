@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { EthersContext } from "../../../context/Ethers";
 import { TokenPairContext } from "../../../context/TokenPair";
 import { humanizeTokenAmount, isZeroAddress } from "../../../utils/utils";
-import { getYieldFarms } from "../Swap/networkRequests";
+import { getYieldFarms } from "./networkRequests";
 
 export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
     const { contracts: { YieldFarm }} = useContext(EthersContext);

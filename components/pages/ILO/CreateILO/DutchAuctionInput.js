@@ -68,7 +68,7 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
 
     return (
         <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.large }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Starting Price (ETH per {assetToken.symbol})</Text>
                     <TokenAmountInput

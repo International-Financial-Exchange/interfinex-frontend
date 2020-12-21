@@ -2,7 +2,7 @@ import { Card } from "../../../../core/Card";
 import Text from "../../../../core/Text";
 import styled from "styled-components";
 import { useContext, useEffect, useState } from "react";
-import { getFundingHistory } from "../../networkRequests";
+import { getFundingHistory } from "../networkRequests";
 import { FundingContext } from "./FundingTab";
 import InfiniteScroll from "react-infinite-scroller";
 import { Spinner } from "../../../../core/Spinner";

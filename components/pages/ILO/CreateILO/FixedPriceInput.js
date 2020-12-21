@@ -68,7 +68,7 @@ export const FixedPriceInput = forwardRef((props, ref) => {
 
     return (
         <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.large }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Amount of ETH to raise</Text>
                     <TokenAmountInput

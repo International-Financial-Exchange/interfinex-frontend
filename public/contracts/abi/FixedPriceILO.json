@@ -97,7 +97,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 554283
+    "gas": 589288
   },
   {
     "name": "hasEnded",
@@ -337,6 +337,19 @@
     "gas": 1901
   },
   {
+    "name": "creationDate",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1931
+  },
+  {
     "name": "creator",
     "outputs": [
       {
@@ -347,7 +360,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1931
+    "gas": 1961
   },
   {
     "name": "balanceOf",
@@ -365,7 +378,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2176
+    "gas": 2206
   },
   {
     "name": "etherDeposited",
@@ -383,7 +396,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2206
+    "gas": 2236
   },
   {
     "name": "totalAssetTokensBought",
@@ -396,7 +409,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2021
+    "gas": 2051
   },
   {
     "name": "isInitialized",
@@ -409,7 +422,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2051
+    "gas": 2081
   },
   {
     "name": "hasCreatorWithdrawn",
@@ -422,6 +435,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 2081
+    "gas": 2111
   }
 ]

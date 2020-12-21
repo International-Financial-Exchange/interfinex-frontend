@@ -5,7 +5,7 @@ import styled, { ThemeContext } from "styled-components";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { MarginContext, Swap, SwapContext } from "../../Swap";
 import Text from "../../../../core/Text";
-import { getMarginPositions } from "../../networkRequests";
+import { getMarginPositions } from "../networkRequests";
 import { Button } from "../../../../core/Button";
 import { inputToOutputAmount } from "../../TradePortal/BuySell";
 import InfiniteScroll from "react-infinite-scroller";

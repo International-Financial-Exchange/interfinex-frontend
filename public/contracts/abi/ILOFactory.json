@@ -9,17 +9,22 @@
       },
       {
         "type": "address",
-        "name": "asset_token",
+        "name": "assetToken",
         "indexed": false
       },
       {
         "type": "uint256",
-        "name": "ILO_type",
+        "name": "type",
         "indexed": false
       },
       {
         "type": "address",
-        "name": "ILO_contract",
+        "name": "contractAddress",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
+        "name": "id",
         "indexed": false
       }
     ],
@@ -106,7 +111,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 598405
+    "gas": 634851
   },
   {
     "name": "createDutchAuctionILO",
@@ -155,7 +160,7 @@
     ],
     "stateMutability": "nonpayable",
     "type": "function",
-    "gas": 598435
+    "gas": 634881
   },
   {
     "name": "id_to_ILO",
@@ -175,6 +180,10 @@
       {
         "type": "uint256",
         "name": "id"
+      },
+      {
+        "type": "uint256",
+        "name": "type"
       }
     ],
     "inputs": [
@@ -185,7 +194,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 23276
+    "gas": 24258
   },
   {
     "name": "id_count",
