@@ -9,4 +9,9 @@ export default styled.div`
     };
     font-weight: ${({ bold }) => bold ? "bold" : "normal"};
     font-size: ${({ primary }) => primary ? '28px' : '' };
+
+    -webkit-line-clamp: ${({ lineClamp }) => lineClamp};
+    -webkit-box-orient: ${({ lineClamp }) => lineClamp ? "vertical" : ""};
+    display: ${({ lineClamp }) => lineClamp ? "-webkit-box" : ""};
+    overflow: ${({ lineClamp }) => lineClamp ? "hidden" : ""};
 `

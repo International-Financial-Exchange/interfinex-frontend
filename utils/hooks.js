@@ -22,7 +22,7 @@ export const useForceUpdate = () => {
       setTick(tick => tick + 1);
     }, [])
     return update;
-  }
+}
 
 export const useLocalStorage = (key, initialValue) => {
     const window = useWindow();

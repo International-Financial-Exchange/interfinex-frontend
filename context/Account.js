@@ -17,6 +17,7 @@ export const AccountProvider = ({ children }) => {
     const [baseTokenBalance, setBaseTokenBalance] = useState();
     const [assetTokenBalance, setAssetTokenBalance] = useState();
     const [ifexTokenBalance, setIfexTokenBalance] = useState();
+    const [ethBalance, setEthBalance] = useState();
     const [deleteWalletWarning, setDeleteWalletWarning] = useState();
 
     useEffect(() => {
@@ -62,6 +63,10 @@ export const AccountProvider = ({ children }) => {
             ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
                 setIfexTokenBalance(humanizeTokenAmount(balance, ifexToken))
             });
+
+            signer.getBalance().then(balance => 
+                setEthBalance(parseFloat(formatEther(balance)))
+            )
         }
     }, [provider, address, baseToken, assetToken, ifexToken]);
 
@@ -69,6 +74,7 @@ export const AccountProvider = ({ children }) => {
     return (
         <AccountContext.Provider 
             value={{ 
+                ethBalance,
                 baseTokenBalance,
                 assetTokenBalance,
                 ifexTokenBalance,

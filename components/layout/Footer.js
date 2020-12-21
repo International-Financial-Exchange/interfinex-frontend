@@ -33,7 +33,7 @@ const SocialMediaLink = styled.div`
 
 export const Footer = () => {
     return (
-        <footer style={{ width: "100%", display: "grid", backgroundColor: "#003049" }}>
+        <footer id={"main-footer"} style={{ width: "100%", display: "grid", backgroundColor: "#003049" }}>
             <FooterContainer>
                 {/* <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
                     <Text style={{ color: "white" }} bold>

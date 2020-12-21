@@ -12,7 +12,8 @@ import SwapEthRouterAbi from "../public/contracts/abi/SwapEthRouter.json";
 import MarginEthRouterAbi from "../public/contracts/abi/MarginEthRouter.json";
 import YieldFarmAbi from "../public/contracts/abi/YieldFarm.json";
 import ILOFactoryAbi from "../public/contracts/abi/ILOFactory.json";
-import { formatEther, parseEther } from "ethers/lib/utils";
+import FixedPriceILOAbi from "../public/contracts/abi/FixedPriceILO.json";
+import DutchAuctionILOAbi from "../public/contracts/abi/DutchAuctionILO.json";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,
@@ -25,6 +26,8 @@ const ABI = {
     MarginEthRouter: MarginEthRouterAbi,
     YieldFarm: YieldFarmAbi,
     ILOFactory: ILOFactoryAbi,
+    FixedPriceILO: FixedPriceILOAbi,
+    DutchAuctionILO: DutchAuctionILOAbi,
 };
 
 export const EthersContext = createContext();
