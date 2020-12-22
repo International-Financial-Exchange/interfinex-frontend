@@ -6,6 +6,8 @@ import { useContext } from "react";
 import Text from "../../../core/Text";
 import { shade } from "../../../../utils/utils";
 import Skeleton from "react-loading-skeleton";
+import { useIloDepositHistory } from "../hooks";
+import InfiniteScroll from "react-infinite-scroller";
 
 const StyledTable = styled.table`
     border-collapse: separate;
@@ -63,6 +65,8 @@ const Container = styled(Card)`
 
 export const ILOHistory = () => {
     const { ilo } = useContext(IloContext);
+    console.log("ilo", ilo);
+    const [depositHistory, isLoading, getMoreDepositHistory, gotAllDepositHistory] = useIloDepositHistory({ contractAddress: ilo?.contractAddress });
 
     const {
         assetToken
@@ -70,54 +74,63 @@ export const ILOHistory = () => {
 
     return (
         <Container>
-            <StyledTable>
-                <tr>
-                    <th style={{ padding: PIXEL_SIZING.small }}>
-                        <Text secondary>Event</Text>
-                    </th>
-                    <th>
-                        <Text secondary>ETH Invested</Text>
-                    </th>
-                    <th>
-                        <Text secondary>{assetToken?.symbol} Bought</Text>
-                    </th>
-                    <th>
-                        <Text secondary>User</Text>
-                    </th>
-                    <th>
-                        <Text secondary>Timestamp</Text>
-                    </th>
-                </tr>
+            <InfiniteScroll
+                loadMore={getMoreDepositHistory}
+                hasMore={!gotAllDepositHistory}
+                useWindow={false}
+            >
+                <StyledTable>
+                    <tr>
+                        <th style={{ padding: PIXEL_SIZING.small }}>
+                            <Text secondary>Event</Text>
+                        </th>
+                        <th>
+                            <Text secondary>ETH Invested</Text>
+                        </th>
+                        <th>
+                            <Text secondary>{assetToken?.symbol} Bought</Text>
+                        </th>
+                        <th>
+                            <Text secondary>User</Text>
+                        </th>
+                        <th>
+                            <Text secondary>Timestamp</Text>
+                        </th>
+                    </tr>
 
-                <Row 
-                    positive
-                    onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
-                >
-                    <td>{"Deposit"}</td>
-                    <td>{"102.0000"}</td>
-                    <td>{"102.0000"}</td>
-                    <td>{"0x093812081209381092389012830912832731817"}</td>
-                    <td>{new Date().toLocaleTimeString()}</td>
-                </Row>
-            </StyledTable>
+                    {
+                        depositHistory.length === 0 && !isLoading ?
+                            <Text secondary style={{ top: CONTAINER_SIZING.tiny }} className={"center-absolute"}>
+                                No events to show
+                            </Text>
+                        :
+                            depositHistory.map(({ assetTokensBought, ethInvested, timestamp, txId, user }) => 
+                                <Row 
+                                    positive
+                                    key={txId}
+                                    onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
+                                >
+                                    <td>Deposit</td>
+                                    <td>{ethInvested.toFixed(4)}</td>
+                                    <td>{assetTokensBought.toFixed(4)}</td>
+                                    <td>{user}</td>
+                                    <td>{new Date(timestamp).toLocaleTimeString()}</td>
+                                </Row>
+                            )
+                    }
+                </StyledTable>
 
-            {
-                false &&
-                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                        <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
-                    </div>
-            }
+                {
+                    isLoading &&
+                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, height: "fit-content" }}>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                        </div>
+                }
+            </InfiniteScroll>
         </Container>
     );
 };

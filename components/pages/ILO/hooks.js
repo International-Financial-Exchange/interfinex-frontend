@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../context/Account";
 import { humanizeTokenAmount } from "../../../utils/utils";
-import { getIloItem } from "./networkRequests";
+import { getIloDepositHistory, getIloItem } from "./networkRequests";
 
 export const useIlo = ({ contractAddress, iloJson }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -12,13 +12,15 @@ export const useIlo = ({ contractAddress, iloJson }) => {
             setIlo(JSON.parse(iloJson));
             setIsLoading(false);
         } else {
-            getIloItem({ contractAddress })
-                .then(ilo => {
-                    setIlo(ilo);
-                    setIsLoading(false);
-                });
+            if (contractAddress) {
+                getIloItem({ contractAddress })
+                    .then(ilo => {
+                        setIlo(ilo);
+                        setIsLoading(false);
+                    });
+            }
         }
-    }, []);
+    }, [contractAddress]);
 
     return [ilo, isLoading];
 };
@@ -49,4 +51,25 @@ export const useYourIloInvestment = ({ ILOContract, assetToken }) => {
     }, [ILOContract, address]);
 
     return [accountEthInvested, accountTokensBought, isLoading];
+};
+
+export const useIloDepositHistory = ({ contractAddress, user }) => {
+    const [depositHistory, setDepositHistory] = useState([]);
+    const [gotAllDepositHistory, setGotAllDepositHistory] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const getMoreDepositHistory = async () => {
+        if (isLoading || !contractAddress) return;
+        setIsLoading(true);
+
+        console.log("contract address", contractAddress);
+        const newDeposits = await getIloDepositHistory({ contractAddress, offset: depositHistory.length, user });
+        console.log("new", newDeposits);
+
+        setGotAllDepositHistory(newDeposits.length === 0);
+        setDepositHistory(existing => existing.concat(newDeposits));
+        setIsLoading(false);
+    };
+
+    return [depositHistory, isLoading, getMoreDepositHistory, gotAllDepositHistory];
 };
