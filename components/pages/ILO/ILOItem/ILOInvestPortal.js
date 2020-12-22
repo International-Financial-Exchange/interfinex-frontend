@@ -15,7 +15,7 @@ import { AccountContext } from "../../../../context/Account";
 import { NotificationsContext } from "../../../../context/Notifications";
 
 const Container = styled(Card)`
-    width: fit-content;
+    width: 100%;
     height: fit-content;
     padding: ${PIXEL_SIZING.medium};
     display: grid;

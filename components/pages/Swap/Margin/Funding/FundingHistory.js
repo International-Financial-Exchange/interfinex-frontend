@@ -55,6 +55,15 @@ const StyledTable = styled.table`
     }
 `;
 
+const Container = styled(Card)`
+    width: 100%;
+    height: ${CONTAINER_SIZING.medium};
+    padding-top: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: auto;
+`;
+
 const useFundingHistory = ({ marginMarketContract }) => {
     const [fundingEvents, setFundingEvents] = useState([]);
     const [gotAllFundingEvents, setGotAllFundingEvents] = useState(false);
@@ -102,7 +111,7 @@ export const FundingHistory = () => {
     console.log("funding", fundingEvents);
 
     return (
-        <Card style={{ width: "100%", height: CONTAINER_SIZING.medium, paddingTop: 0 }}>
+        <Container>
             <InfiniteScroll
                 loadMore={getMoreFundingEvents}
                 hasMore={!gotAllFundingEvents}
@@ -152,6 +161,6 @@ export const FundingHistory = () => {
                         </div>
                 }
             </InfiniteScroll>
-        </Card>
+        </Container>
     );
 };

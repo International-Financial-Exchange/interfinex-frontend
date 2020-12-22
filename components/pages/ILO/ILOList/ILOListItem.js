@@ -73,10 +73,9 @@ export const ILOListItem = ({ ilo }) => {
                         <StatusIndicator
                             status={hasEnded ? ILO_STATUS.ended : ILO_STATUS.live}
                         />
-                                                
-                        <StyledCountdown 
-                            date={new Date(endDate * 1000)}
-                            secondary
+                                   
+                        <StyledCountdown
+                            date={hasEnded ? 0 : new Date(endDate * 1000)}
                         />
                     </div>
 

@@ -6,6 +6,7 @@ import { NotificationsContext } from "../../../../context/Notifications";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
 import { Button } from "../../../core/Button";
 import { Card } from "../../../core/Card";
+import { InfoBubble } from "../../../core/InfoBubble";
 import Text from "../../../core/Text";
 import { TextOption } from "../../../core/TextOption";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
@@ -29,6 +30,7 @@ export const YourILOInvestment = () => {
 
     const {
         assetToken,
+        hasEnded
     } = ilo || {};
 
     const onSubmit = async () => {
@@ -45,7 +47,7 @@ export const YourILOInvestment = () => {
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
-            <TextOption selected>
+            <TextOption selected style={{ width: "fit-content" }}>
                 Your Investment
             </TextOption>
 
@@ -72,16 +74,27 @@ export const YourILOInvestment = () => {
                     }
                 </div>
 
-                <Button 
-                    primary 
-                    style={{ width: "100%" }}
-                    requiresWallet
-                    onClick={onSubmit}
-                    isLoading={isSubmitLoading}
-                >
-                    Withdraw
-                </Button>
+                {
+                    ethInvested > 0 &&
+                        <Button 
+                            primary 
+                            style={{ width: "100%" }}
+                            requiresWallet
+                            onClick={onSubmit}
+                            isLoading={isSubmitLoading}
+                            isDisabled={!hasEnded}
+                        >
+                            Withdraw
+                        </Button>
+                }
             </Container>
+
+            { 
+                ethInvested > 0 &&
+                    <InfoBubble>
+                        You can withdraw your funds when the ILO reaches its end date or hardcap.
+                    </InfoBubble>
+            }
         </div>
     );
 };

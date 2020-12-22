@@ -9,7 +9,7 @@ export const StyledCountdown = ({ date, ...props }) => {
                 return <Text {...props}>
                     {
                         completed ? 
-                            "0d 0h 0m" 
+                            "0d 0h 0m 0s" 
                             : `${days}d ${hours}h ${minutes}m ${seconds}s`
                     }
                 </Text>;

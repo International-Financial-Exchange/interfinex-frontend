@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { createContext, useContext, useMemo } from "react";
 import styled from "styled-components";
-import { PIXEL_SIZING } from "../../../../utils/constants";
+import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
 import { Layout } from "../../../layout/Layout";
 import { useIlo } from "../hooks";
 import { ILODetails } from "./ILODetails";
@@ -11,6 +11,9 @@ import { ILOInvestPortal } from "./ILOInvestPortal";
 import { EthersContext } from "../../../../context/Ethers";
 import { ILO_ABI_NAMES } from "../utils";
 import { YourILOInvestment } from "./YourILOInvestment";
+import { ILOOwnerDash } from "./ILOOwnerDash";
+import { AccountContext } from "../../../../context/Account";
+import { ILOHistory } from "./ILOHistory";
 
 const TitleContainer = styled.div`
     display: grid;
@@ -46,6 +49,7 @@ export const ILOItem = () => {
     const { query: { iloJson, contractAddress }} = useRouter();
     const [ilo, isLoading] = useIlo({ iloJson, contractAddress });
     const { contracts: { createContract, }, signer } = useContext(EthersContext);
+    const { address } = useContext(AccountContext);
 
     const ILOContract = useMemo(() => {
         if (ilo) {
@@ -53,7 +57,7 @@ export const ILOItem = () => {
         }
     }, [ilo?.contractAddress, signer]);
 
-    const { endDate, name } = ilo || {}; 
+    const { endDate, name, hasEnded, creator } = ilo || {}; 
 
     return (
         <Layout>
@@ -65,19 +69,25 @@ export const ILOItem = () => {
                         </Text>
 
                         <StyledCountdown
-                            date={new Date(endDate * 1000)}
+                            date={hasEnded ? 0 : new Date(endDate * 1000)}
                             primary
                             bold
                         />
                     </TitleContainer>
 
-                    <div>
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content", }}>
                         <ILODetails/>
+                        <ILOHistory/>
                     </div>
 
-                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content", width: CONTAINER_SIZING.medium }}>
                         <ILOInvestPortal/>
                         <YourILOInvestment/>
+
+                        {
+                            address === creator &&
+                                <ILOOwnerDash/>
+                        }
                     </div>
                 </Container>
             </IloContext.Provider>
