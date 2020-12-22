@@ -40,7 +40,6 @@ export const ILOInvestPortal = props => {
         assetToken,
         percentageToLock,
         liquidityUnlockDate,
-        softCap
     } = ilo || {};
 
     const tokensPerEth = humanizeTokenAmount(getIloCurrentTokensPerEth(ilo || {}), assetToken || {});

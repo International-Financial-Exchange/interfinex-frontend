@@ -6,7 +6,7 @@ import { IloContext } from "./ILOItem";
 import styled, { ThemeContext } from "styled-components";
 import { StatusIndicator, ILO_STATUS } from "../ILOList/ILOListItem";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
-import { getIloCurrentTokensPerEth, IloProgressBar, ILO_TYPE_NAMES } from "../utils";
+import { getIloCurrentTokensPerEth, IloProgressBar, ILO_TYPES, ILO_TYPE_NAMES } from "../utils";
 import Skeleton from "react-loading-skeleton";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { EthersContext } from "../../../../context/Ethers";
@@ -37,6 +37,9 @@ export const ILODetails = () => {
         assetToken,
         contractAddress 
     } = ilo || {};
+
+
+    console.log(ilo);
     
     const tokensPerEth = getIloCurrentTokensPerEth(ilo || {});
 
@@ -96,7 +99,18 @@ export const ILODetails = () => {
                         {
                             showMoreDetails &&
                                 <>
-                                    <FixedPriceAdditionalDetails/>
+                                    {
+                                        (() => {
+                                            switch (ilo?.type) {
+                                                case ILO_TYPES.fixedPrice:
+                                                    return <FixedPriceAdditionalDetails/>;
+                                                case ILO_TYPES.dutchAuction:
+                                                    return <DutchAuctionAdditionalDetails/>;
+                                                default:
+                                                    return;
+                                            }
+                                        })()
+                                    }
 
                                     {/* <Text>
                                         ILO Contract: {contractAddress}
@@ -109,12 +123,11 @@ export const ILODetails = () => {
     );
 };
 
-const FixedPriceAdditionalDetails = props => {
+const DutchAuctionAdditionalDetails = props => {
     const { ilo, isLoading } = useContext(IloContext);
     const theme = useContext(ThemeContext);
     const { ETHEREUM_TOKEN } = useContext(EthersContext);
     
-    console.log(ilo);
     const { 
         endDate, 
         startDate,
@@ -123,7 +136,51 @@ const FixedPriceAdditionalDetails = props => {
         assetToken,
         percentageToLock,
         liquidityUnlockDate,
-        softCap
+    } = ilo || {};
+
+    return (
+        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.larger, }}>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, alignItems: "center" }}>
+                <Text secondary>Start Date</Text>
+                <Text>{new Date(startDate * 1000).toLocaleString()}</Text>
+
+                <Text secondary>Start Price</Text>
+                <Text>1 ETH = {humanizeTokenAmount(additionalDetails.startTokensPerEth, assetToken)} {assetToken.symbol}</Text>
+
+                <Text secondary>Liquidity Lock Amount</Text>                
+                <Text style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</Text>
+
+                <Text secondary>Total Tokens for Sale</Text>
+                <Text>{humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, height: "fit-content" }}>
+                <Text secondary>End Date</Text>
+                <Text>{new Date(endDate * 1000).toLocaleString()}</Text>
+
+                <Text secondary>End Price</Text>
+                <Text>1 ETH = {humanizeTokenAmount(additionalDetails.endTokensPerEth, assetToken)} {assetToken.symbol}</Text>
+
+                <Text secondary>Liquidity Unlock Date</Text>
+                <Text>{new Date(liquidityUnlockDate * 1000).toLocaleString()}</Text>
+            </div>
+        </div>
+    );
+};
+
+const FixedPriceAdditionalDetails = props => {
+    const { ilo, isLoading } = useContext(IloContext);
+    const theme = useContext(ThemeContext);
+    const { ETHEREUM_TOKEN } = useContext(EthersContext);
+    
+    const { 
+        endDate, 
+        startDate,
+        additionalDetails, 
+        assetTokenAmount, 
+        assetToken,
+        percentageToLock,
+        liquidityUnlockDate,
     } = ilo || {};
 
     return (
@@ -136,10 +193,10 @@ const FixedPriceAdditionalDetails = props => {
                 <Text style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</Text>
 
                 <Text secondary style={{ marginRight: PIXEL_SIZING.small }}>Soft Cap</Text>
-                <Text>{(softCap / additionalDetails.tokensPerEth).toFixed(6)} ETH</Text>
+                <Text>{(additionalDetails.softCap / additionalDetails.tokensPerEth).toFixed(6)} ETH</Text>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small }}>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, }}>
                 <Text secondary>End Date</Text>
                 <Text>{new Date(endDate * 1000).toLocaleString()}</Text>
 

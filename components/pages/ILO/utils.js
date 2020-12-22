@@ -21,22 +21,35 @@ export const ILO_ABI_NAMES = {
     [ILO_TYPES.dutchAuction]: "DutchAuctionILO",
 };
 
-export const getIloEthHardcap = ({ type, additionalDetails, ethInvested, assetTokenAmount }) => {
-    switch (type) {
+export const getIloEthHardcap = ilo => {
+    switch (ilo.type) {
         case ILO_TYPES.fixedPrice:
-            return assetTokenAmount / additionalDetails.tokensPerEth;
+            return ilo.assetTokenAmount / ilo.additionalDetails.tokensPerEth;
+        case ILO_TYPES.dutchAuction:
+            console.log("price", ((ilo.assetTokenAmount - ilo.additionalDetails.totalAssetTokensBought) / getIloCurrentTokensPerEth(ilo)))
+            console.log(ilo.ethInvested);
+            console.log(ilo.assetTokenAmount)
+            console.log(ilo.assetTokensBought);
+            return ilo.ethInvested + ((ilo.assetTokenAmount - ilo.additionalDetails.totalAssetTokensBought) / getIloCurrentTokensPerEth(ilo));
         default:
-            console.warn(`Unsupported ILO type: [${type}]`);
+            console.warn(`Unsupported ILO type: [${ilo.type}]`);
             return 0;
     }
 }; 
 
-export const getIloCurrentTokensPerEth = ({ type, additionalDetails, ethInvested, assetTokenAmount }) => {
-    switch (type) {
+export const getIloCurrentTokensPerEth = ilo => {
+    switch (ilo.type) {
         case ILO_TYPES.fixedPrice:
-            return additionalDetails.tokensPerEth;
+            return ilo.additionalDetails.tokensPerEth;
+        case ILO_TYPES.dutchAuction:
+            const timeDelta = Math.floor(Date.now() / 1000) - ilo.startDate;
+            const maxTimeDelta = ilo.endDate - ilo.startDate;
+            const percentageComplete = timeDelta / maxTimeDelta;
+            const maxPriceDelta = ilo.additionalDetails.endTokensPerEth - ilo.additionalDetails.startTokensPerEth;
+            const tokensPerEth = ilo.additionalDetails.startTokensPerEth + (maxPriceDelta * percentageComplete);
+            return tokensPerEth;
         default:
-            console.warn(`Unsupported ILO type: [${type}]`);
+            console.warn(`Unsupported ILO type: [${ilo.type}]`);
             return 0;
     }
 }; 
@@ -45,8 +58,6 @@ export const IloProgressBar = ({ ilo, secondary }) => {
     const theme = useContext(ThemeContext);
     const { ETHEREUM_TOKEN } = useContext(EthersContext);
     const { ethInvested, } = ilo;
-
-    console.log("eth invested", ethInvested)
 
     const ethHardcap = getIloEthHardcap(ilo);
     const progress = (ethInvested / ethHardcap) * 100;
