@@ -12,6 +12,14 @@ import { PIXEL_SIZING } from '../utils/constants';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 
+import Router from 'next/router';
+import NProgress from 'nprogress'; 
+import 'nprogress/nprogress.css'; 
+
+Router.events.on('routeChangeStart', () => NProgress.start()); 
+Router.events.on('routeChangeComplete', () => NProgress.done()); 
+Router.events.on('routeChangeError', () => NProgress.done());
+
 export default ({ Component, pageProps }) => {
     return (
         <Theme>

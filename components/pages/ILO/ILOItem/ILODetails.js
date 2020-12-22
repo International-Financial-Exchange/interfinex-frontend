@@ -29,6 +29,7 @@ export const ILODetails = () => {
         hasEnded, 
         name, 
         description, 
+        id,
         endDate, 
         ethInvested, 
         type, 
@@ -59,9 +60,10 @@ export const ILODetails = () => {
                                 status={hasEnded ? ILO_STATUS.ended : ILO_STATUS.live}
                             />
 
-                            <Text>
-                                {ILO_TYPE_NAMES[type]}
-                            </Text>
+                            <div style={{ display: "flex" }}>
+                                <Text style={{ marginRight: PIXEL_SIZING.small }}>{ILO_TYPE_NAMES[type]}</Text>
+                                <Text secondary>#{id}</Text>
+                            </div>
                         </div>
 
 

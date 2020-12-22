@@ -67,13 +67,11 @@ export const ILOInvestPortal = props => {
                         setEthAmount(e.target.value);
                         setAssetTokenAmount(e.target.value * tokensPerEth)
                     }}
-                    isError={ethAmount > ethBalance || ethAmount > ethHardcap - ethInvested}
+                    isError={ethAmount > ethBalance}
                     errorMessage={
                         ethAmount > ethBalance ?
                             "Insufficient balance"
-                            : ethAmount > ethHardcap - ethInvested ?
-                                `Not enough ${assetToken.symbol} for sale`
-                                : ""
+                            : ""
                     }
                     value={ethAmount}
                 />

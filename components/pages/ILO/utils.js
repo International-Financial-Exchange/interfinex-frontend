@@ -42,6 +42,8 @@ export const getIloCurrentTokensPerEth = ilo => {
         case ILO_TYPES.fixedPrice:
             return ilo.additionalDetails.tokensPerEth;
         case ILO_TYPES.dutchAuction:
+            if (ilo.hasEnded) return ilo.additionalDetails.endTokensPerEth;
+            
             const timeDelta = Math.floor(Date.now() / 1000) - ilo.startDate;
             const maxTimeDelta = ilo.endDate - ilo.startDate;
             const percentageComplete = timeDelta / maxTimeDelta;

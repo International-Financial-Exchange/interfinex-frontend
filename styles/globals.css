@@ -54,3 +54,16 @@ input:focus {
 .MuiOutlinedInput-notchedOutline {
     border: 1px solid #e9ecef !important;
 }
+
+#nprogress .bar {
+    background: #2A9D8F !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px #2A9D8F, 0 0 5px #2A9D8F !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: #2A9D8F !important;
+    border-left-color: #2A9D8F !important;
+}

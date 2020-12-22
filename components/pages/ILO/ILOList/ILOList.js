@@ -67,7 +67,7 @@ export const ILOList = () => {
     const [list, isLoading, getMoreItems, gotAllItems] = useIloList({});
 
     return (
-        <Layout>
+        <Layout style={{ maxWidth: 1090 }}>
             <Container>
                 <TitleContainer>
                     <Text primary bold>Initial Liquidity Offerings</Text>
@@ -83,7 +83,14 @@ export const ILOList = () => {
                         loadMore={getMoreItems}
                         hasMore={!gotAllItems}
                     >  
-                        <div style={{ display: "flex", justifyContent: "space-around", width: "fit-content", maxWidth: "100%", flexWrap: "wrap", }}>
+                        <div 
+                            style={{ 
+                                display: "flex", 
+                                justifyContent: "space-between",
+                                width: "100%",
+                                flexWrap: "wrap",
+                            }}
+                        >
                             {
                                 isLoading &&
                                     <Spinner/>
