@@ -10,6 +10,7 @@ import Text from "../../../core/Text";
 import { ILOInvestPortal } from "./ILOInvestPortal";
 import { EthersContext } from "../../../../context/Ethers";
 import { ILO_ABI_NAMES } from "../utils";
+import { YourILOInvestment } from "./YourILOInvestment";
 
 const TitleContainer = styled.div`
     display: grid;
@@ -70,8 +71,14 @@ export const ILOItem = () => {
                         />
                     </TitleContainer>
 
-                    <ILODetails/>
-                    <ILOInvestPortal/>
+                    <div>
+                        <ILODetails/>
+                    </div>
+
+                    <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content" }}>
+                        <ILOInvestPortal/>
+                        <YourILOInvestment/>
+                    </div>
                 </Container>
             </IloContext.Provider>
         </Layout>

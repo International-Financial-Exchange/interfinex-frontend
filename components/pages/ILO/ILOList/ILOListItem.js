@@ -86,7 +86,7 @@ export const ILOListItem = ({ ilo }) => {
                         </Text>
                         <Text 
                             secondary 
-                            lineClamp={4}
+                            lineClamp={3}
                             style={{ 
                                 marginTop: PIXEL_SIZING.small,
                                 maxWidth: "100%",

@@ -61,7 +61,7 @@ export const ILOInvestPortal = props => {
     return (
         <Container>
             <InputAndLabel>
-                <Text>ETH Amount</Text>
+                <Text>Amount of ETH to Invest</Text>
                 <TokenAmountInput 
                     token={ETHEREUM_TOKEN}
                     onChange={e => {
@@ -73,7 +73,7 @@ export const ILOInvestPortal = props => {
                         ethAmount > ethBalance ?
                             "Insufficient balance"
                             : ethAmount > ethHardcap - ethInvested ?
-                                "Not enough tokens to buy"
+                                `Not enough ${assetToken.symbol} for sale`
                                 : ""
                     }
                     value={ethAmount}
@@ -89,7 +89,7 @@ export const ILOInvestPortal = props => {
                         </>
                     :
                         <>
-                            <Text>{assetToken.symbol} Amount</Text>
+                            <Text>Amount of {assetToken.symbol} to Buy</Text>
                             <TokenAmountInput 
                                 token={assetToken}
                                 onChange={e => {
