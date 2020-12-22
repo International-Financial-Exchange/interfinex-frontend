@@ -65,7 +65,6 @@ const Container = styled(Card)`
 
 export const ILOHistory = () => {
     const { ilo } = useContext(IloContext);
-    console.log("ilo", ilo);
     const [depositHistory, isLoading, getMoreDepositHistory, gotAllDepositHistory] = useIloDepositHistory({ contractAddress: ilo?.contractAddress });
 
     const {
@@ -110,7 +109,7 @@ export const ILOHistory = () => {
                                     key={txId}
                                     onClick={() => window.open(`https://etherscan.io/tx/${txId}`)}
                                 >
-                                    <td>Deposit</td>
+                                    <td>Invest</td>
                                     <td>{ethInvested.toFixed(4)}</td>
                                     <td>{assetTokensBought.toFixed(4)}</td>
                                     <td>{user}</td>

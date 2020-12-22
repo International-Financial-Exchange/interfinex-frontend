@@ -60,12 +60,9 @@ export const useIloDepositHistory = ({ contractAddress, user }) => {
 
     const getMoreDepositHistory = async () => {
         if (isLoading || !contractAddress) return;
+
         setIsLoading(true);
-
-        console.log("contract address", contractAddress);
         const newDeposits = await getIloDepositHistory({ contractAddress, offset: depositHistory.length, user });
-        console.log("new", newDeposits);
-
         setGotAllDepositHistory(newDeposits.length === 0);
         setDepositHistory(existing => existing.concat(newDeposits));
         setIsLoading(false);

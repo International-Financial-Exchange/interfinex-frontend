@@ -98,9 +98,9 @@ export const ILODetails = () => {
                                 <>
                                     <FixedPriceAdditionalDetails/>
 
-                                    <Text>
+                                    {/* <Text>
                                         ILO Contract: {contractAddress}
-                                    </Text>
+                                    </Text> */}
                                 </>
                         }
                     </>
@@ -127,25 +127,27 @@ const FixedPriceAdditionalDetails = props => {
     } = ilo || {};
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.large, rowGap: PIXEL_SIZING.small }}>
-            <Text>Start Date: {new Date(startDate * 1000).toLocaleString()}</Text>
-            <Text>End Date: {new Date(endDate * 1000).toLocaleString()}</Text>
+        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.larger, }}>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, alignItems: "center" }}>
+                <Text secondary>Start Date</Text>
+                <Text>{new Date(startDate * 1000).toLocaleString()}</Text>
 
-            <Text>Percentage to Lock in Liquidity: <span style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</span></Text>                
-            <Text>Liquidity Unlock Date: {new Date(liquidityUnlockDate * 1000).toLocaleString()}</Text>
+                <Text secondary>Liquidity Lock Amount</Text>                
+                <Text style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</Text>
 
+                <Text secondary style={{ marginRight: PIXEL_SIZING.small }}>Soft Cap</Text>
+                <Text>{(softCap / additionalDetails.tokensPerEth).toFixed(6)} ETH</Text>
+            </div>
 
-            <Text>
-                Total Tokens for Sale: {humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}
-            </Text>
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small }}>
+                <Text secondary>End Date</Text>
+                <Text>{new Date(endDate * 1000).toLocaleString()}</Text>
 
-            <div style={{ display: "flex", alignItems: "center" }}>
-                <Text secondary style={{ marginRight: PIXEL_SIZING.small }}>Soft Cap:</Text>
-                <TokenAndLogo token={ETHEREUM_TOKEN}>
-                    <Text>
-                        {(softCap / additionalDetails.tokensPerEth).toFixed(6)} ETH
-                    </Text>
-                </TokenAndLogo>
+                <Text secondary>Liquidity Unlock Date</Text>
+                <Text>{new Date(liquidityUnlockDate * 1000).toLocaleString()}</Text>
+
+                <Text secondary>Total Tokens for Sale</Text>
+                <Text>{humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
             </div>
         </div>
     );

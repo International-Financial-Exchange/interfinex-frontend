@@ -158,6 +158,8 @@ export const FundingHistory = () => {
                             <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
                             <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
                             <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
+                            <Skeleton style={{ height: PIXEL_SIZING.large, width: "100%" }}/>
                         </div>
                 }
             </InfiniteScroll>
