@@ -50,7 +50,7 @@ export const StatusIndicator = ({ status }) => {
 
 
 const StyledCardButton = styled(CardButton)` 
-    margin: ${PIXEL_SIZING.small}; 
+    margin: 0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}; 
     width: ${CONTAINER_SIZING.small}; 
     height: ${CONTAINER_SIZING.small}; 
 `;
