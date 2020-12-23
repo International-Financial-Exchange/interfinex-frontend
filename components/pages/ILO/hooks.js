@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../context/Account";
 import { humanizeTokenAmount } from "../../../utils/utils";
-import { getIloDepositHistory, getIloItem } from "./networkRequests";
+import { getIloDepositHistory, getIloItem, getIloList, getUserIlos } from "./networkRequests";
 
 export const useIlo = ({ contractAddress, iloJson }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +23,79 @@ export const useIlo = ({ contractAddress, iloJson }) => {
     }, [contractAddress]);
 
     return [ilo, isLoading];
+};
+
+export const useIloList = ({ limit, sortType }) => {
+    const [list, setList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [gotAllItems, setGotAllItems] = useState(false);
+
+    const getMoreItems = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
+
+        const newItems = await getIloList({ 
+            limit, 
+            sortType, 
+            offset: list.length,
+        });
+
+        setGotAllItems(newItems.length === 0);
+
+        // Remove the duplicates
+        setList(existing => {
+            if (newItems.every(({ txId }) => !existing.some(({ txId: _txId }) => txId === txId))) {
+                return existing.concat(newItems);
+            };
+
+            return existing;
+        });
+
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        getMoreItems();
+    }, []);
+
+    return { list, isLoading, getMoreItems, gotAllItems };
+};
+
+export const useMyIlos = ({ limit, user }) => {
+    const [list, setList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [gotAllItems, setGotAllItems] = useState(false);
+
+    const getMoreItems = async () => {
+        if (isLoading || !user) return;
+        setIsLoading(true);
+
+        const newItems = await getUserIlos({ 
+            limit, 
+            user, 
+            offset: list.length,
+        });
+
+        setGotAllItems(newItems.length === 0);
+
+        // Remove the duplicates
+        setList(existing => {
+            if (newItems.every(({ txId }) => !existing.some(({ txId: _txId }) => txId === txId))) {
+                return existing.concat(newItems);
+            };
+
+            return existing;
+        });
+
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        setList([]);
+        getMoreItems();
+    }, [user]);
+
+    return { list, isLoading, getMoreItems, gotAllItems };
 };
 
 export const useYourIloInvestment = ({ ILOContract, assetToken }) => {

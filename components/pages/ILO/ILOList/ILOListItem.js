@@ -1,8 +1,5 @@
 import Link from "next/link";
 import { useContext } from "react";
-import Countdown from "react-countdown";
-import { EthersContext } from "../../../../context/Ethers";
-import { humanizeTokenAmount } from "../../../../utils/utils";
 import { ProgressBar } from "../../../core/ProgressBar";
 import { StyledCountdown } from "../../../core/StyledCountdown";
 import Text from "../../../core/Text";

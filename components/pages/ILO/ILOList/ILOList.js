@@ -12,8 +12,10 @@ import { InfiniteFooterScroll } from "../../../core/InfiniteFooterScroll";
 import { CardButton } from "../../../core/CardButton";
 import { ILOListItem } from "./ILOListItem";
 import { FilterOption } from "../../../core/FilterOption";
-import { HotIcon, NewIcon, TimeIcon, TopIcon } from "./FilterIcons";
+import { HotIcon, NewIcon, TimeIcon, TopIcon, UserIcon } from "./FilterIcons";
 import Skeleton from "react-loading-skeleton";
+import { useIloList, useMyIlos } from "../hooks";
+import { AccountContext } from "../../../../context/Account";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
@@ -41,61 +43,33 @@ const TitleContainer = styled.div`
     }
 `;
 
-export const useIloList = ({ limit, sortType }) => {
-    const [list, setList] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [gotAllItems, setGotAllItems] = useState(false);
-
-    const getMoreItems = async () => {
-        if (isLoading) return;
-        setIsLoading(true);
-
-        const newItems = await getIloList({ 
-            limit, 
-            sortType, 
-            offset: list.length,
-        });
-
-        setGotAllItems(newItems.length === 0);
-
-        // Remove the duplicates
-        setList(existing => {
-            if (newItems.every(({ txId }) => !existing.some(({ txId: _txId }) => txId === txId))) {
-                return existing.concat(newItems);
-            };
-
-            return existing;
-        });
-
-        setIsLoading(false);
-    };
-
-    useEffect(() => {
-        getMoreItems();
-    }, []);
-
-    return { list, isLoading, getMoreItems, gotAllItems };
-};
-
 const SORT_TYPES = {
     hot: { value: 0, label: "Hot", icon: <HotIcon/> }, 
     new: { value: 1, label: "New", icon: <NewIcon/> }, 
     top: { value: 2, label: "Top", icon: <TopIcon/> }, 
     timeLeft: { value: 3, label: "Time Left", icon: <TimeIcon/> }, 
+    myIlos: { value: 4, label: "My ILOs", icon: <UserIcon/> }, 
+};
+
+const DUMMY_CARD_STYLE = {
+    margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}`, 
+    height: CONTAINER_SIZING.small, 
+    width: CONTAINER_SIZING.small,
 };
 
 export const ILOList = () => {
+    const { address } = useContext(AccountContext);
+    console.log("address", address);
     const listItems = {
         [SORT_TYPES.hot.value]: useIloList({ sortType: SORT_TYPES.hot.value }),
         [SORT_TYPES.new.value]: useIloList({ sortType: SORT_TYPES.new.value }),
         [SORT_TYPES.top.value]: useIloList({ sortType: SORT_TYPES.top.value }),
         [SORT_TYPES.timeLeft.value]: useIloList({ sortType: SORT_TYPES.timeLeft.value }),
+        [SORT_TYPES.myIlos.value]: useMyIlos({ user: address }),
     };
 
     const theme = useContext(ThemeContext);
     const [selectedSortType, setSelectedSortType] = useState(SORT_TYPES.hot.value);
-
-    console.log("selected", selectedSortType);
 
     return (
         <Layout style={{ maxWidth: 1090 }}>
@@ -148,16 +122,19 @@ export const ILOList = () => {
                             {
                                listItems[selectedSortType].isLoading &&
                                     <>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
-                                        <Skeleton style={{ margin: `0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}` }} height={CONTAINER_SIZING.small} width={CONTAINER_SIZING.small}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton style={DUMMY_CARD_STYLE}/>
                                     </>
                             }
+
+                            <div style={DUMMY_CARD_STYLE}/>
+                            <div style={DUMMY_CARD_STYLE}/>
+                            <div style={DUMMY_CARD_STYLE}/>
+                            <div style={DUMMY_CARD_STYLE}/>
                         </div>
                     </InfiniteFooterScroll>
                 </div>
