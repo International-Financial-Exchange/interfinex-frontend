@@ -388,6 +388,7 @@ import { TabNav } from "../../core/TabNav";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { useDocument, useWindow } from "../../../utils/hooks";
 import { CircleNav } from "./CircleNav";
+import { humanizeTokenAmount } from "../../../utils/utils";
 
 const ConnectWallet = props => {
     const document = useDocument();
@@ -488,7 +489,7 @@ export const AppNavBar = props => {
                         >
                             <AccountQuickInfoCard padding>
                                 <Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {ethers.utils.formatEther(signerTokenBalance || 0)} ETH
+                                    {humanizeTokenAmount(signerTokenBalance || 0, { decimals: 18 }).toFixed(4)} ETH
                                 </Text>
                             </AccountQuickInfoCard>
                             
