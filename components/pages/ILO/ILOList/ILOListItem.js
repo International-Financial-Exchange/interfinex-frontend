@@ -50,6 +50,10 @@ const StyledCardButton = styled(CardButton)`
     margin: 0 ${PIXEL_SIZING.small} ${PIXEL_SIZING.large} ${PIXEL_SIZING.small}; 
     width: ${CONTAINER_SIZING.small}; 
     height: ${CONTAINER_SIZING.small}; 
+
+    @media (max-width: 570px) {
+        width: 100%;
+    }
 `;
 
 export const ILOListItem = ({ ilo }) => {
@@ -63,7 +67,7 @@ export const ILOListItem = ({ ilo }) => {
                 query: { iloJson: JSON.stringify(ilo) },
             }}
         >
-            <StyledCardButton>
+            <StyledCardButton className={"ilo-list-item"}>
                 <Container>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.medium }}>
                         <StatusIndicator

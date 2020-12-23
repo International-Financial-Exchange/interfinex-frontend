@@ -68,7 +68,7 @@ export const FixedPriceInput = forwardRef((props, ref) => {
 
     return (
         <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
+            <div className={"create-ilo-split-grid"} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Amount of ETH to raise</Text>
                     <TokenAmountInput
@@ -102,7 +102,7 @@ export const FixedPriceInput = forwardRef((props, ref) => {
                 </TokenAndLogo>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
+            <div className={"create-ilo-split-grid"} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Start Date</Text>
                     <DateTimeInput

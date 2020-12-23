@@ -18,6 +18,25 @@ const Container = styled(Card)`
     padding: ${PIXEL_SIZING.medium};
     display: grid;
     row-gap: ${PIXEL_SIZING.medium};
+
+    @media (max-width: 1180px) {
+        #price-per-token {
+            margin-top: ${PIXEL_SIZING.small};
+        }
+    }
+
+    .additional-details {
+        display: grid; 
+        grid-template-columns: auto 1fr; 
+        column-gap: ${PIXEL_SIZING.larger};
+        white-space: nowrap;
+
+        @media (max-width: 1180px) {
+            column-gap: 0;
+            grid-template-columns: 1fr;
+            row-gap: ${PIXEL_SIZING.small};
+        }
+    }
 `;
 
 export const ILODetails = () => {
@@ -71,8 +90,8 @@ export const ILODetails = () => {
                             {description}
                         </Text>
 
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.tiny }}>
+                        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "auto auto 1fr", alignItems: "center", columnGap: PIXEL_SIZING.tiny, marginRight: PIXEL_SIZING.large }}>
                                 <TokenAndLogo token={ETHEREUM_TOKEN}>
                                     <Text>1 {ETHEREUM_TOKEN.symbol}</Text>
                                 </TokenAndLogo>
@@ -80,16 +99,13 @@ export const ILODetails = () => {
                                 <Text>{humanizeTokenAmount(Number.isNaN(tokensPerEth) ? 0 : tokensPerEth, assetToken).toFixed(6)} {assetToken.symbol}</Text>
                             </div>
 
-                            <div style={{ display: "flex", marginLeft: PIXEL_SIZING.large }}>
+                            <div id={"price-per-token"} style={{ display: "flex", }}>
                                 <Text style={{ marginRight: PIXEL_SIZING.tiny }}>Price per Token:</Text>
                                 <Text>{(1 / humanizeTokenAmount(tokensPerEth, assetToken)).toFixed(6)} ETH</Text>
                             </div>
                         </div>
 
-                        <div style={{ marginTop: PIXEL_SIZING.medium }}>
-                            <Text bold style={{ textAlign: "center" }}>ILO Progress</Text>
-                            <IloProgressBar ilo={ilo}/>
-                        </div>
+                        <IloProgressBar ilo={ilo}/>
 
                         <TextButton 
                             style={{ justifySelf: "right" }}
@@ -141,7 +157,7 @@ const DutchAuctionAdditionalDetails = props => {
     } = ilo || {};
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.larger, }}>
+        <div className={"additional-details"}>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, alignItems: "center" }}>
                 <Text secondary>Start Date</Text>
                 <Text>{new Date(startDate * 1000).toLocaleString()}</Text>
@@ -186,7 +202,7 @@ const FixedPriceAdditionalDetails = props => {
     } = ilo || {};
 
     return (
-        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.larger, }}>
+        <div className={"additional-details"}>
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, alignItems: "center" }}>
                 <Text secondary>Start Date</Text>
                 <Text>{new Date(startDate * 1000).toLocaleString()}</Text>

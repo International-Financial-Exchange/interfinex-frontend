@@ -178,8 +178,10 @@ export const AddButton = ({ children, ...props }) => {
     const childRef = useRef();
     const [width, setWidth] = useState(0);
     const [isLoaded, setIsLoaded] = useState();
-
+    const [isMobileView, setIsMobileView] = useState();
+    
     useLayoutEffect(() => {
+        setIsMobileView(window.innerWidth < 600);
         setWidth(childRef.current.getBoundingClientRect().width);
     });
 
@@ -191,12 +193,12 @@ export const AddButton = ({ children, ...props }) => {
             style={{ 
                 borderRadius: 1000, 
                 width: "fit-content", 
-                padding: PIXEL_SIZING.small, 
+                padding: 0,
                 ...props.style, 
             }}
         >
-            <div style={{ width, transition: "width 0.17s ease-out", }}>
-                <div style={{ display: "flex", width: "fit-content" }} ref={childRef}>
+            <div style={{ width: isMobileView ? "fit-content" : width, transition: "width 0.17s ease-out", }}>
+                <div style={{ display: "flex", width: "fit-content", padding: PIXEL_SIZING.small }} ref={childRef}>
                     <img
                         onLoad={() => setIsLoaded(true)}
                         src={"/plus.svg"}
@@ -208,8 +210,8 @@ export const AddButton = ({ children, ...props }) => {
                     />
 
                     {
-                        isHovered &&
-                            <div style={{ marginLeft: PIXEL_SIZING.small, alignSelf: "center", whiteSpace: "nowrap", marginRight: "4px" }}>
+                        (isHovered || isMobileView) &&
+                            <div style={{ marginLeft: PIXEL_SIZING.small, alignSelf: "center", whiteSpace: "nowrap", }}>
                                 {children}
                             </div>
                     }

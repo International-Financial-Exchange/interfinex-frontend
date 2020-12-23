@@ -20,6 +20,12 @@ const StyledTable = styled.table`
             display:none;
         }
     }
+
+    @media (max-width: 820px) {
+        th:nth-child(3), td:nth-child(3) {
+            display:none;
+        }
+    }
 `;
 
 const Row = styled.tr`
@@ -61,6 +67,8 @@ const Container = styled(Card)`
     display: grid;
     grid-template-rows: auto 1fr;
     overflow: auto;
+
+
 `;
 
 export const ILOHistory = () => {

@@ -68,7 +68,7 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
 
     return (
         <>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
+            <div className={"create-ilo-split-grid"} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Starting Price (ETH per {assetToken.symbol})</Text>
                     <TokenAmountInput
@@ -107,7 +107,7 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
                 />
             </InputAndLabel>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
+            <div className={"create-ilo-split-grid"} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", columnGap: PIXEL_SIZING.medium }}>
                 <InputAndLabel>
                     <Text>Start Date</Text>
                     <DateTimeInput

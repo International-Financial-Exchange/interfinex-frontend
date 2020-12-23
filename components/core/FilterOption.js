@@ -13,6 +13,7 @@ const Container = styled.div`
     align-items: center;
     margin-right: ${PIXEL_SIZING.medium};
     font-weight: ${({ selected }) => selected ? "bold" : ""};
+    white-space: nowrap;
 
     .filter-icon {
         path {

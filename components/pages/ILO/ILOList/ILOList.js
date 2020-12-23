@@ -22,6 +22,12 @@ const Container = styled.div`
     display: grid;
     height: fit-content;
     row-gap: ${PIXEL_SIZING.large};
+
+    @media (max-width: 600px) {
+        .placeholder-div {
+            display: none;
+        }
+    }
 `;
 
 const TitleContainer = styled.div`
@@ -73,7 +79,7 @@ export const ILOList = () => {
     const { getMoreItems, gotAllItems, isLoading, list } = listItems[selectedSortType];
 
     return (
-        <Layout style={{ maxWidth: 1090 }}>
+        <Layout style={{ maxWidth: 1080 }}>
             <Container>
                 <TitleContainer>
                     <Text primary bold>Initial Liquidity Offerings</Text>
@@ -105,7 +111,7 @@ export const ILOList = () => {
                         <div 
                             style={{ 
                                 display: "flex", 
-                                justifyContent: "space-between",
+                                justifyContent: "space-around",
                                 width: "100%",
                                 flexWrap: "wrap",
                             }}
@@ -123,6 +129,7 @@ export const ILOList = () => {
                                 list.length === 0 && !isLoading &&
                                     <Text 
                                         className={"center-absolute"} 
+                                        style={{ top: PIXEL_SIZING.larger, textAlign: "center", whiteSpace: "nowrap" }}
                                         secondary
                                     >
                                         {
@@ -140,16 +147,16 @@ export const ILOList = () => {
                                         <Skeleton style={DUMMY_CARD_STYLE}/>
                                         <Skeleton style={DUMMY_CARD_STYLE}/>
                                         <Skeleton style={DUMMY_CARD_STYLE}/>
-                                        <Skeleton style={DUMMY_CARD_STYLE}/>
-                                        <Skeleton style={DUMMY_CARD_STYLE}/>
-                                        <Skeleton style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
+                                        <Skeleton className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
                                     </>
                             }
 
-                            <div style={DUMMY_CARD_STYLE}/>
-                            <div style={DUMMY_CARD_STYLE}/>
-                            <div style={DUMMY_CARD_STYLE}/>
-                            <div style={DUMMY_CARD_STYLE}/>
+                            <div className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
+                            <div className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
+                            <div className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
+                            <div className={"placeholder-div"} style={DUMMY_CARD_STYLE}/>
                         </div>
                     </InfiniteFooterScroll>
                 </div>

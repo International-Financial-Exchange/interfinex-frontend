@@ -27,6 +27,15 @@ const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
     display: grid;
     row-gap: ${PIXEL_SIZING.large};
+    max-width: ${CONTAINER_SIZING.large}; 
+    width: 100%;
+
+    @media (max-width: 600px) {
+        .create-ilo-split-grid {
+            grid-template-columns: 1fr !important;
+            row-gap: ${PIXEL_SIZING.medium};
+        }
+    }
 `;
 
 const TitleContainer = styled.div`
@@ -100,7 +109,7 @@ export const CreateILO = () => {
                         <Text primary bold>Create an Initial Liquidity Offering</Text>
                     </TitleContainer>
 
-                    <Card style={{ width: CONTAINER_SIZING.large, padding: PIXEL_SIZING.large }}>
+                    <Card style={{ padding: PIXEL_SIZING.large }}>
                         <div style={{ display: "grid", rowGap: PIXEL_SIZING.large }}>
                             <div style={{ display: "grid", rowGap: PIXEL_SIZING.large,}}>
                                 <InputAndLabel>

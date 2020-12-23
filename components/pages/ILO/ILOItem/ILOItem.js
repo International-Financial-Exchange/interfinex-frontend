@@ -23,7 +23,11 @@ const TitleContainer = styled.div`
     margin-top: ${PIXEL_SIZING.medium};
     grid-column: 1/3;
 
-    @media (max-width: 600px) {
+    @media (max-width: 800px) {
+        grid-column: 1;
+    }
+
+    @media (max-width: 800px) {
         grid-template-columns: 1fr;
         row-gap: ${PIXEL_SIZING.medium};
 
@@ -41,6 +45,10 @@ const Container = styled.div`
     row-gap: ${PIXEL_SIZING.large};
     grid-template-columns: 1fr auto;
     column-gap: ${PIXEL_SIZING.large};
+
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr !important;
+    }
 `;
 
 export const IloContext = createContext();
