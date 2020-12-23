@@ -59,7 +59,6 @@ const DUMMY_CARD_STYLE = {
 
 export const ILOList = () => {
     const { address } = useContext(AccountContext);
-    console.log("address", address);
     const listItems = {
         [SORT_TYPES.hot.value]: useIloList({ sortType: SORT_TYPES.hot.value }),
         [SORT_TYPES.new.value]: useIloList({ sortType: SORT_TYPES.new.value }),
@@ -70,6 +69,8 @@ export const ILOList = () => {
 
     const theme = useContext(ThemeContext);
     const [selectedSortType, setSelectedSortType] = useState(SORT_TYPES.hot.value);
+
+    const { getMoreItems, gotAllItems, isLoading, list } = listItems[selectedSortType];
 
     return (
         <Layout style={{ maxWidth: 1090 }}>
@@ -96,10 +97,10 @@ export const ILOList = () => {
                     }
                 </div>
 
-                <div>
+                <div style={{ position: "relative" }}>
                     <InfiniteFooterScroll
-                        loadMore={listItems[selectedSortType].getMoreItems}
-                        hasMore={!listItems[selectedSortType].gotAllItems}
+                        loadMore={getMoreItems}
+                        hasMore={!gotAllItems}
                     >  
                         <div 
                             style={{ 
@@ -110,7 +111,7 @@ export const ILOList = () => {
                             }}
                         >
                             {
-                                listItems[selectedSortType].list.map(ilo =>
+                                list.map(ilo =>
                                     <ILOListItem
                                         key={ilo.contractAddress}
                                         ilo={ilo}
@@ -118,9 +119,23 @@ export const ILOList = () => {
                                 )
                             }
 
+                            {
+                                list.length === 0 && !isLoading &&
+                                    <Text 
+                                        className={"center-absolute"} 
+                                        secondary
+                                    >
+                                        {
+                                            selectedSortType === SORT_TYPES.myIlos.value && !address ?
+                                                "Connect your wallet to view your ILOs"
+                                                : "No ILOs to show"
+                                        }
+                                    </Text>
+                            }
+
 
                             {
-                               listItems[selectedSortType].isLoading &&
+                               isLoading &&
                                     <>
                                         <Skeleton style={DUMMY_CARD_STYLE}/>
                                         <Skeleton style={DUMMY_CARD_STYLE}/>
