@@ -34,7 +34,7 @@ const Container = styled.div`
 export const ContentAndArrow = ({ children, ...props }) => {
     return (
         <Container {...props}>
-            <div style={{ marginRight: PIXEL_SIZING.larger }}>
+            <div style={{ marginRight: PIXEL_SIZING.medium }}>
                 { children }
             </div>
 

@@ -220,13 +220,13 @@ export const TokenSelectMenu = ({ onChange, type, onClose }) => {
                                     }}
                                     style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", }}
                                 >
-                                    <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.small, alignItems: "center", }}>
                                         <img
                                             loading="lazy"
                                             style={{ height: PIXEL_SIZING.medium }}
                                             src={logoURI}
                                         />
-                                        <Text primary style={{ textOverflow: "ellipsis", width: "70%", overflow: "hidden" }}>
+                                        <Text primary style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
                                             {name}
                                         </Text>
                                     </div>
