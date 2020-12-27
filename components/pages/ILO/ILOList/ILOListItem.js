@@ -23,9 +23,14 @@ export const ILO_STATUS = {
     ended: "ENDED",
 };
 
-export const StatusIndicator = ({ status }) => {
+export const StatusIndicator = ({ ilo }) => {
     const theme = useContext(ThemeContext);
-    const color = status === ILO_STATUS.live ? theme.colors.positive : theme.colors.textSecondary;
+
+    const { hasEnded, endDate } = ilo || {};
+    const isClosed = hasEnded || Date.now() > endDate * 1000;
+
+    const color = isClosed ? theme.colors.textSecondary : theme.colors.positive;
+
     return (
         <div style={{ display: "flex", alignItems: "center" }}>
             <div 
@@ -39,7 +44,7 @@ export const StatusIndicator = ({ status }) => {
             />
 
             <div style={{ color }}>
-                {status === ILO_STATUS.live ? "Live" : "Closed"}
+                {isClosed ? "Closed" : "Live"}
             </div>
         </div>
     )
@@ -70,9 +75,7 @@ export const ILOListItem = ({ ilo }) => {
             <StyledCardButton className={"ilo-list-item"}>
                 <Container>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.medium }}>
-                        <StatusIndicator
-                            status={hasEnded ? ILO_STATUS.ended : ILO_STATUS.live}
-                        />
+                        <StatusIndicator ilo={ilo}/>
                                    
                         <StyledCountdown
                             date={hasEnded ? 0 : new Date(endDate * 1000)}

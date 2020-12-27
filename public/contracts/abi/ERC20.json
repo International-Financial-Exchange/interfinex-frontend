@@ -264,6 +264,58 @@
     "gas": 1421
   },
   {
+    "name": "NAME",
+    "outputs": [
+      {
+        "type": "string",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 7853
+  },
+  {
+    "name": "Name",
+    "outputs": [
+      {
+        "type": "string",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 7883
+  },
+  {
+    "name": "DECIMALS",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1511
+  },
+  {
+    "name": "Decimals",
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": ""
+      }
+    ],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 1541
+  },
+  {
     "name": "balanceOf",
     "outputs": [
       {
@@ -279,7 +331,7 @@
     ],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1666
+    "gas": 1786
   },
   {
     "name": "total_supply",
@@ -292,7 +344,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1481
+    "gas": 1601
   },
   {
     "name": "minter",
@@ -305,7 +357,7 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1511
+    "gas": 1631
   },
   {
     "name": "mintable",
@@ -318,6 +370,6 @@
     "inputs": [],
     "stateMutability": "view",
     "type": "function",
-    "gas": 1541
+    "gas": 1661
   }
 ]

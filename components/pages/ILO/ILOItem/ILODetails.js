@@ -75,9 +75,7 @@ export const ILODetails = () => {
                 :
                     <>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
-                            <StatusIndicator
-                                status={hasEnded ? ILO_STATUS.ended : ILO_STATUS.live}
-                            />
+                            <StatusIndicator ilo={ilo}/>
 
                             <div style={{ display: "flex" }}>
                                 <Text style={{ marginRight: PIXEL_SIZING.small }}>{ILO_TYPE_NAMES[type]}</Text>
