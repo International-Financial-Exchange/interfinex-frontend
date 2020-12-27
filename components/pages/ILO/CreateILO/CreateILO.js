@@ -22,6 +22,7 @@ import { FixedPriceInput } from "./FixedPriceInput";
 import { xor } from "lodash";
 import { SubmitContext, useContractApproval } from "../../../../utils/hooks";
 import { DutchAuctionInput } from "./DutchAuctionInput";
+import { parseTokenAmount } from "../../../../utils/utils";
 
 const Container = styled.div`
     margin-top: ${PIXEL_SIZING.large};
@@ -76,7 +77,7 @@ export const CreateILO = () => {
     const [description, setDescription] = useState();
     const [iloType, setIloType] = useState(ILO_TYPES.fixedPrice);
     const [softCap, setSoftCap] = useState();
-    const [percentageOfLiquidityToLock, setPercentageOfLiquidityToLock] = useState();
+    const [percentageOfLiquidityToLock, setPercentageOfLiquidityToLock] = useState(0);
     const [liquidityUnlockDate, setLiquidityUnlockDate] = useState(new Date(Date.now() + TIMEFRAMES["1d"] * 3));
     const [isSubmitted, setIsSubmitted] = useState();
 
@@ -91,7 +92,7 @@ export const CreateILO = () => {
                 {
                     name, 
                     description,
-                    percentageOfLiquidityToLock,
+                    percentageOfLiquidityToLock: parseTokenAmount(percentageOfLiquidityToLock / 100, { decimals: 18 }),
                     liquidityUnlockDate,
                     softCap,
                 }

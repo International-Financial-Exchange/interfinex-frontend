@@ -126,48 +126,88 @@
     "kovan": {
         "TemplateDividendERC20": {
             "name": "TemplateDividendERC20",
-            "address": "0xE8F7d98bE6722d42F29b50500B0E318EF2be4fc8",
+            "address": "0x6D712CB50297b97b79dE784d10F487C00d7f8c2C",
             "artifactName": "DividendERC20"
         },
         "IfexToken": {
             "name": "IfexToken",
-            "address": "0x70bDA08DBe07363968e9EE53d899dFE48560605B",
+            "address": "0x04F339eC4D75Cf2833069e6e61b60eF56461CD7C",
             "artifactName": "DividendERC20"
         },
         "WrappedEther": {
             "name": "WrappedEther",
-            "address": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+            "address": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
             "artifactName": "WrappedEther"
         },
         "TemplateSwapExchange": {
             "name": "TemplateSwapExchange",
-            "address": "0xe38b6847E611e942E6c80eD89aE867F522402e80",
+            "address": "0x89372b32b8AF3F1272e2efb3088616318D2834cA",
             "artifactName": "SwapExchange"
         },
         "SwapFactory": {
             "name": "SwapFactory",
-            "address": "0x2c8ED11fd7A058096F2e5828799c68BE88744E2F",
+            "address": "0xB1c05b498Cb58568B2470369FEB98B00702063dA",
             "artifactName": "SwapFactory"
         },
         "SwapEthRouter": {
             "name": "SwapEthRouter",
-            "address": "0x75c68e69775fA3E9DD38eA32E554f6BF259C1135",
+            "address": "0x2f8D338360D095a72680A943A22fE6a0d398a0B4",
             "artifactName": "SwapEthRouter"
         },
         "templateMarginMarket": {
             "name": "templateMarginMarket",
-            "address": "0x975Ab64F4901Af5f0C96636deA0b9de3419D0c2F",
+            "address": "0x44863F234b137A395e5c98359d16057A9A1fAc55",
             "artifactName": "MarginMarket"
         },
         "MarginFactory": {
             "name": "MarginFactory",
-            "address": "0x4593ed9CbE6003e687e5e77368534bb04b162503",
+            "address": "0x0c03eCB91Cb50835e560a7D52190EB1a5ffba797",
             "artifactName": "MarginFactory"
         },
         "MarginEthRouter": {
             "name": "MarginEthRouter",
-            "address": "0x8ac87219a0F5639BC01b470F87BA2b26356CB2B9",
+            "address": "0xb04CB6c52E73CF3e2753776030CE85a36549c9C2",
             "artifactName": "MarginEthRouter"
+        },
+        "Token0": {
+            "name": "Token0",
+            "address": "0x696358bBb1a743052E0E87BeD78AAd9d18f0e1F4",
+            "artifactName": "ERC20"
+        },
+        "Token1": {
+            "name": "Token1",
+            "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
+            "artifactName": "ERC20"
+        },
+        "Token2": {
+            "name": "Token2",
+            "address": "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
+            "artifactName": "ERC20"
+        },
+        "Token3": {
+            "name": "Token3",
+            "address": "0x0724F18B2aA7D6413D3fDcF6c0c27458a8170Dd9",
+            "artifactName": "ERC20"
+        },
+        "TemplateFixedPriceILO": {
+            "name": "TemplateFixedPriceILO",
+            "address": "0x6F9679BdF5F180a139d01c598839a5df4860431b",
+            "artifactName": "FixedPriceILO"
+        },
+        "TemplateDutchAuctionILO": {
+            "name": "TemplateDutchAuctionILO",
+            "address": "0xf4AE7E15B1012edceD8103510eeB560a9343AFd3",
+            "artifactName": "DutchAuctionILO"
+        },
+        "ILOFactory": {
+            "name": "ILOFactory",
+            "address": "0x0bF7dE8d71820840063D4B8653Fd3F0618986faF",
+            "artifactName": "ILOFactory"
+        },
+        "YieldFarm": {
+            "name": "YieldFarm",
+            "address": "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
+            "artifactName": "YieldFarm"
         }
     },
     "mainnet": {

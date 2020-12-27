@@ -89,7 +89,11 @@ export const ILOItem = () => {
                     </div>
 
                     <div style={{ display: "grid", rowGap: PIXEL_SIZING.large, height: "fit-content", width: CONTAINER_SIZING.medium }}>
-                        <ILOInvestPortal/>
+                        {
+                            !hasEnded &&
+                                <ILOInvestPortal/>
+                        }
+                        
                         <YourILOInvestment/>
 
                         {

@@ -38,7 +38,7 @@ export const YourILOInvestment = () => {
         try {
             await addTransactionNotification({
                 content: `Withdraw from ILO`,
-                transactionPromise: ILOContract.withdraw()
+                transactionPromise: ILOContract.withdraw({ gasLimit: 350_000 }),
             });
         } finally {
             setIsSubmitLoading(false);

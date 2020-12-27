@@ -10,7 +10,7 @@ import { getIloCurrentTokensPerEth, IloProgressBar, ILO_TYPES, ILO_TYPE_NAMES } 
 import Skeleton from "react-loading-skeleton";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { EthersContext } from "../../../../context/Ethers";
-import { humanizeTokenAmount } from "../../../../utils/utils";
+import { humanizeMultiplier, humanizeTokenAmount } from "../../../../utils/utils";
 import { TextButton } from "../../../core/Button";
 
 const Container = styled(Card)`
@@ -57,9 +57,6 @@ export const ILODetails = () => {
         assetToken,
         contractAddress 
     } = ilo || {};
-
-
-    console.log(ilo);
     
     const tokensPerEth = getIloCurrentTokensPerEth(ilo || {});
 
@@ -164,7 +161,7 @@ const DutchAuctionAdditionalDetails = props => {
                 <Text>1 ETH = {humanizeTokenAmount(additionalDetails.startTokensPerEth, assetToken)} {assetToken.symbol}</Text>
 
                 <Text secondary>Liquidity Lock Amount</Text>                
-                <Text style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</Text>
+                <Text style={{ color: theme.colors.positive }}>{humanizeMultiplier(percentageToLock).toFixed(2)}%</Text>
 
                 <Text secondary>Total Tokens for Sale</Text>
                 <Text>{humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
@@ -206,7 +203,7 @@ const FixedPriceAdditionalDetails = props => {
                 <Text>{new Date(startDate * 1000).toLocaleString()}</Text>
 
                 <Text secondary>Liquidity Lock Amount</Text>                
-                <Text style={{ color: theme.colors.positive }}>{percentageToLock.toFixed(2)}%</Text>
+                <Text style={{ color: theme.colors.positive }}>{humanizeMultiplier(percentageToLock).toFixed(2)}%</Text>
 
                 <Text secondary style={{ marginRight: PIXEL_SIZING.small }}>Soft Cap</Text>
                 <Text>{(additionalDetails.softCap / additionalDetails.tokensPerEth).toFixed(6)} ETH</Text>

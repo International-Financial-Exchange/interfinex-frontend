@@ -78,6 +78,8 @@ export const ILOList = () => {
 
     const { getMoreItems, gotAllItems, isLoading, list } = listItems[selectedSortType];
 
+    console.log("list", list);
+
     return (
         <Layout style={{ maxWidth: 1080 }}>
             <Container>

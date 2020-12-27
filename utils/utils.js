@@ -54,4 +54,9 @@ export const parseTokenAmount = (amount, token) => {
 
 export const safeParseEther = amount => parseEther(parseFloat(amount).toFixed(18));
 
-export const humanizeTokenAmount = (amount, token) => parseFloat(ethers.utils.formatUnits(amount.toString(), token.decimals));
+export const humanizeTokenAmount = (amount, token) => {
+    const safeAmount = amount.toLocaleString("en-US", { useGrouping: false });
+    return parseFloat(ethers.utils.formatUnits(safeAmount.toString(), token.decimals));
+};
+
+export const humanizeMultiplier = amount => parseFloat(ethers.utils.formatUnits(amount.toString(), 18));

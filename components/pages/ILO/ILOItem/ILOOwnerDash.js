@@ -5,6 +5,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
+import { humanizeTokenAmount } from "../../../../utils/utils";
 import { Button } from "../../../core/Button";
 import { Card } from "../../../core/Card";
 import { InfoBubble } from "../../../core/InfoBubble";
@@ -35,17 +36,19 @@ export const ILOOwnerDash = () => {
         assetToken,
         hasEnded,
         ethInvested,
-        percentageToLock,
+        percentageToLock: rawPercentageToLock,
         liquidityUnlockDate,
         hasCreatorWithdrawn,
     } = ilo || {};
+
+    const percentageToLock = rawPercentageToLock && humanizeTokenAmount(rawPercentageToLock.toString(), { decimals: 18 });
 
     const withdrawEth = async () => {
         setIsWithdrawEthLoading(true);
         try {
             await addTransactionNotification({
                 content: `Owner withdraw ETH from ILO`,
-                transactionPromise: ILOContract.ownerWithdrawFunds(address)
+                transactionPromise: ILOContract.ownerWithdrawFunds(address, { gasLimit: 300_000 })
             });
         } finally {
             setIsWithdrawEthLoading(false);
@@ -57,14 +60,14 @@ export const ILOOwnerDash = () => {
         try {
             await addTransactionNotification({
                 content: `Owner withdraw ETH:${assetToken.symbol} swap pool liquidity from ILO`,
-                transactionPromise: ILOContract.ownerWithdrawLiquidity(address)
+                transactionPromise: ILOContract.ownerWithdrawLiquidity(address, { gasLimit: 300_000 })
             });
         } finally {
             setIsWithdrawLiquidityLoading(false);
         }
     };
 
-    const raisedEthAvailable = hasCreatorWithdrawn ? 0 : ethInvested;
+    const raisedEthAvailable = hasCreatorWithdrawn ? 0 : ethInvested * (1 - percentageToLock);
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
@@ -105,7 +108,7 @@ export const ILOOwnerDash = () => {
                                 {
                                     isLoading ?
                                         <Skeleton width={CONTAINER_SIZING.miniscule}/>
-                                        : <Text style={{ color: theme.colors.positive }} secondary bold>{percentageToLock.toFixed(4)}%</Text>
+                                        : <Text style={{ color: theme.colors.positive }} secondary bold>{(percentageToLock * 100).toFixed(4)}%</Text>
                                 }
                             </div>
         

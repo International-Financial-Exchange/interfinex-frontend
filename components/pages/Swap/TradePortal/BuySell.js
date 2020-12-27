@@ -240,8 +240,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
                                         inputToOutputAmount(baseTokenBalance * 0.95, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                         : assetTokenBalance
 
-
-
                                 setAssetTokenAmount(maxAssetAmount);
                             }}
                         >

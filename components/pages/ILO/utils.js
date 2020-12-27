@@ -1,8 +1,9 @@
+import { BigNumber } from "ethers";
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 import { EthersContext } from "../../../context/Ethers";
-import { PIXEL_SIZING } from "../../../utils/constants";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { MULTIPLIER, PIXEL_SIZING } from "../../../utils/constants";
+import { humanizeMultiplier, humanizeTokenAmount } from "../../../utils/utils";
 import { ProgressBar } from "../../core/ProgressBar";
 import Text from "../../core/Text";
 
@@ -24,12 +25,9 @@ export const ILO_ABI_NAMES = {
 export const getIloEthHardcap = ilo => {
     switch (ilo.type) {
         case ILO_TYPES.fixedPrice:
-            return ilo.assetTokenAmount / ilo.additionalDetails.tokensPerEth;
+            console.log("hardcap", BigNumber.from(ilo.assetTokenAmount).mul(MULTIPLIER).div(BigNumber.from(ilo.additionalDetails.tokensPerEth)).toString());
+            return humanizeMultiplier(BigNumber.from(ilo.assetTokenAmount).mul(MULTIPLIER).div(BigNumber.from(ilo.additionalDetails.tokensPerEth)));
         case ILO_TYPES.dutchAuction:
-            console.log("price", ((ilo.assetTokenAmount - ilo.additionalDetails.totalAssetTokensBought) / getIloCurrentTokensPerEth(ilo)))
-            console.log(ilo.ethInvested);
-            console.log(ilo.assetTokenAmount)
-            console.log(ilo.assetTokensBought);
             return ilo.ethInvested + ((ilo.assetTokenAmount - ilo.additionalDetails.totalAssetTokensBought) / getIloCurrentTokensPerEth(ilo));
         default:
             console.warn(`Unsupported ILO type: [${ilo.type}]`);

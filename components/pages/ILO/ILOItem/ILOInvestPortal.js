@@ -42,7 +42,10 @@ export const ILOInvestPortal = props => {
         liquidityUnlockDate,
     } = ilo || {};
 
+    console.log("before", ilo);
     const tokensPerEth = humanizeTokenAmount(getIloCurrentTokensPerEth(ilo || {}), assetToken || {});
+
+    console.log("after", ilo);
     const ethHardcap = getIloEthHardcap(ilo || {});
 
     const onSubmit = async () => {
