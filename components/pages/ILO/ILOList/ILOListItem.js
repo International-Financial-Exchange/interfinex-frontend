@@ -73,7 +73,16 @@ export const ILOListItem = ({ ilo }) => {
             }}
         >
             <StyledCardButton className={"ilo-list-item"}>
-                <Container>
+                <div 
+                    style={{
+                        display: "grid",
+                        rowGap: PIXEL_SIZING.medium,
+                        gridTemplateRows: "auto 1fr auto",
+                        wordWrap: "break-word",
+                        wordBreak: "break-word",
+                        overflow: "hidden",
+                    }}
+                >
                     <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.medium }}>
                         <StatusIndicator ilo={ilo}/>
                                    
@@ -99,7 +108,7 @@ export const ILOListItem = ({ ilo }) => {
                     </div>
 
                     <IloProgressBar secondary ilo={ilo}/>
-                </Container>
+                </div>
             </StyledCardButton>
         </Link>
     );
