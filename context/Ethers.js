@@ -34,12 +34,12 @@ export const EthersContext = createContext();
 
 export const EthersProvider = ({ children }) => {
     // const [provider, setProvider] = useState(new ethers.getDefaultProvider("http://localhost:7545"));
-    const [provider, setProvider] = useState(new ethers.providers.InfuraWebSocketProvider("kovan", "f6a09cc8f51c45d2bd74137004115dbf"));
+    const [provider, setProvider] = useState(new ethers.providers.InfuraWebSocketProvider("homestead", "f6a09cc8f51c45d2bd74137004115dbf"));
     const [signer, setSigner] = useState();
-    const [networkInfo, setNetworkInfo] = useState({ name: "kovan" });
+    const [networkInfo, setNetworkInfo] = useState({ name: "mainnet" });
     const [blockNumber, setBlockNumber] = useState();
 
-    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["kovan"];
+    const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["mainnet"];
     const getAbi = abiName => ABI[abiName];
 
     const { 

@@ -275,6 +275,21 @@
             "name": "CommunityVault",
             "address": "0x4cFfb1e77c2EAc1E6F4697bB433cCA9Edac7Eed7",
             "artifactName": "Vault"
+        },
+        "TemplateFixedPriceILO": {
+            "name": "TemplateFixedPriceILO",
+            "address": "0x72b6D651fF2E8DcE69d8eAf498c7ec9E96243721",
+            "artifactName": "FixedPriceILO"
+        },
+        "TemplateDutchAuctionILO": {
+            "name": "TemplateDutchAuctionILO",
+            "address": "0x1988aD9023869a1A8c0Ab943b028519c11B2321f",
+            "artifactName": "DutchAuctionILO"
+        },
+        "ILOFactory": {
+            "name": "ILOFactory",
+            "address": "0x6413F17D3B09EE7Ce7efF4F3F5E1E4e8f833c53f",
+            "artifactName": "ILOFactory"
         }
     },
     "localhost": {
