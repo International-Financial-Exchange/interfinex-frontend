@@ -216,10 +216,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
             setIsLoading(false);
         }
     };
-
-    console.log("actual balance", assetTokenBalance);
-    console.log("calc balance", assetTokenAmount);
-
+    
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu

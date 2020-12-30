@@ -74,7 +74,8 @@ export const FundingDepositPortal = () => {
             if (selectedToken.name === "Ethereum") {
                 await approveMarginRouter(liquidityToken);
     
-                const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
+                const liquidityTokenAmount = liquidityToken.totalSupply.mul(tokenAmount).div(totalValue);
+                console.log("withdrawing", liquidityTokenAmount);
                 await addTransactionNotification({
                     content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,
                     transactionPromise: MarginEthRouter.withdraw(
@@ -85,7 +86,8 @@ export const FundingDepositPortal = () => {
             } else {
                 await approveMarginMarket(liquidityToken);
     
-                const liquidityTokenAmount = (liquidityToken.totalSupply * tokenAmount) / totalValue;
+                const liquidityTokenAmount = liquidityToken.totalSupply.mul(tokenAmount).div(totalValue);
+                console.log("withdrawing", liquidityTokenAmount.toString());
                 await addTransactionNotification({
                     content: `Withdraw ${parseFloat(tokenAmount).toFixed(4)} ${selectedToken.symbol} from funding pool`,
                     transactionPromise: MarginMarket.withdraw(
@@ -129,7 +131,7 @@ export const FundingDepositPortal = () => {
                         </div>
             
                         <TokenAmountInput
-                            onChange={e => setTokenAmount(e.target.value)}
+                            onChange={num => setTokenAmount(num)}
                             value={tokenAmount}
                             token={selectedToken}
                         />
