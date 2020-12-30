@@ -5,6 +5,7 @@ import { TextButton } from "./Button";
 import { Input } from "./Input";
 import Text from "./Text";
 import { PIXEL_SIZING } from "../../utils/constants";
+import Big from 'big.js';
 
 export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
     const theme = useContext(ThemeContext);
@@ -33,6 +34,10 @@ export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
                     style={{ paddingRight: PIXEL_SIZING.huge }}
                     placeholder={"0.0"}
                     {...props}
+                    onChange={e => {
+                        const num = new Big(e.target.value || 0);
+                        props.onChange(num, e);
+                    }}
                 />
             </div>
 

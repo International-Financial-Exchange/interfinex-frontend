@@ -1,5 +1,6 @@
 import { ethers, BigNumber } from "ethers";
-import { parseEther } from "ethers/lib/utils";
+import { formatUnits, parseEther } from "ethers/lib/utils";
+import Big from 'big.js';
 
 export const sizingToInt = size => {
     return parseInt(size.slice(0, size.length - 2));
@@ -48,15 +49,27 @@ export const shade = (col, light)=> {
     return color(r, g, b);
 }
 
+export const appendDecimalZeroes = (num, decimals = 18) => {
+    const strNum = num.toString();
+    const decimalsStr = strNum.split(".")[1]?.slice(0, decimals) ?? "";
+    const requiredZeroes = new Array(decimals - decimalsStr.length).join("0");
+    const paddedNum = strNum.split(".")[0]?.concat(".").concat(decimalsStr.concat(requiredZeroes));
+    return paddedNum;
+};
+
+export const tokenAmountToBig = (amount, token) => new Big(formatUnits(amount, token.decimals));
+
 export const parseTokenAmount = (amount, token) => {
-    return ethers.utils.parseUnits(parseFloat(amount).toFixed(token.decimals), token.decimals).toString();
+    const parsedAmount = appendDecimalZeroes(amount, token.decimals);
+    return ethers.utils.parseUnits(parsedAmount, token.decimals).toString();
 };
 
 export const safeParseEther = amount => parseEther(parseFloat(amount).toFixed(18));
 
+// TODO: This should only be used for display purposes
 export const humanizeTokenAmount = (amount, token) => {
-    const safeAmount = amount.toLocaleString("en-US", { useGrouping: false });
-    return parseFloat(ethers.utils.formatUnits(safeAmount.toString(), token.decimals));
+    const strDecimalAmount = ethers.utils.formatUnits(amount, token.decimals);
+    return parseFloat(strDecimalAmount.substr(0, strDecimalAmount.indexOf('.') + 6));
 };
 
 export const humanizeMultiplier = amount => parseFloat(ethers.utils.formatUnits(amount.toString(), 18));

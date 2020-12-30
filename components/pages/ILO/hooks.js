@@ -106,16 +106,13 @@ export const useYourIloInvestment = ({ ILOContract, assetToken }) => {
 
     const updateInfo = async () => {
         setIsLoading(true);
-        console.log("updating");
-        console.log(ILOContract);
-        console.log(address)
+        
         await Promise.all([
             ILOContract.etherDeposited(address, { gasLimit: 1_000_000 }),
             ILOContract.balanceOf(address, { gasLimit: 1_000_000 }),
         ]).then(([etherDeposited, tokensBought]) => {
-            console.log("invested", etherDeposited, tokensBought)
-            setAccountEthInvested(humanizeTokenAmount(etherDeposited, { decimals: 18 }));
-            setAccountTokensBought(humanizeTokenAmount(tokensBought, assetToken));
+            setAccountEthInvested(etherDeposited);
+            setAccountTokensBought(tokensBought);
             setIsLoading(false);
         });
     };

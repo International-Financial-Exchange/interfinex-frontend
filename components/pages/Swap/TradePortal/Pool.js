@@ -41,6 +41,10 @@ export const Pool = () => {
     const [isDepositLoading, setIsDepositLoading] = useState(false);
     const theme = useContext(ThemeContext);
 
+    console.log(exchangeBaseTokenBalance.toString(),
+        exchangeAssetTokenBalance.toString(),);
+    console.log("price", baseTokenAmount.toString(), assetTokenAmount.toString());
+
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu
@@ -61,12 +65,12 @@ export const Pool = () => {
                         requiresWallet
                         style={{ marginRight: PIXEL_SIZING.tiny }}
                         onClick={() => {
-                            if (baseTokenBalance * price < assetTokenBalance) {
-                                setBaseTokenAmount(parseFloat(baseTokenBalance) * 0.95);
-                                setAssetTokenAmount((price * parseFloat(baseTokenBalance)) * 0.95);
+                            if (baseTokenBalance.mul(price).lt(assetTokenBalance)) {
+                                setBaseTokenAmount(baseTokenBalance);
+                                setAssetTokenAmount(price.mul(baseTokenBalance));
                             } else {
-                                setBaseTokenAmount((assetTokenBalance * 0.95) / price);
-                                setAssetTokenAmount(assetTokenBalance * 0.95);
+                                setBaseTokenAmount(assetTokenBalance.div(price));
+                                setAssetTokenAmount(assetTokenBalance);
                             }
                         }}
                     >
@@ -85,18 +89,18 @@ export const Pool = () => {
 
                 <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
                     <TokenAmountInput
-                        onChange={e => {
-                            setAssetTokenAmount(e.target.value);
-                            setBaseTokenAmount(e.target.value / price);
+                        onChange={num => {
+                            setAssetTokenAmount(num);                            
+                            setBaseTokenAmount(num.div(price));
                         }}
                         value={assetTokenAmount}
                         token={assetToken}
                     />
 
                     <TokenAmountInput
-                        onChange={e => {
-                            setBaseTokenAmount(e.target.value);
-                            setAssetTokenAmount(e.target.value * price);
+                        onChange={num => {
+                            setBaseTokenAmount(num);
+                            setAssetTokenAmount(num.mul(price));
                         }}
                         value={baseTokenAmount}
                         token={baseToken}

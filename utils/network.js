@@ -7,7 +7,7 @@ export const getRequest = (endpoint, params = {}, isJSON = true) => {
     );
 
     const url = `${SERVER_URL}${endpoint}?${urlParams}`;
-    console.log(url);
+    console.log("server", url);
 
     if (isJSON) 
         return fetch(url).then(res => res.json());

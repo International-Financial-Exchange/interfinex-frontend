@@ -23,14 +23,27 @@ import { MarginContext, SwapContext } from "../Swap";
 
 // I am paying 5 tokens, how much will i receive for them?
 export const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, feeRate) => {
-    const fee = parseFloat(inputAmount) * feeRate;
-    return ((parseFloat(inputAmount) - fee) * parseFloat(outputBalance)) / (parseFloat(inputBalance) + parseFloat(inputAmount) - fee)
+    if (!(inputAmount && inputBalance && outputBalance && feeRate)) 
+        return 0;
+
+    const fee = inputAmount.mul(feeRate);
+    return inputAmount
+        .sub(fee)
+        .mul(outputBalance)
+        .div(inputBalance.add(inputAmount).sub(fee))
 }
 
 // I want 10 tokens, how much do i have to pay for them?
 const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate) => {
-    const amount = parseFloat(outputAmount) * parseFloat(inputBalance) * (1 - feeRate) / ((parseFloat(outputBalance) - parseFloat(outputAmount)) * (1 - feeRate));
-    return amount >= 0 ? amount : Infinity;
+    if (!(outputAmount && inputBalance && outputBalance && feeRate)) 
+        return Infinity;
+
+    const amount = outputAmount
+        .mul(inputBalance)
+        .mul(1 - feeRate)
+        .div(outputBalance.sub(outputAmount).mul(1 - feeRate));
+
+    return amount.gt(0) ? amount : Infinity;
 }
 
 export const BuySell = ({ isBuy, isMargin }) => {
@@ -101,7 +114,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 const receiveAmount = isBuy ? 
                     assetTokenAmount 
                     : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
-    
+
                 await approveRouter(sendToken);
 
                 await addTransactionNotification({
@@ -111,8 +124,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         sendToken.address,
                         parseTokenAmount(sendAmount, sendToken), 
                         address,
-                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
                         ethers.constants.AddressZero, 
                         false,
@@ -130,17 +143,17 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 const receiveAmount = isBuy ? 
                     assetTokenAmount 
                     : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
-    
+
                 await approveExchange(sendToken);
-    
+
                 await addTransactionNotification({
                     content: `${isBuy ? "Buy" : "Sell"} ${assetTokenAmount} ${assetToken.symbol} ${isBuy ? "with" : "for"} ${isBuy ? sendAmount.toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: exchangeContract.swap(
                         sendToken.address,
                         parseTokenAmount(sendAmount, sendToken), 
                         address,
-                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
                         ethers.constants.AddressZero, 
                         false,
@@ -163,11 +176,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
             const receiveAmount = isBuy ? 
                 assetTokenAmount
                 : inputToOutputAmount(assetTokenAmount, exchangeAssetTokenBalance, exchangeBaseTokenBalance, FEE_RATE);
-            
-            console.log("total margin", initialMargin + maintenanceMargin);
-            console.log("initial margin", initialMargin);
-            console.log("maintenance margin", maintenanceMargin);
-            console.log("borrow amount", borrowAmount);
 
             if (sendToken.name === "Ethereum") {
                 // TODO: Cache this authorization result in a hook somewhere
@@ -209,6 +217,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
         }
     };
 
+    console.log("actual balance", assetTokenBalance);
+    console.log("calc balance", assetTokenAmount);
 
     return (
         showTokenSelectMenu ?
@@ -237,7 +247,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                                         : (assetTokenBalance * leverage)
                                 :
                                     isBuy ? 
-                                        inputToOutputAmount(baseTokenBalance * 0.95, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
                                         : assetTokenBalance
 
                                 setAssetTokenAmount(maxAssetAmount);
@@ -252,7 +262,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         type={"number"}
                         isError={!hasSufficientBalance}
                         errorMessage={"Insufficient balance"}
-                        onChange={e => setAssetTokenAmount(e.target.value)}
+                        onChange={num => setAssetTokenAmount(num)}
                         ref={input => input && input.focus()}
                         value={assetTokenAmount}
                         placeholder={"0.0"}

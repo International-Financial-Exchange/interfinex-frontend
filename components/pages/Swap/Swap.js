@@ -27,7 +27,7 @@ import { FundingTab } from "./Margin/Funding/FundingTab";
 import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
 import { VoteTab } from "./Margin/Vote/VoteTab";
 import { PIXEL_SIZING } from "../../../utils/constants";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
 import { useContractApproval } from "../../../utils/hooks";
 
 export const SwapContext = createContext();
@@ -134,7 +134,7 @@ export const Swap = () => {
             assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 }),
             baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 })
         ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-            return [humanizeTokenAmount(assetTokenBalance, assetToken), humanizeTokenAmount(baseTokenBalance, baseToken)];
+            return [tokenAmountToBig(assetTokenBalance, assetToken), tokenAmountToBig(baseTokenBalance, baseToken)];
         });
 
         console.log("asset amount", exchangeAssetTokenBalance)
@@ -147,8 +147,8 @@ export const Swap = () => {
             
             // Update the liquidity for the user and the total liquidity
             await Promise.all([
-                liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
-                liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
+                liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => tokenAmountToBig(totalSupply, { decimals: 18 })),
+                liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => tokenAmountToBig(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
                 setAccount(old => ({
                     ...old,
@@ -202,7 +202,7 @@ export const Swap = () => {
                     approveExchange,
                     isMarginEnabled,
                     approveRouter,
-                    price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
+                    price: exchangeAssetTokenBalance?.div(exchangeBaseTokenBalance || 1),
                     account,
                     liquidityToken,
                 }}
