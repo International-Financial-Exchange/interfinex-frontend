@@ -6,6 +6,7 @@ import { MULTIPLIER, PIXEL_SIZING } from "../../../utils/constants";
 import { humanizeMultiplier, humanizeTokenAmount } from "../../../utils/utils";
 import { ProgressBar } from "../../core/ProgressBar";
 import Text from "../../core/Text";
+import Big from "big.js";
 
 export const ILO_TYPES = {
     fixedPrice: 1,
@@ -41,13 +42,18 @@ export const getIloCurrentTokensPerEth = ilo => {
             return ilo.additionalDetails.tokensPerEth;
         case ILO_TYPES.dutchAuction:
             if (ilo.hasEnded) return ilo.additionalDetails.endTokensPerEth;
+
+            const [startTokensPerEth, endTokensPerEth] = [
+                new Big(ilo.additionalDetails.startTokensPerEth),
+                new Big(ilo.additionalDetails.endTokensPerEth),
+            ];
             
             const timeDelta = Math.floor(Date.now() / 1000) - ilo.startDate;
             const maxTimeDelta = ilo.endDate - ilo.startDate;
             const percentageComplete = timeDelta / maxTimeDelta;
-            const maxPriceDelta = ilo.additionalDetails.endTokensPerEth - ilo.additionalDetails.startTokensPerEth;
-            const tokensPerEth = ilo.additionalDetails.startTokensPerEth + (maxPriceDelta * percentageComplete);
-            return tokensPerEth;
+            const maxPriceDelta = endTokensPerEth.sub(startTokensPerEth);
+            const tokensPerEth = startTokensPerEth.add(maxPriceDelta.mul(percentageComplete));
+            return tokensPerEth.toFixed(0);
         default:
             console.warn(`Unsupported ILO type: [${ilo.type}]`);
             return 0;

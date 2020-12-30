@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Text from "../../core/Text";
-import { humanizeTokenAmount, shade } from "../../../utils/utils";
+import { humanizeTokenAmount, shade, tokenAmountToBig } from "../../../utils/utils";
 import { TextOption } from "../../core/TextOption";
 import { useState, useEffect, useContext, useMemo } from "react";
 import { getHistoricalTrades } from "./networkRequests";
@@ -138,17 +138,14 @@ export const HistoricalTrades = () => {
 
         return trades
             ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
-                console.log(token0, token1)
-                console.log(assetToken);
-
                 const isInverted = baseToken.address !== token0.address;
                 const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [
-                    humanizeTokenAmount(baseTokenAmount, isInverted ? assetToken : baseToken), 
-                    humanizeTokenAmount(assetTokenAmount, isInverted ? baseToken : assetToken)
+                    tokenAmountToBig(baseTokenAmount, isInverted ? assetToken : baseToken), 
+                    tokenAmountToBig(assetTokenAmount, isInverted ? baseToken : assetToken)
                 ];
                 
                 return {
-                    price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
+                    price: isInverted ? humanizedAssetTokenAmount.div(humanizedBaseTokenAmount) : humanizedBaseTokenAmount.div(humanizedAssetTokenAmount),
                     volume: isInverted ? humanizedAssetTokenAmount : humanizedBaseTokenAmount,
                     timestamp: timestamp,
                     user,

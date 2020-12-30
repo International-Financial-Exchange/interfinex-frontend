@@ -10,6 +10,7 @@ import { InputAndLabel } from "../../../core/InputAndLabel";
 import Text from "../../../core/Text";
 import { TokenAmountInput } from "../../../core/TokenAmountInput";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
+import Big from "big.js";
 
 export const DutchAuctionInput = forwardRef((props, ref) => {
     const { isSubmitted } = useContext(SubmitContext);
@@ -17,9 +18,9 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
     const { assetToken = {}} = useContext(TokenPairContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
 
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
-    const [startPrice, setStartPrice] = useState();
-    const [endPrice, setEndPrice] = useState();
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
+    const [startPrice, setStartPrice] = useState(new Big(0));
+    const [endPrice, setEndPrice] = useState(new Big(0));
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date(Date.now() + TIMEFRAMES["1d"]));
 
@@ -27,9 +28,9 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
         const validations = {
             name: name && name.length <= 60,
             description: description && description.length <= 250,
-            startPrice: startPrice > 0,
-            endPrice: endPrice > 0 && endPrice < startPrice,
-            assetTokenAmount: assetTokenAmount > 0,
+            startPrice: startPrice.gt(0),
+            endPrice: endPrice.gt(0) && endPrice.lt(startPrice),
+            assetTokenAmount: assetTokenAmount.gt(0),
             timerange: startDate.getTime() < endDate.getTime(),
         };
 
@@ -52,8 +53,8 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
                 transactionPromise: ILOFactory.createDutchAuctionILO(
                     assetToken.address,
                     parseTokenAmount(assetTokenAmount, assetToken),
-                    parseTokenAmount(1 / startPrice, assetToken),
-                    parseTokenAmount(1 / endPrice, assetToken),
+                    parseTokenAmount(new Big(1).div(startPrice), assetToken),
+                    parseTokenAmount(new Big(1).div(endPrice), assetToken),
                     Math.floor(startDate.getTime() / 1000),
                     Math.floor(endDate.getTime() / 1000),
                     percentageOfLiquidityToLock,
@@ -74,8 +75,8 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
                     <TokenAmountInput
                         token={ETHEREUM_TOKEN}
                         value={startPrice}
-                        onChange={e => setStartPrice(e.target.value)}
-                        isError={isSubmitted && !startPrice}
+                        onChange={num => setStartPrice(num)}
+                        isError={isSubmitted && startPrice.lte(0)}
                         errorMessage={"Start price must be greater than 0"}
                     />
                 </InputAndLabel>
@@ -85,11 +86,11 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
                     <TokenAmountInput
                         token={ETHEREUM_TOKEN}
                         value={endPrice}
-                        onChange={e => setEndPrice(e.target.value)}
-                        isError={(isSubmitted && !endPrice) || endPrice >= startPrice}
+                        onChange={num => setEndPrice(num)}
+                        isError={(isSubmitted && endPrice.lt(0)) || endPrice.gt(startPrice)}
                         errorMessage={
-                            !endPrice ? `End price must be greater than 0`
-                                : endPrice >= startPrice ? "End price must be less than start price"
+                            endPrice.lt(0) ? `End price must be greater than 0`
+                                : endPrice.gt(startPrice) ? "End price must be less than start price"
                                     : ""
                         }
                     />
@@ -100,9 +101,9 @@ export const DutchAuctionInput = forwardRef((props, ref) => {
                 <Text>Amount of {assetToken.symbol} to sell</Text>
                 <TokenAmountInput
                     token={assetToken}
-                    onChange={e => setAssetTokenAmount(e.target.value)}
+                    onChange={num => setAssetTokenAmount(num)}
                     value={assetTokenAmount}
-                    isError={isSubmitted && !assetTokenAmount}
+                    isError={isSubmitted && assetTokenAmount.lte(0)}
                     errorMessage={`${assetToken.symbol} amount must be greater than 0`}
                 />
             </InputAndLabel>

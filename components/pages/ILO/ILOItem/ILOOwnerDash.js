@@ -5,7 +5,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
-import { humanizeTokenAmount } from "../../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../../utils/utils";
 import { Button } from "../../../core/Button";
 import { Card } from "../../../core/Card";
 import { InfoBubble } from "../../../core/InfoBubble";
@@ -14,6 +14,7 @@ import { TextOption } from "../../../core/TextOption";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { useYourIloInvestment } from "../hooks";
 import { IloContext } from "./ILOItem";
+import Big from "big.js";
 
 const Container = styled(Card)`
     width: 100%;
@@ -35,13 +36,13 @@ export const ILOOwnerDash = () => {
     const {
         assetToken,
         hasEnded,
-        ethInvested,
-        percentageToLock: rawPercentageToLock,
+        ethInvested = 0,
+        percentageToLock: rawPercentageToLock = 0,
         liquidityUnlockDate,
         hasCreatorWithdrawn,
     } = ilo || {};
 
-    const percentageToLock = rawPercentageToLock && humanizeTokenAmount(rawPercentageToLock.toString(), { decimals: 18 });
+    const percentageToLock = rawPercentageToLock && tokenAmountToBig(rawPercentageToLock.toString(), { decimals: 18 });
 
     const withdrawEth = async () => {
         setIsWithdrawEthLoading(true);
@@ -67,7 +68,7 @@ export const ILOOwnerDash = () => {
         }
     };
 
-    const raisedEthAvailable = hasCreatorWithdrawn ? 0 : ethInvested * (1 - percentageToLock);
+    const raisedEthAvailable = hasCreatorWithdrawn ? 0 : new Big(ethInvested).mul(1 - percentageToLock);
 
     return (
         <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>

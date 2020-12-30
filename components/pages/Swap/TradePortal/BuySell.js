@@ -19,12 +19,12 @@ import { TokenAmountInput } from "../../../core/TokenAmountInput";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { TokenSelectMenu } from "../../../layout/NavBar/AppNavBar";
 import { MarginContext, SwapContext } from "../Swap";
-
+import Big from "big.js";
 
 // I am paying 5 tokens, how much will i receive for them?
-export const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, feeRate) => {
-    if (!(inputAmount && inputBalance && outputBalance && feeRate)) 
-        return 0;
+export const inputToOutputAmount = (inputAmount = Big(0), inputBalance = Big(0), outputBalance = Big(0), feeRate) => {
+    if ([inputAmount, inputBalance, outputBalance,].some(b => b.lte(0))) 
+        return new Big(0);
 
     const fee = inputAmount.mul(feeRate);
     return inputAmount
@@ -34,16 +34,19 @@ export const inputToOutputAmount = (inputAmount, inputBalance, outputBalance, fe
 }
 
 // I want 10 tokens, how much do i have to pay for them?
-const outputToInputAmount = (outputAmount, inputBalance, outputBalance, feeRate) => {
-    if (!(outputAmount && inputBalance && outputBalance && feeRate)) 
-        return Infinity;
+const outputToInputAmount = (outputAmount = Big(0), inputBalance = Big(0), outputBalance = Big(0), feeRate) => {
+    if ([outputAmount, inputBalance, outputBalance,].some(b => b.lte(0))) 
+        return new Big(0);
+
+        console.log(outputBalance.toString(), outputAmount.toString(), 1 - feeRate);
+    console.log(outputBalance.sub(outputAmount).mul(1 - feeRate).toString());
 
     const amount = outputAmount
         .mul(inputBalance)
         .mul(1 - feeRate)
         .div(outputBalance.sub(outputAmount).mul(1 - feeRate));
 
-    return amount.gt(0) ? amount : Infinity;
+    return amount.gt(0) ? amount : new Big(0);
 }
 
 export const BuySell = ({ isBuy, isMargin }) => {
@@ -63,7 +66,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [tokenSelectType, setTokenSelectType] = useState("");
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
     const [slippageValue, setSlippageValue] = useState(0.1);
     const [isLoading, setIsLoading] = useState(false);
     const theme = useContext(ThemeContext);
@@ -74,28 +77,33 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const parameters = _parameters?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
     const fundingStats = _stats?.[marginMarkets?.[isBuy ? baseToken.address : assetToken.address]?.address];
     const [_leverage, setLeverage] = useState();
-    const maxLeverage = (1 / parameters?.minInitialMarginRate).toFixed(1);
+    const maxLeverage = (1 / (parameters?.minInitialMarginRate ?? 0.5)).toFixed(1);
     const leverage = _leverage ?? maxLeverage / 2;
     
+    console.log("error here", [assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance].map(e => e.toString()))
     const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
-    const initialMargin = isBuy ? 
-        inverseAmount / (leverage + 1) 
-        : assetTokenAmount / (leverage + 1);
-    const borrowAmount = isBuy ?
-        inverseAmount - initialMargin
-        : assetTokenAmount - initialMargin;
-    const maintenanceMargin = borrowAmount * parameters?.maintenanceMarginRate;
-    const totalMargin = initialMargin + maintenanceMargin;
 
-    const hasSufficientFunding = fundingStats && parameters && assetTokenAmount > 0 ? borrowAmount <= fundingStats.totalValue * parameters.maxBorrowAmountRate : true;
+    const initialMargin = isBuy ? 
+        inverseAmount.div(leverage + 1) 
+        : assetTokenAmount.div(leverage + 1);
+    const borrowAmount = isBuy ?
+        inverseAmount.sub(initialMargin)
+        : assetTokenAmount.sub(initialMargin);
+    const maintenanceMargin = borrowAmount.mul(parameters?.maintenanceMarginRate ?? 0.5);
+    const totalMargin = initialMargin.add(maintenanceMargin);
+
+    const hasSufficientFunding = (fundingStats && parameters && assetTokenAmount > 0) 
+        ? borrowAmount.lte(fundingStats.totalValue.mul(parameters.maxBorrowAmountRate)) 
+        : true;
+
     const hasSufficientBalance = !assetTokenAmount || (isMargin ?
             isBuy ?
-                parseFloat(baseTokenBalance) >= totalMargin
-                : parseFloat(assetTokenBalance) >= totalMargin
+                baseTokenBalance.gte(totalMargin)
+                : assetTokenBalance.gte(totalMargin)
         :
             isBuy ?
-                parseFloat(baseTokenBalance) >= outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE)
-                : parseFloat(assetTokenBalance) >= parseFloat(assetTokenAmount)
+                baseTokenBalance.gte(outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE))
+                : assetTokenBalance.gte(assetTokenAmount)
     );
 
     const spotTrade = async () => {
@@ -185,15 +193,14 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 }
 
                 await addTransactionNotification({
-                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage}x leverage ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
+                    content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage}x leverage ${isBuy ? "with" : "for"} ${isBuy ? initialMargin.add(borrowAmount).toFixed(4) : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: MarginEthRouter.increasePosition(
                         receiveToken.address,
                         parseTokenAmount(borrowAmount, sendToken), 
-                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        0,0,
                         0,
                         false,
-                        { gasLimit: 500_000, value: safeParseEther((initialMargin + maintenanceMargin).toString()) },
+                        { gasLimit: 500_000, value: safeParseEther(initialMargin.add(maintenanceMargin).toString()) },
                     ),
                 });
             } else {
@@ -201,10 +208,10 @@ export const BuySell = ({ isBuy, isMargin }) => {
                 await addTransactionNotification({
                     content: `${isBuy ? "Margin Buy" : "Margin Sell"} ${assetTokenAmount} ${assetToken.symbol} with ${leverage}x leverage ${isBuy ? "with" : "for"} ${isBuy ? initialMargin + borrowAmount : receiveAmount.toFixed(4)} ${baseToken.symbol}`,
                     transactionPromise: MarginMarket.increasePosition(
-                        parseTokenAmount(initialMargin + maintenanceMargin, sendToken),
+                        parseTokenAmount(initialMargin.add(maintenanceMargin), sendToken),
                         parseTokenAmount(borrowAmount, sendToken), 
-                        parseTokenAmount(receiveAmount * (1 - slippagePercentage), receiveToken),
-                        parseTokenAmount(receiveAmount * (1 + slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 - slippagePercentage), receiveToken),
+                        parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
                         false,
                         address,
@@ -216,7 +223,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
             setIsLoading(false);
         }
     };
-    
+
     return (
         showTokenSelectMenu ?
             <TokenSelectMenu
@@ -238,10 +245,13 @@ export const BuySell = ({ isBuy, isMargin }) => {
                             style={{ marginRight: PIXEL_SIZING.tiny }}
                             requiresWallet
                             onClick={() => {
+                                if (!address) return;
+
+                                console.log("before err", baseTokenBalance.toString(), exchangeBaseTokenBalance.toString(), exchangeAssetTokenBalance.toString())
                                 const maxAssetAmount = isMargin ?
                                     isBuy ? 
-                                        inputToOutputAmount((baseTokenBalance * leverage), exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
-                                        : (assetTokenBalance * leverage)
+                                        inputToOutputAmount(baseTokenBalance.mul(leverage + 1), exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 
+                                        : assetTokenBalance.mul(leverage + 1)
                                 :
                                     isBuy ? 
                                         inputToOutputAmount(baseTokenBalance, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE) 

@@ -10,9 +10,10 @@ import Text from "../../../core/Text";
 import { Button } from "../../../core/Button";
 import { getIloCurrentTokensPerEth, getIloEthHardcap } from "../utils";
 import Skeleton from "react-loading-skeleton";
-import { humanizeTokenAmount, parseTokenAmount } from "../../../../utils/utils";
+import { parseTokenAmount, tokenAmountToBig } from "../../../../utils/utils";
 import { AccountContext } from "../../../../context/Account";
 import { NotificationsContext } from "../../../../context/Notifications";
+import Big from "big.js";
 
 const Container = styled(Card)`
     width: 100%;
@@ -25,8 +26,8 @@ const Container = styled(Card)`
 export const ILOInvestPortal = props => {
     const { ilo, isLoading, ILOContract } = useContext(IloContext);
     const { ETHEREUM_TOKEN } = useContext(EthersContext);
-    const [ethAmount, setEthAmount] = useState();
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
+    const [ethAmount, setEthAmount] = useState(new Big(0));
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
     const { ethBalance } = useContext(AccountContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [isSubmitLoading, setIsSubmitLoading] = useState();
@@ -42,17 +43,13 @@ export const ILOInvestPortal = props => {
         liquidityUnlockDate,
     } = ilo || {};
 
-    console.log("before", ilo);
-    const tokensPerEth = humanizeTokenAmount(getIloCurrentTokensPerEth(ilo || {}), assetToken || {});
-
-    console.log("after", ilo);
-    const ethHardcap = getIloEthHardcap(ilo || {});
+    const tokensPerEth = tokenAmountToBig(getIloCurrentTokensPerEth(ilo || {}), assetToken || {});
 
     const onSubmit = async () => {
         setIsSubmitLoading(true);
         try {
             await addTransactionNotification({
-                content: `Invested into ${assetToken.symbol} ILO with ${parseFloat(ethAmount).toFixed(6)} ETH`,
+                content: `Invested into ${assetToken.symbol} ILO with ${ethAmount.toFixed(6)} ETH`,
                 transactionPromise: ILOContract.invest({ value: parseTokenAmount(ethAmount, ETHEREUM_TOKEN) })
             });
         } finally {
@@ -66,13 +63,13 @@ export const ILOInvestPortal = props => {
                 <Text>Amount of ETH to Invest</Text>
                 <TokenAmountInput 
                     token={ETHEREUM_TOKEN}
-                    onChange={e => {
-                        setEthAmount(e.target.value);
-                        setAssetTokenAmount(e.target.value * tokensPerEth)
+                    onChange={num => {
+                        setEthAmount(num);
+                        setAssetTokenAmount(num.mul(tokensPerEth))
                     }}
-                    isError={ethAmount > ethBalance}
+                    isError={ethAmount.gt(ethBalance)}
                     errorMessage={
-                        ethAmount > ethBalance ?
+                        ethAmount.gt(ethBalance) ?
                             "Insufficient balance"
                             : ""
                     }
@@ -92,9 +89,9 @@ export const ILOInvestPortal = props => {
                             <Text>Amount of {assetToken.symbol} to Buy</Text>
                             <TokenAmountInput 
                                 token={assetToken}
-                                onChange={e => {
-                                    setAssetTokenAmount(e.target.value);
-                                    setEthAmount(e.target.value / tokensPerEth);
+                                onChange={num => {
+                                    setAssetTokenAmount(num);
+                                    setEthAmount(num.div(tokensPerEth));
                                 }}
                                 value={assetTokenAmount}
                             />

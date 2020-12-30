@@ -3,7 +3,7 @@ import { AccountContext } from "../../../../../context/Account";
 import { EthersContext } from "../../../../../context/Ethers";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
-import Big from 'big.js';
+import Big from "big.js";
 
 export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
@@ -30,7 +30,7 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marg
                 newState[MarginMarket.address] = { 
                     totalBorrowed: tokenAmountToBig(totalBorrowed, token), 
                     totalReserved: tokenAmountToBig(totalReserved, token), 
-                    totalValue: tokenAmountToBig(totalBorrowed, token) + tokenAmountToBig(totalReserved, token),
+                    totalValue: tokenAmountToBig(totalBorrowed, token).add(tokenAmountToBig(totalReserved, token)),
                     interestRate: tokenAmountToBig(interestRate, { decimals: 18 }),
                 };
                 return newState;

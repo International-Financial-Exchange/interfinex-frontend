@@ -14,6 +14,7 @@ import Text from "../../../core/Text";
 import { TokenAmountInput } from "../../../core/TokenAmountInput";
 import { TokenSelectMenu } from "../../../layout/NavBar/AppNavBar";
 import { SwapContext } from "../Swap";
+import Big from "big.js";
 
 export const Pool = () => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0, token1 } = useContext(TokenPairContext);
@@ -21,7 +22,7 @@ export const Pool = () => {
     const { contracts: { SwapEthRouter, YieldFarm }} = useContext(EthersContext);
     const { 
         exchangeContract, 
-        price,
+        assetTokensPerBaseToken,
         exchangeHasAllowance,
         approveExchange,
         exchangeBaseTokenBalance,
@@ -33,8 +34,8 @@ export const Pool = () => {
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [showTokenSelectMenu, setShowTokenSelectMenu] = useState(false);
     const [tokenSelectType, setTokenSelectType] = useState("");
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
-    const [baseTokenAmount, setBaseTokenAmount] = useState();
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
+    const [baseTokenAmount, setBaseTokenAmount] = useState(new Big(0));
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [slippageValue, setSlippageValue] = useState(0.75);
     const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
@@ -65,11 +66,11 @@ export const Pool = () => {
                         requiresWallet
                         style={{ marginRight: PIXEL_SIZING.tiny }}
                         onClick={() => {
-                            if (baseTokenBalance.mul(price).lt(assetTokenBalance)) {
+                            if (baseTokenBalance.mul(assetTokensPerBaseToken).lt(assetTokenBalance)) {
                                 setBaseTokenAmount(baseTokenBalance);
-                                setAssetTokenAmount(price.mul(baseTokenBalance));
+                                setAssetTokenAmount(assetTokensPerBaseToken.mul(baseTokenBalance));
                             } else {
-                                setBaseTokenAmount(assetTokenBalance.div(price));
+                                setBaseTokenAmount(assetTokenBalance.div(assetTokensPerBaseToken));
                                 setAssetTokenAmount(assetTokenBalance);
                             }
                         }}
@@ -91,7 +92,7 @@ export const Pool = () => {
                     <TokenAmountInput
                         onChange={num => {
                             setAssetTokenAmount(num);                            
-                            setBaseTokenAmount(num.div(price));
+                            setBaseTokenAmount(num.div(assetTokensPerBaseToken));
                         }}
                         value={assetTokenAmount}
                         token={assetToken}
@@ -100,7 +101,7 @@ export const Pool = () => {
                     <TokenAmountInput
                         onChange={num => {
                             setBaseTokenAmount(num);
-                            setAssetTokenAmount(num.mul(price));
+                            setAssetTokenAmount(num.mul(assetTokensPerBaseToken));
                         }}
                         value={baseTokenAmount}
                         token={baseToken}
@@ -126,22 +127,22 @@ export const Pool = () => {
                             
                                 console.log(
                                     sendToken?.address,
-                                        parseTokenAmount(sendTokenAmount * (1 - slippagePercentage), sendToken),
-                                        parseTokenAmount(sendTokenAmount * (1 + slippagePercentage), sendToken),
+                                        parseTokenAmount(sendTokenAmount.mul(1 - slippagePercentage), sendToken),
+                                        parseTokenAmount(sendTokenAmount.mul(1 + slippagePercentage), sendToken),
                                         address,
                                         0,
                                         { value: safeParseEther(etherTokenAmount.toString()) }
                                 );
 
                                 await addTransactionNotification({
-                                    content: `Deposit ${assetTokenAmount} ${assetToken.symbol} and ${baseTokenAmount} ${baseToken.symbol} to the liquidity pool`,
+                                    content: `Deposit ${assetTokenAmount.toFixed(4)} ${assetToken.symbol} and ${baseTokenAmount.toFixed(4)} ${baseToken.symbol} to the liquidity pool`,
                                     transactionPromise: SwapEthRouter.mint_liquidity(
                                         sendToken?.address,
-                                        parseTokenAmount(sendTokenAmount * (1 - (slippagePercentage * 2)), sendToken),
+                                        parseTokenAmount(sendTokenAmount.mul(1 - (slippagePercentage * 2)), sendToken),
                                         parseTokenAmount(sendTokenAmount, sendToken),
                                         address,
                                         0,
-                                        { gasLimit: 450_000, value: safeParseEther((etherTokenAmount * 0.99).toString()) }
+                                        { gasLimit: 450_000, value: safeParseEther(etherTokenAmount.toString()) }
                                     )
                                 });
                             } else {
@@ -153,8 +154,8 @@ export const Pool = () => {
                                     transactionPromise: exchangeContract.mint_liquidity(
                                         assetToken.address,
                                         parseTokenAmount(assetTokenAmount, assetToken),
-                                        parseTokenAmount(sendTokenAmount * (1 - (slippagePercentage * 2)), sendToken),
-                                        parseTokenAmount((baseTokenAmount * 0.99), baseToken),
+                                        parseTokenAmount(sendTokenAmount.mul(1 - (slippagePercentage * 2)), sendToken),
+                                        parseTokenAmount(baseTokenAmount, baseToken),
                                         address,
                                         0,
                                         { gasLimit: 450_000 }
@@ -179,12 +180,11 @@ export const Pool = () => {
                     onClick={async () => {
                         setIsWithdrawLoading(true);
 
-                        await YieldFarm.harvest(liquidityToken.address);
-                        
                         try {
+                            await YieldFarm.harvest(liquidityToken.address);
                             if (assetToken.name === "Ethereum" || baseToken.name === "Ethereum") {
                                 const [etherToken, sendToken] = assetToken.name === "Ethereum" ? [assetToken, baseToken] : [baseToken, assetToken];
-                                const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                                const liquidityTokenAmount = account.liquidityTokenBalance.mul(baseTokenAmount).div(account.depositedBaseTokenAmount);
 
                                 await approveRouter(liquidityToken);
 
@@ -200,7 +200,7 @@ export const Pool = () => {
                             } else {
                                 await approveExchange(liquidityToken);
         
-                                const liquidityTokenAmount = (account.liquidityTokenBalance * baseTokenAmount) / account.depositedBaseTokenAmount;
+                                const liquidityTokenAmount =  account.liquidityTokenBalance.mul(baseTokenAmount).div(account.depositedBaseTokenAmount);
                                 await addTransactionNotification({
                                     content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                     transactionPromise: exchangeContract.burn_liquidity(
@@ -221,7 +221,7 @@ export const Pool = () => {
                 </Button>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto", columnGap: PIXEL_SIZING.miniscule }}>
-                    <Text secondary>1 {assetToken.symbol} = {(1 / price).toFixed(4)} {baseToken.symbol}</Text>
+                    <Text secondary>1 {assetToken.symbol} = {(1 / assetTokensPerBaseToken).toFixed(4)} {baseToken.symbol}</Text>
 
                     <TextButton onClick={() => setShowAdvanced(!showAdvanced)}>
                         {showAdvanced ? "Hide" : "Show"} Advanced

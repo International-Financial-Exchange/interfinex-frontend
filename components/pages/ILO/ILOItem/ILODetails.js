@@ -10,7 +10,7 @@ import { getIloCurrentTokensPerEth, IloProgressBar, ILO_TYPES, ILO_TYPE_NAMES } 
 import Skeleton from "react-loading-skeleton";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { EthersContext } from "../../../../context/Ethers";
-import { humanizeMultiplier, humanizeTokenAmount } from "../../../../utils/utils";
+import { humanizeMultiplier, humanizeTokenAmount, tokenAmountToBig } from "../../../../utils/utils";
 import { TextButton } from "../../../core/Button";
 
 const Container = styled(Card)`
@@ -58,7 +58,7 @@ export const ILODetails = () => {
         contractAddress 
     } = ilo || {};
     
-    const tokensPerEth = getIloCurrentTokensPerEth(ilo || {});
+    const tokensPerEth = tokenAmountToBig(getIloCurrentTokensPerEth(ilo || {}), assetToken || {});
 
     return (
         <Container>
@@ -91,12 +91,12 @@ export const ILODetails = () => {
                                     <Text>1 {ETHEREUM_TOKEN.symbol}</Text>
                                 </TokenAndLogo>
                                 <Text>=</Text>
-                                <Text>{humanizeTokenAmount(Number.isNaN(tokensPerEth) ? 0 : tokensPerEth, assetToken).toFixed(6)} {assetToken.symbol}</Text>
+                                <Text>{tokensPerEth.toFixed(6)} {assetToken.symbol}</Text>
                             </div>
 
                             <div id={"price-per-token"} style={{ display: "flex", }}>
                                 <Text style={{ marginRight: PIXEL_SIZING.tiny }}>Price per Token:</Text>
-                                <Text>{(1 / humanizeTokenAmount(tokensPerEth, assetToken)).toFixed(6)} ETH</Text>
+                                <Text>{new Big(1).div(tokensPerEth).toFixed(6)} ETH</Text>
                             </div>
                         </div>
 
@@ -158,13 +158,13 @@ const DutchAuctionAdditionalDetails = props => {
                 <Text>{new Date(startDate * 1000).toLocaleString()}</Text>
 
                 <Text secondary>Start Price</Text>
-                <Text>1 ETH = {humanizeTokenAmount(additionalDetails.startTokensPerEth, assetToken)} {assetToken.symbol}</Text>
+                <Text>1 ETH = {tokenAmountToBig(additionalDetails.startTokensPerEth, assetToken)} {assetToken.symbol}</Text>
 
                 <Text secondary>Liquidity Lock Amount</Text>                
                 <Text style={{ color: theme.colors.positive }}>{humanizeMultiplier(percentageToLock).toFixed(2)}%</Text>
 
                 <Text secondary>Total Tokens for Sale</Text>
-                <Text>{humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
+                <Text>{tokenAmountToBig(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", columnGap: PIXEL_SIZING.medium, rowGap: PIXEL_SIZING.small, height: "fit-content" }}>
@@ -172,7 +172,7 @@ const DutchAuctionAdditionalDetails = props => {
                 <Text>{new Date(endDate * 1000).toLocaleString()}</Text>
 
                 <Text secondary>End Price</Text>
-                <Text>1 ETH = {humanizeTokenAmount(additionalDetails.endTokensPerEth, assetToken)} {assetToken.symbol}</Text>
+                <Text>1 ETH = {tokenAmountToBig(additionalDetails.endTokensPerEth, assetToken)} {assetToken.symbol}</Text>
 
                 <Text secondary>Liquidity Unlock Date</Text>
                 <Text>{new Date(liquidityUnlockDate * 1000).toLocaleString()}</Text>
@@ -217,7 +217,7 @@ const FixedPriceAdditionalDetails = props => {
                 <Text>{new Date(liquidityUnlockDate * 1000).toLocaleString()}</Text>
 
                 <Text secondary>Total Tokens for Sale</Text>
-                <Text>{humanizeTokenAmount(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
+                <Text>{tokenAmountToBig(assetTokenAmount, assetToken).toFixed(6)} {assetToken.symbol}</Text>
             </div>
         </div>
     );

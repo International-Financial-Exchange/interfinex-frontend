@@ -6,7 +6,7 @@ import { NotificationsContext, NOTIFICATION_TYPES } from "./Notifications";
 import Text from "../components/core/Text";
 import { humanizeTokenAmount, tokenAmountToBig } from "../utils/utils";
 import { formatEther, formatUnits } from "ethers/lib/utils";
-import Big from 'big.js';
+import Big from "big.js";
 
 export const AccountContext = createContext();
 
@@ -15,10 +15,10 @@ export const AccountProvider = ({ children }) => {
     const { baseToken, assetToken, ifexToken } = useContext(TokenPairContext);
     const { addLayoutNotification } = useContext(NotificationsContext);
     const [address, setAddress] = useState();
-    const [baseTokenBalance, setBaseTokenBalance] = useState();
-    const [assetTokenBalance, setAssetTokenBalance] = useState();
-    const [ifexTokenBalance, setIfexTokenBalance] = useState();
-    const [ethBalance, setEthBalance] = useState();
+    const [baseTokenBalance, setBaseTokenBalance] = useState(new Big(0));
+    const [assetTokenBalance, setAssetTokenBalance] = useState(new Big(0));
+    const [ifexTokenBalance, setIfexTokenBalance] = useState(new Big(0));
+    const [ethBalance, setEthBalance] = useState(new Big(0));
     const [deleteWalletWarning, setDeleteWalletWarning] = useState();
 
     useEffect(() => {

@@ -5,7 +5,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { TokenPairContext } from "../../../../context/TokenPair";
 import { useContractApproval } from "../../../../utils/hooks";
-import { humanizeTokenAmount, isZeroAddress } from "../../../../utils/utils";
+import { tokenAmountToBig, isZeroAddress, } from "../../../../utils/utils";
 import { MarginContext, Swap } from "../Swap";
 import { useFunding } from "./Funding/hooks";
 
@@ -114,7 +114,7 @@ export const useMarginTrading = ({ swapMarketExists }) => {
                     MarginMarket.minInitialMarginRate({ gasLimit: 1_000_000 }),
                     MarginMarket.maintenanceMarginRate({ gasLimit: 1_000_000 }),
                     MarginMarket.maxBorrowAmountRate({ gasLimit: 1_000_000 })
-                ])).map(res => humanizeTokenAmount(res, { decimals: 18 }));
+                ])).map(res => tokenAmountToBig(res, { decimals: 18 }));
 
                 setParameters((oldState = {}) => {
                     const newState = _.cloneDeep(oldState);
@@ -138,16 +138,16 @@ export const useMarginTrading = ({ swapMarketExists }) => {
         ]).then(([assetPosition, basePosition]) => {
             setAccount({
                 assetPosition: {
-                    borrowedAmount: humanizeTokenAmount(assetPosition.borrowedAmount, assetToken),
-                    collateralAmount: humanizeTokenAmount(assetPosition.collateralAmount, baseToken),
-                    lastInterestIndex: humanizeTokenAmount(assetPosition.lastInterestIndex, { decimals: 18 }),
-                    maintenanceMargin: humanizeTokenAmount(assetPosition.maintenanceMargin, assetToken),
+                    borrowedAmount: tokenAmountToBig(assetPosition.borrowedAmount, assetToken),
+                    collateralAmount: tokenAmountToBig(assetPosition.collateralAmount, baseToken),
+                    lastInterestIndex: tokenAmountToBig(assetPosition.lastInterestIndex, { decimals: 18 }),
+                    maintenanceMargin: tokenAmountToBig(assetPosition.maintenanceMargin, assetToken),
                 },
                 basePosition: {
-                    borrowedAmount: humanizeTokenAmount(basePosition.borrowedAmount, baseToken),
-                    collateralAmount: humanizeTokenAmount(basePosition.collateralAmount, assetToken),
-                    lastInterestIndex: humanizeTokenAmount(basePosition.lastInterestIndex, { decimals: 18 }),
-                    maintenanceMargin: humanizeTokenAmount(basePosition.maintenanceMargin, baseToken),
+                    borrowedAmount: tokenAmountToBig(basePosition.borrowedAmount, baseToken),
+                    collateralAmount: tokenAmountToBig(basePosition.collateralAmount, assetToken),
+                    lastInterestIndex: tokenAmountToBig(basePosition.lastInterestIndex, { decimals: 18 }),
+                    maintenanceMargin: tokenAmountToBig(basePosition.maintenanceMargin, baseToken),
                 },
                 isLoading: false,
             });

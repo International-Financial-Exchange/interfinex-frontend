@@ -12,7 +12,6 @@ import { Spinner } from "../../core/Spinner";
 import { Card } from "../../core/Card";
 import { Input } from "../../core/Input";
 import { TextButton, Button } from "../../core/Button";
-import { TokenAmountInput } from "../../core/TokenAmountInput";
 import { CreateMarket } from "./CreateMarket";
 import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
@@ -29,6 +28,7 @@ import { VoteTab } from "./Margin/Vote/VoteTab";
 import { PIXEL_SIZING } from "../../../utils/constants";
 import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
 import { useContractApproval } from "../../../utils/hooks";
+import Big from "big.js";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();
@@ -69,8 +69,8 @@ export const Swap = () => {
     const [marketExists, setMarketExists] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [exchangeContract, setExchangeContract] = useState();
-    const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState();
-    const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
+    const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState(new Big(0));
+    const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState(new Big(0));
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
     const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState(true);
@@ -202,7 +202,9 @@ export const Swap = () => {
                     approveExchange,
                     isMarginEnabled,
                     approveRouter,
-                    price: exchangeAssetTokenBalance?.div(exchangeBaseTokenBalance || 1),
+                    assetTokensPerBaseToken: exchangeBaseTokenBalance.gt(0) ? 
+                        exchangeAssetTokenBalance.div(exchangeBaseTokenBalance || 1) 
+                        : new Big(0),
                     account,
                     liquidityToken,
                 }}

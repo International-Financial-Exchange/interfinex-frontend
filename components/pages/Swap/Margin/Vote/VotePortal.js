@@ -350,7 +350,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                                 <TokenAmountInput 
                                     token={ifexToken}
                                     value={voteAmount}
-                                    onChange={e => setVoteAmount(e.target.value)}
+                                    onChange={num => setVoteAmount(num)}
                                 />
                                 
                                 <div id={"vote-details-buttons"}>

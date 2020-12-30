@@ -1,6 +1,6 @@
 import { ethers, BigNumber } from "ethers";
 import { formatUnits, parseEther } from "ethers/lib/utils";
-import Big from 'big.js';
+import Big from "big.js";
 
 export const sizingToInt = size => {
     return parseInt(size.slice(0, size.length - 2));
@@ -49,8 +49,8 @@ export const shade = (col, light)=> {
     return color(r, g, b);
 }
 
-export const appendDecimalZeroes = (num, decimals = 18) => {
-    const strNum = num.toString();
+export const appendDecimalZeroes = (bigNum = new Big(0), decimals = 18) => {
+    const strNum = bigNum.toFixed();
     const decimalsStr = strNum.split(".")[1]?.slice(0, decimals) ?? "";
     const requiredZeroes = new Array(decimals - decimalsStr.length).join("0");
     const paddedNum = strNum.split(".")[0]?.concat(".").concat(decimalsStr.concat(requiredZeroes));
@@ -66,7 +66,8 @@ export const parseTokenAmount = (amount, token) => {
 
 export const safeParseEther = amount => parseEther(parseFloat(amount).toFixed(18));
 
-// TODO: This should only be used for display purposes
+// DEPRECTED
+// DO NOT USE THIS GOING FORWARD - REPLACE WITH tokenAmountToBig
 export const humanizeTokenAmount = (amount, token) => {
     const strDecimalAmount = ethers.utils.formatUnits(amount, token.decimals);
     return parseFloat(strDecimalAmount.substr(0, strDecimalAmount.indexOf('.') + 6));

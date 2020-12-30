@@ -32,6 +32,7 @@ export default ({ Component, pageProps }) => {
                                     <title>Interfinex</title>
                                     <link rel="icon" href="/logo.png" />
                                     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+                                    <script src='https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js'></script>
                                     <meta name="description" content="Access financial products and DeFi for any ethereum token - The international financial exchange."/>
                                 </Head>
 
