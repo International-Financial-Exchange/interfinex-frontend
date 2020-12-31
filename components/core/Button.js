@@ -17,7 +17,7 @@ const ButtonContainer = styled.div`
             theme.colors.negative
             : theme.colors.primary 
     };
-    color: ${({ theme }) => theme.colors.invert};
+    color: white;
     width: fit-content;
     display: grid;
     align-items: center;
@@ -194,6 +194,7 @@ export const AddButton = ({ children, ...props }) => {
                 borderRadius: 1000, 
                 width: "fit-content", 
                 padding: 0,
+                overflow: "hidden",
                 ...props.style, 
             }}
         >

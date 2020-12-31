@@ -4,8 +4,8 @@ import { shade } from "../../utils/utils";
 
 const Container = styled.div`
     border-radius: ${PIXEL_SIZING.tiny};
-    background-color: ${({ theme, selected }) => selected ? shade(theme.colors.primary, 0.95) : ""};
-    color: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.grey};
+    background-color: ${({ theme, selected }) => selected ? "rgba(42,157,143, 0.2)" : ""};
+    color: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.highlight};
     padding: ${PIXEL_SIZING.tiny};
     width: fit-content;
     user-select: none;
@@ -17,7 +17,7 @@ const Container = styled.div`
 
     .filter-icon {
         path {
-            fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.grey} !important;
+            fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.highlight} !important;
         }
     }
 
@@ -31,8 +31,8 @@ const Container = styled.div`
         cursor: pointer;
         color: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.textPrimary};
         background-color: ${({ theme, selected }) => selected 
-            ? shade(theme.colors.primary, 0.9) 
-            : shade(theme.colors.grey, 0.7)
+            ? "rgba(42,157,143, 0.2)"
+            : shade(theme.colors.highlight, 0)
         };
     }
 `;

@@ -16,7 +16,7 @@ export const SwitchInput = ({ value, onChange }) => {
             checkedIcon={false}
             height={sizingToInt(PIXEL_SIZING.medium)}
             width={sizingToInt(PIXEL_SIZING.large)}
-            offColor={theme.colors.grey}
+            offColor={theme.colors.highlight}
         />
     );
 }

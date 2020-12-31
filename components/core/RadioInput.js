@@ -17,7 +17,7 @@ const StyledRadioOption = styled(Card)`
     padding: ${PIXEL_SIZING.small};
 
     border-color: ${({ theme, selected }) => selected && theme.colors.primary};
-    background-color: ${({ theme, selected }) => selected && shade(theme.colors.primary, 0.96)};
+    background-color: ${({ theme, selected }) => selected && "rgba(42,157,143, 0.07)"};
 
     &:last-child {
         margin-right: 0;

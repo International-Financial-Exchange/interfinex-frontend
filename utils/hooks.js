@@ -27,7 +27,7 @@ export const useForceUpdate = () => {
 export const useLocalStorage = (key, initialValue) => {
     const window = useWindow();
 
-    const [storedValue, setStoredValue] = useState();
+    const [storedValue, setStoredValue] = useState(initialValue);
   
     const setValue = value => {
         const valueToStore = value instanceof Function ? value(storedValue) : value;

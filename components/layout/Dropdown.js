@@ -32,7 +32,10 @@ export const Dropdown = ({ children, parentRef, left=false, right=false, center=
     
     useEffect(() => {
         const handleClick = e => {
+            console.log(e);
             const isContainerClick = e.composedPath().some(({ id }) => id === CONTAINER_ID || id === MODAL_ID);
+            console.log(isContainerClick);
+            console.log(e.composedPath());
             if (!isContainerClick) onClose();
         };
 

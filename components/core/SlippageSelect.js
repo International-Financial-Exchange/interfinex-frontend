@@ -36,7 +36,7 @@ export const SlippageSelect = ({ onChange, value }) => {
             }
 
             <Input
-                style={{ width: CONTAINER_SIZING.miniscule }}
+                style={{ width: CONTAINER_SIZING.miniscule, borderWidth: 2 }}
                 onChange={e => onChange(e.target.value)}
                 selected={!OPTIONS.includes(value)}
                 placeholder={value + "%"}

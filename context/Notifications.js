@@ -123,7 +123,6 @@ const LayoutNotificationContainer = styled.div`
     background-color: ${({ typeColor, }) => shade(typeColor, 0.85)};
     border: 1px solid ${({ typeColor }) => typeColor};
     border-radius: ${PIXEL_SIZING.miniscule};
-    color: ${({ theme }) => theme.colors.textPrimary};
     position: relative;
 
     width: 100%;
@@ -161,7 +160,7 @@ const LayoutNotification = ({ content, type, timestamp, deleteNotification, }) =
                 style={{ height: PIXEL_SIZING.medium }}
             />
 
-            <Text bold>{ content }</Text>
+            <Text style={{ color:  "black" }} bold>{ content }</Text>
 
             <div>
                 <TextButton onClick={deleteNotification}>

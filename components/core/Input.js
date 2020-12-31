@@ -14,6 +14,8 @@ const InputContainer = styled.input`
     padding: ${PIXEL_SIZING.small};
     font-size: ${PIXEL_SIZING.small};
     width: 100%;
+    background-color: ${({ theme }) => theme.colors.invert};
+    color: ${({ theme }) => theme.colors.textPrimary};
 
     &:focus {
         border: 1px solid ${({ theme, isError }) => isError ? theme.colors.negative : theme.colors.primary};

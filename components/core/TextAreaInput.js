@@ -5,6 +5,8 @@ import { PIXEL_SIZING } from "../../utils/constants";
 
 const InputContainer = styled.textarea`
     border-radius: ${PIXEL_SIZING.miniscule};
+    background-color: ${({ theme }) => theme.colors.invert};
+    color: ${({ theme }) => theme.colors.textPrimary};
     border: 1px solid ${({ theme, isError, selected }) => isError ? 
         theme.colors.negative 
         : selected ?

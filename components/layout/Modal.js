@@ -30,7 +30,7 @@ export const Modal = ({ isOpen, onClose = _.noop, children, topRight, showBackdr
             ReactDOM.createPortal(
                 <CloseModalContext.Provider value={onClose}>
                     <div 
-                        style={{ position: 'fixed', height: '100%', width: '100%', zIndex: 100, backgroundColor: showBackdrop ? "rgba(0, 0, 0, 0.7)" : "transparent" }}
+                        style={{ position: 'fixed', height: '100%', width: '100%', zIndex: 100, backgroundColor: showBackdrop ? "rgba(0, 0, 0, 0.7)" : "transparent", top: 0, left: 0, }}
                         id={MODAL_ID}
                         onClick={e => {
                             e.stopPropagation();
