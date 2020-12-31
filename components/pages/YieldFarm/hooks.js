@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { EthersContext } from "../../../context/Ethers";
 import { TokenPairContext } from "../../../context/TokenPair";
-import { humanizeTokenAmount, isZeroAddress } from "../../../utils/utils";
+import { divOrZero, humanizeTokenAmount, isZeroAddress, tokenAmountToBig } from "../../../utils/utils";
 import { getYieldFarms } from "./networkRequests";
 
 export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
@@ -17,9 +17,9 @@ export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
             const ifexBalance = assetToken.address === ifexToken.address ? exchangeAssetTokenBalance : exchangeBaseTokenBalance;
 
             const rawFarmInfo = await YieldFarm.tokenToFarmInfo(liquidityToken.address);
-            const yieldPerBlock = humanizeTokenAmount(rawFarmInfo.yieldPerBlock, { decimals: 18 });
-            const annualYield = yieldPerBlock * 2336000;
-            const annualAPR = ((annualYield / ifexBalance) * 100).toFixed(2);
+            const yieldPerBlock = tokenAmountToBig(rawFarmInfo.yieldPerBlock, { decimals: 18 });
+            const annualYield = yieldPerBlock.mul(2336000);
+            const annualAPR = divOrZero(annualYield, ifexBalance).mul(100).toFixed(2);
             const farmInfo = {
                 lastBlockUpdate: rawFarmInfo.lastBlockUpdate.toString(),
                 tokenContract: rawFarmInfo.tokenContract,
@@ -42,15 +42,13 @@ export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
     return [farmInfo, isLoading]
 };
 
-export const useYieldFarm = () => {
+export const useYieldFarms = () => {
     const [isLoading, setIsLoading] = useState();
     const [farms, setFarms] = useState();
 
     useEffect(() => {
         setIsLoading(true);
         getYieldFarms({ limit: 500 }).then(rawFarms => {
-            console.log("renal", rawFarms)
-            
             const farms = rawFarms.map(({ 
                 liquidityTokenContract: tokenContract, 
                 yieldPerBlock,
@@ -59,8 +57,8 @@ export const useYieldFarm = () => {
                 marketContract
             }) => ({ 
                 tokenContract,
-                yieldPerBlock: humanizeTokenAmount(yieldPerBlock, { decimals: 18 }),
-                annualYield: humanizeTokenAmount(yieldPerBlock, { decimals: 18 }) * 2336000,
+                yieldPerBlock: tokenAmountToBig(yieldPerBlock, { decimals: 18 }),
+                annualYield: tokenAmountToBig(yieldPerBlock, { decimals: 18 }) * 2336000,
                 token0Address,
                 token1Address,
                 marketContract,

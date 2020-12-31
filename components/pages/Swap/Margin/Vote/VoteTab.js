@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from "react";
 import styled from "styled-components";
 import { TokenPairContext } from "../../../../../context/TokenPair";
 import { PIXEL_SIZING } from "../../../../../utils/constants";
-import { humanizeTokenAmount } from "../../../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
 import { TabSquareNav } from "../../../../core/TabSquareNav";
 import { TokenAndLogo } from "../../../../core/TokenAndLogo";
 import { MarginContext } from "../../Swap";
@@ -37,42 +37,42 @@ export const PROPOSAL_INFO = {
         description: "The minimum amount of collateral that a user must post relative to the amount borrowed.", 
         multiplier: 10, 
         contractKey: "minInitialMarginRate",
-        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%" 
+        formatValue: value => (tokenAmountToBig(value, { decimals: 18 }) * 100).toFixed(4) + "%" 
     },
     [PROPOSAL_IDS.maintenanceMargin]: { 
         name: "Maintenance Margin", 
         description: "The amount of collateral that a user must post as insurance in case their position gets liquidated.", 
         multiplier: 5, 
         contractKey: "maintenanceMarginRate",
-        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%"
+        formatValue: value => (tokenAmountToBig(value, { decimals: 18 }) * 100).toFixed(4) + "%"
     },
     [PROPOSAL_IDS.interestMultiplier]: { 
         name: "Interest Multiplier", 
         description: "The multiplier on the utilisation rate to attain the current interest rate.\nCalculated like so: (utilisation rate * interest multiplier) ^ 2", 
         multiplier: 5, 
         contractKey: "interestMultiplier", 
-        formatValue: value => humanizeTokenAmount(value, { decimals: 18 }).toFixed(4) + "x"
+        formatValue: value => tokenAmountToBig(value, { decimals: 18 }).toFixed(4) + "x"
     },
     [PROPOSAL_IDS.maxBorrowAmountRate]: { 
         name: "Max Borrow Amount", 
         description: "The maxium amount that a user can borrow in a single position relative to the total assets in the funding pool.", 
         multiplier: 10, 
         contractKey: "maxBorrowAmountRate",
-        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",
+        formatValue: value => (tokenAmountToBig(value, { decimals: 18 }) * 100).toFixed(4) + "%",
     },
     [PROPOSAL_IDS.maxLiquidateVolumeRate]: { 
         name: "Max Liquidate Volume", 
         description: "The maxium amount of liquidations that can occur in a single block relative to the total assets in the funding pool - if there is only one liquidation, then this value will be ignored.", 
         multiplier: 10, 
         contractKey: "maxLiquidateVolumeRate",
-        formatValue: value => (humanizeTokenAmount(value, { decimals: 18 }) * 100).toFixed(4) + "%",
+        formatValue: value => (tokenAmountToBig(value, { decimals: 18 }) * 100).toFixed(4) + "%",
     },
     [PROPOSAL_IDS.votingDuration]: { 
         name: "Voting Duration", 
         description: "The amount of time that each vote lasts before it finishes.", 
         multiplier: 15, 
         contractKey: "votingDuration",
-        formatValue: (value) => `${parseInt(humanizeTokenAmount(value, { decimals: 0 }) / 86400) + " days " + new Date(humanizeTokenAmount(value, { decimals: 0 }) * 1000).toISOString().substr(11, 8)}`,
+        formatValue: (value) => `${parseInt(tokenAmountToBig(value, { decimals: 0 }) / 86400) + " days " + new Date(tokenAmountToBig(value, { decimals: 0 }) * 1000).toISOString().substr(11, 8)}`,
     },
 };
 

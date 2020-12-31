@@ -3,10 +3,10 @@ import Text from "../../core/Text";
 import styled, { ThemeContext } from "styled-components";
 import { Layout } from "../../layout/Layout";
 import { Button } from "../../core/Button";
-import { useYieldFarm } from "./hooks";
+import { useYieldFarm, useYieldFarms } from "./hooks";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { divOrZero, humanizeTokenAmount } from "../../../utils/utils";
 import { useRouter } from "next/router";
 import Skeleton from "react-loading-skeleton";
 
@@ -49,7 +49,7 @@ const StyledRow = styled.tr`
 `;
 
 export const YieldFarm = () => {
-    const [farms, isLoading] = useYieldFarm();
+    const [farms, isLoading] = useYieldFarms();
 
     return (
         <Layout>
@@ -127,7 +127,7 @@ const FarmRow = ({ farm }) => {
 
         ifexToken.contract.balanceOf(marketContract).then(rawMarketBalance => {
             const marketBalance = humanizeTokenAmount(rawMarketBalance, ifexToken);
-            const APR = (annualYield / marketBalance * 100).toFixed(2);
+            const APR = divOrZero(annualYield, marketBalance).mul(100).toFixed(2);
             setAPR(APR);
         });
     }, []);
@@ -142,8 +142,8 @@ const FarmRow = ({ farm }) => {
                         : <Skeleton height={PIXEL_SIZING.medium} width={PIXEL_SIZING.huge}/>
                 }
             </td>
-            <td>{yieldPerBlock} IFEX</td>
-            <td>{annualYield} IFEX</td>
+            <td>{yieldPerBlock.toFixed(2)} IFEX</td>
+            <td>{annualYield.toFixed(2)} IFEX</td>
             <td>
                 <Button
                     style={{ width: "100%" }}

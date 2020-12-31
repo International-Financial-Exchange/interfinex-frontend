@@ -146,7 +146,7 @@ export const YourLiquidity = () => {
                             <div style={{ display: "grid", gridTemplateColumns: "50% auto", }}>
                                 <div>Annual APR:</div> 
                                 <div style={{ color: theme.colors.positive, fontWeight: "bold" }}>
-                                    {" " + farmInfo.annualAPR}%
+                                    {" " + farmInfo.annualAPR.toFixed(2)}%
                                 </div>
                             </div>
 
@@ -155,7 +155,7 @@ export const YourLiquidity = () => {
                                     Annual Yield:
                                 </div> 
                                 <div style={{ fontWeight: "bold" }}>
-                                    {" " + farmInfo.annualYield} IFEX
+                                    {" " + farmInfo.annualYield.toFixed(2)} IFEX
                                 </div>
                             </div>
                         </div>

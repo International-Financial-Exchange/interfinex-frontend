@@ -49,6 +49,10 @@ export const shade = (col, light)=> {
     return color(r, g, b);
 }
 
+export const divOrZero = (bigNum1 = new Big(0), bigNum2 = new Big(0)) => {
+    return (bigNum1.gt(0) && bigNum2.gt(0)) ? bigNum1.div(bigNum2) : 0;
+};
+
 export const appendDecimalZeroes = (bigNum = new Big(0), decimals = 18) => {
     const strNum = bigNum.toFixed();
     const decimalsStr = strNum.split(".")[1]?.slice(0, decimals) ?? "";

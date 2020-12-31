@@ -15,10 +15,10 @@ import { AccountContext } from "../../../../../context/Account";
 import { InfoBubble } from "../../../../core/InfoBubble";
 import { add } from "lodash";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
-import { humanizeTokenAmount, parseTokenAmount } from "../../../../../utils/utils";
+import { divOrZero, humanizeTokenAmount, parseTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
 
 const useVotes = ({ proposalId, MarginMarket, }) => {
-    const [votesCast, setVotesCast] = useState({ up: 0, preserve: 0, down: 0 });
+    const [votesCast, setVotesCast] = useState({ up: new Big(0), preserve: new Big(0), down: new Big(0) });
     const [account, setAccount] = useState();
     const [currentValue, setCurrentValue] = useState();
     const [finishDate, setFinishDate] = useState();
@@ -37,9 +37,9 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
             MarginMarket.proposalVotes(proposalId, VOTING_OPTIONS.up, { gasLimit: 1_000_000 }),
             MarginMarket.proposalVotes(proposalId, VOTING_OPTIONS.down, { gasLimit: 1_000_000 }),
             MarginMarket.proposalVotes(proposalId, VOTING_OPTIONS.preserve, { gasLimit: 1_000_000 }),
-        ])).map(res => humanizeTokenAmount(res, { decimals: 18 }));
+        ])).map(res => tokenAmountToBig(res, { decimals: 18 }));
 
-        setVotesCast({ up, down, preserve, total: up + down + preserve });
+        setVotesCast({ up, down, preserve, total: up.add(down).add(preserve) });
     }
 
     const updateCurrentValue = async () => {
@@ -47,7 +47,7 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
     };
 
     const updateFinishDate = async () => {
-        setFinishDate((await MarginMarket.proposalFinalisationDate(proposalId, { gasLimit: 1_000_000 })) * 1000);
+        setFinishDate(parseInt(await MarginMarket.proposalFinalisationDate(proposalId, { gasLimit: 1_000_000 })) * 1000);
     }
 
     useEffect(() => {
@@ -62,8 +62,8 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
 
     const updateAccount = async () => {
         setAccount();
-        const votesDeposited = humanizeTokenAmount(await MarginMarket.userVotes(address, proposalId), ifexToken);
-        const userLastVote = humanizeTokenAmount(await MarginMarket.userLastVote(address, proposalId), { decimals: 0 }) * 1000;
+        const votesDeposited = tokenAmountToBig(await MarginMarket.userVotes(address, proposalId), ifexToken);
+        const userLastVote = parseInt(await MarginMarket.userLastVote(address, proposalId), { decimals: 0 }) * 1000;
         setAccount({
             votesDeposited,
             isVoting: userLastVote === finishDate,
@@ -139,7 +139,7 @@ const CastVotesPreview = ({ values = [], totalCount }) => {
                             <div 
                                 style={{ 
                                     height: "100%", 
-                                    width: `${count > 0 ? (count / totalCount * 100) : 0}%`, 
+                                    width: `${divOrZero(count, totalCount.mul(100))}%`, 
                                     backgroundColor: color || theme.colors.positive, 
                                     borderRadius: "inherit" 
                                 }}
@@ -318,14 +318,14 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
                     </div>
 
                     {
-                        account?.votesDeposited > 0 ?
+                        account?.votesDeposited.gt(0) ?
                             <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
                                 <InfoBubble>
-                                    You have voted with {account.votesDeposited} IFEX. You can withdraw your IFEX after the vote you participated in has been finalised and a consensus has been reached. 
+                                    You have voted with {account.votesDeposited.toFixed(4)} IFEX. You can withdraw your IFEX after the vote you participated in has been finalised and a consensus has been reached. 
                                 </InfoBubble>   
 
                                 { 
-                                    account.votesDeposited > 0 && !account.isVoting &&
+                                    account.votesDeposited.gt(0) && !account.isVoting &&
                                         <Button 
                                             secondary
                                             primary 

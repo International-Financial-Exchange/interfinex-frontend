@@ -11,7 +11,8 @@ import { NotificationsContext } from "../../../context/Notifications"
 import { SwapContext } from "./Swap"
 import { parseEther } from "ethers/lib/utils"
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants"
-import { safeParseEther } from "../../../utils/utils"
+import { divOrZero, safeParseEther } from "../../../utils/utils";
+import Big from "big.js";
 
 export const CreateMarket = () => {
     const { token0, token1, assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
@@ -20,9 +21,9 @@ export const CreateMarket = () => {
     const { addTransactionNotification } = useContext(NotificationsContext);
     const { approveFactory, approveRouter } = useContext(SwapContext);
 
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
-    const [baseTokenAmount, setBaseTokenAmount] = useState();
-    const [ifexTokenAmount, setIfexTokenAmount] = useState();
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
+    const [baseTokenAmount, setBaseTokenAmount] = useState(new Big(0));
+    const [ifexTokenAmount, setIfexTokenAmount] = useState(new Big(0));
 
     const [isLoading, setIsLoading] = useState();
 
@@ -84,34 +85,34 @@ export const CreateMarket = () => {
 
             <TokenAmountInput 
                 value={assetTokenAmount}
-                isError={assetTokenAmount > assetTokenBalance}
+                isError={assetTokenAmount.gt(assetTokenBalance)}
                 errorMessage={`Insufficent ${assetToken.symbol} balance`}
-                onChange={e => setAssetTokenAmount(e.target.value)}
+                onChange={num => setAssetTokenAmount(num)}
                 token={assetToken}
             />
 
             <TokenAmountInput 
                 value={baseTokenAmount}
-                isError={baseTokenAmount > baseTokenBalance}
+                isError={baseTokenAmount.gt(baseTokenBalance)}
                 errorMessage={`Insufficent ${baseToken.symbol} balance`}
-                onChange={e => setBaseTokenAmount(e.target.value)}
+                onChange={num => setBaseTokenAmount(num)}
                 token={baseToken}
             />
 
             <TokenAmountInput 
                 value={ifexTokenAmount}
-                isError={ifexTokenAmount > ifexTokenBalance}
+                isError={ifexTokenAmount.gt(ifexTokenBalance)}
                 errorMessage={`Insufficent ${ifexToken.symbol} balance`}
-                onChange={e => setIfexTokenAmount(e.target.value)}
+                onChange={num => setIfexTokenAmount(num)}
                 token={ifexToken}
             />
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
                 <Text secondary>
-                    1 {baseToken.symbol} ≈ {Number.isNaN(assetTokenAmount / baseTokenAmount) ? 0 : (assetTokenAmount / baseTokenAmount).toFixed(4)} {assetToken.symbol}
+                    1 {baseToken.symbol} ≈ {divOrZero(assetTokenAmount, baseTokenAmount).toFixed(6)} {assetToken.symbol}
                 </Text>
 
-                <Text secondary>1 {baseToken.symbol} ≈ {Number.isNaN(ifexTokenAmount / (baseTokenAmount / 10)) ? 0 : (ifexTokenAmount / (baseTokenAmount / 10)).toFixed(4)} {ifexToken.symbol}</Text>
+                <Text secondary>1 {baseToken.symbol} ≈ {divOrZero(ifexTokenAmount, divOrZero(baseTokenAmount, new Big(10)).toFixed(6))} {ifexToken.symbol}</Text>
             </div>
 
             <Button 
