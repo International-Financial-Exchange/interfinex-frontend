@@ -50,7 +50,7 @@ export const shade = (col, light)=> {
 }
 
 export const divOrZero = (bigNum1 = new Big(0), bigNum2 = new Big(0)) => {
-    return (bigNum1.gt(0) && bigNum2.gt(0)) ? bigNum1.div(bigNum2) : 0;
+    return (bigNum1.gt(0) && bigNum2.gt(0)) ? bigNum1.div(bigNum2) : new Big(0);
 };
 
 export const appendDecimalZeroes = (bigNum = new Big(0), decimals = 18) => {

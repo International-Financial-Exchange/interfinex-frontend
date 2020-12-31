@@ -112,7 +112,7 @@ export const CreateMarket = () => {
                     1 {baseToken.symbol} ≈ {divOrZero(assetTokenAmount, baseTokenAmount).toFixed(6)} {assetToken.symbol}
                 </Text>
 
-                <Text secondary>1 {baseToken.symbol} ≈ {divOrZero(ifexTokenAmount, divOrZero(baseTokenAmount, new Big(10)).toFixed(6))} {ifexToken.symbol}</Text>
+                <Text secondary>1 {baseToken.symbol} ≈ {divOrZero(ifexTokenAmount, divOrZero(baseTokenAmount, new Big(10))).toFixed(6)} {ifexToken.symbol}</Text>
             </div>
 
             <Button 

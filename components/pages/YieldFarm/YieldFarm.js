@@ -6,7 +6,7 @@ import { Button } from "../../core/Button";
 import { useYieldFarm, useYieldFarms } from "./hooks";
 import { useContext, useEffect, useState } from "react";
 import { TokenPairContext } from "../../../context/TokenPair";
-import { divOrZero, humanizeTokenAmount } from "../../../utils/utils";
+import { divOrZero, humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
 import { useRouter } from "next/router";
 import Skeleton from "react-loading-skeleton";
 
@@ -126,7 +126,7 @@ const FarmRow = ({ farm }) => {
         setToken1(token1);
 
         ifexToken.contract.balanceOf(marketContract).then(rawMarketBalance => {
-            const marketBalance = humanizeTokenAmount(rawMarketBalance, ifexToken);
+            const marketBalance = tokenAmountToBig(rawMarketBalance, ifexToken);
             const APR = divOrZero(annualYield, marketBalance).mul(100).toFixed(2);
             setAPR(APR);
         });

@@ -137,8 +137,6 @@ export const Swap = () => {
             return [tokenAmountToBig(assetTokenBalance, assetToken), tokenAmountToBig(baseTokenBalance, baseToken)];
         });
 
-        console.log("asset amount", exchangeAssetTokenBalance)
-
         setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
         setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
 
