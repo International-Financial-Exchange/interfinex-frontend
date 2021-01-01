@@ -1,12 +1,19 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styled, { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../context/Account";
 import { EthersContext } from "../../../context/Ethers";
+import { NotificationsContext, NOTIFICATION_CONTENT_TYPES } from "../../../context/Notifications";
 import { THEME_OPTIONS } from "../../../context/Theme";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { Avatar } from "../../core/Avatar";
+import { FailCrossIcon } from "../../core/FailCrossIcon";
+import { LinkIcon } from "../../core/LinkIcon";
 import { ModalCard } from "../../core/ModalCard";
+import { BarSpinner, CircleSpinner } from "../../core/Spinner";
+import { SuccessTickIcon } from "../../core/SuccesTickIcon";
+import Text from "../../core/Text";
 import { Triangle } from "../../core/Triangle";
+import { DropdownItem } from "../Dropdown";
 import { DropdownTransitioner, SelectableDropdownItem } from "../DropdownTransitioner";
 import { Modal } from "../Modal";
 
@@ -315,18 +322,54 @@ const NotificationBell = props => {
 
 const NotificationsPreview = () => {
     const [showDropDown, setShowDropDown] = useState(false);
+    const theme = useContext(ThemeContext);
+    const { notifications, markAsRead } = useContext(NotificationsContext);
+
+    useEffect(() => {
+        if (showDropDown) {
+            markAsRead();
+        }
+    }, [showDropDown]);
+
+    const unreadNotificationsCount = notifications.reduce(
+        (count, { isRead }) => isRead ? count : count + 1,
+        0
+    );
 
     return (
         <>
             <DropdownIconContainer 
                 onClick={() => setShowDropDown(!showDropDown)} 
                 selected={showDropDown}
-                style={{ marginRight: PIXEL_SIZING.small }}
+                style={{ marginRight: PIXEL_SIZING.small, position: "relative" }}
             >
                 <NotificationBell 
                     style={{ height: 18, marginTop: "1%", }} 
                     className={"options-menu-triangle"}
                 />
+
+                {
+                    unreadNotificationsCount > 0 &&
+                        <div 
+                            style={{ 
+                                backgroundColor: theme.colors.negative,
+                                position: "absolute",
+                                borderRadius: PIXEL_SIZING.small,
+                                padding: PIXEL_SIZING.microscopic,
+                                top: 0,
+                                right: 0,
+                                minWidth: PIXEL_SIZING.medium,
+                                minHeight: PIXEL_SIZING.medium,
+                                display: "grid",
+                                alignItems: "center",
+                                justifyItems: "center",
+                                transform: "translate(30%, -30%)"
+                            }}
+                        >
+                            {unreadNotificationsCount}
+                        </div>
+                }
+
             </DropdownIconContainer>
 
             <Modal 
@@ -337,11 +380,65 @@ const NotificationsPreview = () => {
             >
                 <ModalCard style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.small }}>
                     <DropdownTransitioner>
-                        <ExpandedOptionsMenu/>
+                        <ExpandedNotificationsPreview/>
                     </DropdownTransitioner>
                 </ModalCard>
             </Modal>
         </>
+    );
+};
+
+const TransactionNotificationItem = styled(DropdownItem)`
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    height: fit-content;
+    align-items: start;
+    column-gap: ${PIXEL_SIZING.small};
+    row-gap: ${PIXEL_SIZING.tiny};
+    padding: ${PIXEL_SIZING.small};
+
+    &:hover {
+        cursor: pointer;
+        .tx-link-icon {
+            path {
+                fill: ${({ theme, }) =>  theme.colors.primary} !important;
+                stroke: ${({ theme, }) =>  theme.colors.primary} !important;
+            }
+        }
+    }
+`;
+
+const ExpandedNotificationsPreview = () => {
+    const { notifications } = useContext(NotificationsContext);
+
+    console.log("notifications", notifications);
+
+    return (
+        <div>
+            {
+                notifications.sort((a, b) => b.timestamp - a.timestamp).map(({ textContent, timestamp, contentType }) => {
+                    switch (contentType) {
+                        case NOTIFICATION_CONTENT_TYPES.transaction:
+                            return (
+                                <TransactionNotificationItem>
+                                    <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
+                                        {/* <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/> */}
+                                        {/* <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/> */}
+                                        <LinkIcon className={"tx-link-icon"}/>
+                                    </div>
+                                    <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
+                                </TransactionNotificationItem>
+                            );
+                        default:
+                            console.warn("Unsupported notification content type: ", contentType);
+                            return null;
+                    }
+                })
+            }
+        </div>
     );
 };
 
@@ -375,7 +472,6 @@ const ExpandedOptionsMenu = () => {
             <SelectableDropdownItem 
                 Icon={<LogoutIcon className={"dropdown-transition-icon"}/>}
                 onClick={() => {
-                    console.log("hello there")
                     setSigner();
                 }}
             >

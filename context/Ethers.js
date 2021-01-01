@@ -42,6 +42,8 @@ export const EthersProvider = ({ children }) => {
     const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["ganache"];
     const getAbi = abiName => ABI[abiName];
 
+    console.log("provider", provider);
+
     const { 
         IfexToken, 
         SwapFactory,  

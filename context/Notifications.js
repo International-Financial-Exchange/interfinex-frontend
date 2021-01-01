@@ -8,6 +8,8 @@ import { TextButton } from "../components/core/Button";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../utils/constants";
 import { hexToRgba, shade } from "../utils/utils";
 import { useLocalStorage } from "../utils/hooks";
+import { TransactionDescription } from "ethers/lib/utils";
+import { EthersContext } from "./Ethers";
 
 export const NOTIFICATION_TYPES = {
     success: "SUCCESS",
@@ -22,10 +24,25 @@ export const NOTIFICATION_CONTENT_TYPES = {
 
 export const NotificationsContext = createContext();
 
-export const NotificationsProvider = ({ children }) => {
+const useNotifications = () => {
     const [notifications, setNotifications] = useLocalStorage("notifications", []);
     const [displayNotifications, setDisplayNotifications] = useState([]);
-    const [layoutNotifications, setLayoutNotifications] = useState([]);
+    const { provider, } = useContext(EthersContext);
+
+    const markAsRead = () => {
+        setNotifications(existing => 
+            existing.map(notification => ({ 
+                ...notification, 
+                isRead: true 
+            }))
+        );
+    };
+
+    const addTransactionListener = async notification => {
+        const transaction = await provider.getTransaction(notification.additionalDetails.tx.hash);
+        const res = await transaction.wait(1);
+        console.log("res", res);
+    };
 
     const addNotification = ({ textContent, contentType, type, timeout = 1000 * 7, additionalDetails }) => {
         const id = uniqueId("notification");
@@ -35,14 +52,39 @@ export const NotificationsProvider = ({ children }) => {
             type, 
             timestamp: Date.now(), 
             timeout,
+            isRead: false,
             additionalDetails,
             id, 
             deleteNotification: () => setDisplayNotifications(existing => existing.filter(({ id: _id }) => _id !== id))
         };
 
+        console.log("transaction", contentType === NOTIFICATION_CONTENT_TYPES.transaction && type !== NOTIFICATION_TYPES.error)
+        if (contentType === NOTIFICATION_CONTENT_TYPES.transaction && type !== NOTIFICATION_TYPES.error) {
+            notifications.additionalDetails = {
+                ...notification.additionalDetails,
+                isLoading: true,
+            };
+
+            addTransactionListener(notification);
+        }
+
         setDisplayNotifications(existing => existing.concat(notification));
         setNotifications(existing => existing.concat(notification));
     };
+
+
+    return [
+        notifications, 
+        displayNotifications,
+        setNotifications, 
+        addNotification, 
+        markAsRead
+    ];
+};
+
+export const NotificationsProvider = ({ children }) => {
+    const [notifications, displayNotifications, setNotifications, addNotification, markAsRead] = useNotifications();
+    const [layoutNotifications, setLayoutNotifications] = useState([]);
 
     const addTransactionNotification = useCallback(async ({ content, transactionPromise }) => {
         try {
@@ -60,10 +102,10 @@ export const NotificationsProvider = ({ children }) => {
             addNotification({
                 type: NOTIFICATION_TYPES.error,
                 contentType: NOTIFICATION_CONTENT_TYPES.transaction,
-                textContent: content,
+                textContent: "Failed: " + content,
             });
         }
-    }, []);
+    }, [addNotification]);
 
     const addLayoutNotification = useCallback(({ content, type }) => {
         const id = uniqueId("layout-notification");
@@ -90,6 +132,8 @@ export const NotificationsProvider = ({ children }) => {
                 addTransactionNotification,
                 addLayoutNotification,
                 layoutNotifications,
+                markAsRead,
+                notifications,
             }}
         >
             { children }

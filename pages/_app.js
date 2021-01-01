@@ -57,8 +57,8 @@ export default ({ Component, pageProps }) => {
     return (
         <Theme>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <NotificationsProvider>
-                    <EthersProvider>
+                <EthersProvider>
+                    <NotificationsProvider>
                         <TokenPairProvider>
                             <AccountProvider>
                                 <Head>
@@ -77,8 +77,8 @@ export default ({ Component, pageProps }) => {
                                 <Footer/>
                             </AccountProvider>
                         </TokenPairProvider>
-                    </EthersProvider>
-                </NotificationsProvider>
+                    </NotificationsProvider>
+                </EthersProvider>
             </MuiPickersUtilsProvider>
         </Theme>
     );
