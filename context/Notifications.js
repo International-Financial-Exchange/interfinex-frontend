@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
-import { uniqueId } from "lodash";
+import { cloneDeep, uniqueId } from "lodash";
 import ReactDOM from "react-dom";
 import styled, { ThemeContext } from "styled-components";
 import { Cross } from "../components/core/Cross";
@@ -10,6 +10,7 @@ import { hexToRgba, shade } from "../utils/utils";
 import { useLocalStorage } from "../utils/hooks";
 import { TransactionDescription } from "ethers/lib/utils";
 import { EthersContext } from "./Ethers";
+import { v4 as uuidv4 } from 'uuid';
 
 export const NOTIFICATION_TYPES = {
     success: "SUCCESS",
@@ -26,6 +27,7 @@ export const NotificationsContext = createContext();
 
 const useNotifications = () => {
     const [notifications, setNotifications] = useLocalStorage("notifications", []);
+    const [listeners, setListeners] = useState({});
     const [displayNotifications, setDisplayNotifications] = useState([]);
     const { provider, } = useContext(EthersContext);
 
@@ -41,11 +43,29 @@ const useNotifications = () => {
     const addTransactionListener = async notification => {
         const transaction = await provider.getTransaction(notification.additionalDetails.tx.hash);
         const res = await transaction.wait(1);
-        console.log("res", res);
+
+        setNotifications(existing => {
+            const newArr = cloneDeep(existing);
+            const index = newArr.findIndex(({ id }) => id === notification.id);
+
+            newArr[index].additionalDetails.isLoading = false;
+            newArr[index].type = res.status === 1 ? NOTIFICATION_TYPES.success : NOTIFICATION_TYPES.error;
+
+            return newArr;
+        });
     };
 
+    useEffect(() => {
+        notifications.forEach(notification => {
+            if (notification.additionalDetails?.isLoading && !listeners[notification.id]) {
+                setListeners(old => ({ ...old, [notification.id]: true }));
+                addTransactionListener(notification);
+            }
+        });
+    }, [notifications]);
+
     const addNotification = ({ textContent, contentType, type, timeout = 1000 * 7, additionalDetails }) => {
-        const id = uniqueId("notification");
+        const id = uuidv4();
         const notification = { 
             textContent, 
             contentType,
@@ -58,14 +78,11 @@ const useNotifications = () => {
             deleteNotification: () => setDisplayNotifications(existing => existing.filter(({ id: _id }) => _id !== id))
         };
 
-        console.log("transaction", contentType === NOTIFICATION_CONTENT_TYPES.transaction && type !== NOTIFICATION_TYPES.error)
         if (contentType === NOTIFICATION_CONTENT_TYPES.transaction && type !== NOTIFICATION_TYPES.error) {
-            notifications.additionalDetails = {
+            notification.additionalDetails = {
                 ...notification.additionalDetails,
                 isLoading: true,
             };
-
-            addTransactionListener(notification);
         }
 
         setDisplayNotifications(existing => existing.concat(notification));

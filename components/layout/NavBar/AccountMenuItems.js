@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import styled, { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../context/Account";
 import { EthersContext } from "../../../context/Ethers";
-import { NotificationsContext, NOTIFICATION_CONTENT_TYPES } from "../../../context/Notifications";
+import { NotificationsContext, NOTIFICATION_CONTENT_TYPES, NOTIFICATION_TYPES } from "../../../context/Notifications";
 import { THEME_OPTIONS } from "../../../context/Theme";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { Avatar } from "../../core/Avatar";
@@ -326,6 +326,7 @@ const NotificationsPreview = () => {
     const { notifications, markAsRead } = useContext(NotificationsContext);
 
     useEffect(() => {
+        console.log("show drop down", showDropDown);
         if (showDropDown) {
             markAsRead();
         }
@@ -378,7 +379,7 @@ const NotificationsPreview = () => {
                 onClose={() => setShowDropDown(false)}
                 showBackdrop={false}
             >
-                <ModalCard style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.small }}>
+                <ModalCard style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.small, maxHeight: CONTAINER_SIZING.large, overflow: "auto" }}>
                     <DropdownTransitioner>
                         <ExpandedNotificationsPreview/>
                     </DropdownTransitioner>
@@ -417,20 +418,26 @@ const ExpandedNotificationsPreview = () => {
     return (
         <div>
             {
-                notifications.sort((a, b) => b.timestamp - a.timestamp).map(({ textContent, timestamp, contentType }) => {
+                notifications.sort((a, b) => b.timestamp - a.timestamp).map(({ textContent, timestamp, contentType, additionalDetails, type }) => {
                     switch (contentType) {
                         case NOTIFICATION_CONTENT_TYPES.transaction:
                             return (
-                                <TransactionNotificationItem>
-                                    <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
-                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                        <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
-                                        {/* <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/> */}
-                                        {/* <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/> */}
-                                        <LinkIcon className={"tx-link-icon"}/>
-                                    </div>
-                                    <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
-                                </TransactionNotificationItem>
+                                <a href={`https://etherscan.io/tx/${additionalDetails?.tx.hash}`}>
+                                    <TransactionNotificationItem>
+                                        <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            {
+                                                additionalDetails?.isLoading ?
+                                                    <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
+                                                    : type === NOTIFICATION_TYPES.success ?
+                                                        <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/>
+                                                        : <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/>
+                                            }
+                                            <LinkIcon className={"tx-link-icon"}/>
+                                        </div>
+                                        <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
+                                    </TransactionNotificationItem>
+                                </a>
                             );
                         default:
                             console.warn("Unsupported notification content type: ", contentType);
