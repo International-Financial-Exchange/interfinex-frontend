@@ -14,13 +14,13 @@ const Container = styled.div`
     display: flex;
     align-items: center;
 
-    @media (max-width: 1100px) {
+    @media (max-width: 900px) {
         #account-eth-balance {
             display: none;
         }
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
         #nav-account-address {
             display: none;
         }

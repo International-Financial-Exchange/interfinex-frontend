@@ -7,6 +7,7 @@ import Text from "../components/core/Text";
 import { TextButton } from "../components/core/Button";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../utils/constants";
 import { hexToRgba, shade } from "../utils/utils";
+import { useLocalStorage } from "../utils/hooks";
 
 export const NOTIFICATION_TYPES = {
     success: "SUCCESS",
@@ -15,24 +16,32 @@ export const NOTIFICATION_TYPES = {
     warn: "WARN",
 };
 
+export const NOTIFICATION_CONTENT_TYPES = {
+    transaction: "TRANSACTION",
+};
+
 export const NotificationsContext = createContext();
 
 export const NotificationsProvider = ({ children }) => {
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useLocalStorage("notifications", []);
+    const [displayNotifications, setDisplayNotifications] = useState([]);
     const [layoutNotifications, setLayoutNotifications] = useState([]);
 
-    const addNotification = ({ content, type, timeout = 1000 * 7 }) => {
+    const addNotification = ({ textContent, contentType, type, timeout = 1000 * 7, additionalDetails }) => {
         const id = uniqueId("notification");
-        setNotifications(existing => 
-            existing.concat({ 
-                content, 
-                type, 
-                timestamp: Date.now(), 
-                timeout,
-                id, 
-                deleteNotification: () => setNotifications(existing => existing.filter(({ id: _id }) => _id !== id))
-            })
-        );
+        const notification = { 
+            textContent, 
+            contentType,
+            type, 
+            timestamp: Date.now(), 
+            timeout,
+            additionalDetails,
+            id, 
+            deleteNotification: () => setDisplayNotifications(existing => existing.filter(({ id: _id }) => _id !== id))
+        };
+
+        setDisplayNotifications(existing => existing.concat(notification));
+        setNotifications(existing => existing.concat(notification));
     };
 
     const addTransactionNotification = useCallback(async ({ content, transactionPromise }) => {
@@ -40,35 +49,18 @@ export const NotificationsProvider = ({ children }) => {
             const tx = await transactionPromise;
             addNotification({
                 type: NOTIFICATION_TYPES.success,
-                content: <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
-                    <Text bold>
-                        Successfully Sent Transaction
-                    </Text>
-
-                    <Text secondary>
-                        {content}
-                    </Text>
-
-                    <TextButton
-                        onClick={() => window.open(`https://etherscan.io/tx/${tx.hash}`)}
-                    >
-                        Tx Id: {tx.hash.slice(0, 28)}...
-                    </TextButton>
-                </div>,
+                contentType: NOTIFICATION_CONTENT_TYPES.transaction,
+                textContent: content,
+                additionalDetails: {
+                    tx,
+                }
             });
         } catch (e) {
             console.log(e);
             addNotification({
                 type: NOTIFICATION_TYPES.error,
-                content: <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
-                    <Text bold>
-                        Failed to Send Transaction
-                    </Text>
-
-                    <Text secondary>
-                        {content}
-                    </Text>
-                </div>,
+                contentType: NOTIFICATION_CONTENT_TYPES.transaction,
+                textContent: content,
             });
         }
     }, []);
@@ -104,10 +96,10 @@ export const NotificationsProvider = ({ children }) => {
 
             <div style={{ position: "fixed", bottom: PIXEL_SIZING.large, left: PIXEL_SIZING.large, display: "grid", rowGap: PIXEL_SIZING.small }}>
                 {
-                    notifications.map(notification => 
+                    displayNotifications.map(notification => 
                         <Notification 
                             key={notification.id}
-                            {...notification}
+                            notification={notification}
                         />
                     )
                 }
@@ -191,7 +183,8 @@ const NotificationContainer = styled.div`
     }
 `;
 
-const Notification = ({ content, type, timestamp, deleteNotification, timeout }) => {
+const Notification = ({ notification }) => {
+    const { textContent, type, contentType, additionalDetails, timestamp, deleteNotification, timeout } = notification;
     const [timer, setTimer] = useState();
     const theme = useContext(ThemeContext);
     
@@ -216,12 +209,53 @@ const Notification = ({ content, type, timestamp, deleteNotification, timeout })
                             theme.colors.highlight
                             : theme.colors.primary
             }
-            onMouseOver={() => clearTimeout(timer)}
-            onMouseLeave={() => setTimeout(() => {
-                deleteNotification();
-            }, timeout)}
+            onMouseOver={() => {
+                console.log("clearing", timer);
+                clearTimeout(timer);
+            }}
+            onMouseLeave={() => {
+                const timer = setTimeout(() => {
+                    deleteNotification();
+                }, timeout);
+                setTimer(timer);
+            }}
         >
-            { content }
+            {
+                (() => {
+                    switch (contentType) {
+                        case NOTIFICATION_CONTENT_TYPES.transaction:
+                            return type === NOTIFICATION_TYPES.success ?
+                                <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
+                                    <Text bold>
+                                        Successfully Sent Transaction
+                                    </Text>
+
+                                    <Text secondary>
+                                        {textContent}
+                                    </Text>
+
+                                    <TextButton
+                                        onClick={() => window.open(`https://etherscan.io/tx/${additionalDetails.tx.hash}`)}
+                                    >
+                                        Tx Id: {additionalDetails.tx.hash.slice(0, 28)}...
+                                    </TextButton>
+                                </div>
+                            :
+                                <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>
+                                    <Text bold>
+                                        Failed to Send Transaction
+                                    </Text>
+                
+                                    <Text secondary>
+                                        {textContent}
+                                    </Text>
+                                </div>;
+                        default:
+                            console.warn("Unsupported notification contentType: ", contentType);
+                            return null;
+                    }
+                })()
+            }
             <div>
                 <Cross
                     onClick={() => deleteNotification()}
