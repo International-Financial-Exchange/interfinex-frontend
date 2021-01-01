@@ -5,7 +5,7 @@ import { shade } from "../../utils/utils";
 const Container = styled.div`
     border-radius: ${PIXEL_SIZING.tiny};
     background-color: ${({ theme, selected }) => selected ? "rgba(42,157,143, 0.2)" : ""};
-    color: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.highlight};
+    color: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.textSecondary};
     padding: ${PIXEL_SIZING.tiny};
     width: fit-content;
     user-select: none;
@@ -17,7 +17,7 @@ const Container = styled.div`
 
     .filter-icon {
         path {
-            fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.highlight} !important;
+            fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.textSecondary} !important;
         }
     }
 

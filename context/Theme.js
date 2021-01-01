@@ -23,7 +23,7 @@ export const THEMES = {
         grey: "#d4d4d4",
         blue: "#3182DD",
         boxShadow: "10px 7px 55px -22px rgba(0,0,0,0.15)",
-        primaryBoxShadow: "-1px 42px 97px 41px rgba(0,0,0,1)",
+        primaryBoxShadow: "10px 7px 55px 10px rgba(0,0,0,0.15)",
     },
 
     [THEME_OPTIONS.dark]: {
@@ -31,17 +31,17 @@ export const THEMES = {
         secondary: "#F4A261",
         tertiary: "#E9C46A",
         textPrimary: "white",
-        textSecondary: "#8f8f8f",
+        textSecondary: "#bababa",
         highlight: "#3b3b3b",
         unselected: "#2b2b2b",
-        invert: "#141414",
+        invert: "#151515",
         positive: "#28d76e",
         negative: "#f00f30",
         warn: "#ff9900",
         grey: "#d4d4d4",
         blue: "#3182DD",
         boxShadow: "10px 7px 55px -22px rgba(0,0,0,1)",
-        primaryBoxShadow: "-1px 42px 97px 41px rgba(0,0,0,1)",
+        primaryBoxShadow: "10px 7px 55px 10px rgba(0,0,0,1)",
     },
 };
 
