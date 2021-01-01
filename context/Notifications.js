@@ -6,7 +6,7 @@ import { Cross } from "../components/core/Cross";
 import Text from "../components/core/Text";
 import { TextButton } from "../components/core/Button";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../utils/constants";
-import { shade } from "../utils/utils";
+import { hexToRgba, shade } from "../utils/utils";
 
 export const NOTIFICATION_TYPES = {
     success: "SUCCESS",
@@ -120,7 +120,7 @@ const LayoutNotificationContainer = styled.div`
     padding: ${PIXEL_SIZING.small};
     transition: all 0.1s ease-out;
 
-    background-color: ${({ typeColor, }) => shade(typeColor, 0.85)};
+    background-color: ${({ typeColor, }) => hexToRgba(typeColor, 0.25)};
     border: 1px solid ${({ typeColor }) => typeColor};
     border-radius: ${PIXEL_SIZING.miniscule};
     position: relative;
@@ -160,7 +160,7 @@ const LayoutNotification = ({ content, type, timestamp, deleteNotification, }) =
                 style={{ height: PIXEL_SIZING.medium }}
             />
 
-            <Text style={{ color:  "black" }} bold>{ content }</Text>
+            <Text bold>{ content }</Text>
 
             <div>
                 <TextButton onClick={deleteNotification}>

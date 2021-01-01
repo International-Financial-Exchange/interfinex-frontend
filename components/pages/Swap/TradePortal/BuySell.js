@@ -8,7 +8,7 @@ import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
 import { FEE_RATE, PIXEL_SIZING } from "../../../../utils/constants";
-import { parseTokenAmount, safeParseEther } from "../../../../utils/utils";
+import { divOrZero, parseTokenAmount, safeParseEther } from "../../../../utils/utils";
 import { Button, TextButton } from "../../../core/Button";
 import { ContentAndArrow } from "../../../core/ContentAndArrow";
 import { InputAndLabel } from "../../../core/InputAndLabel";
@@ -27,10 +27,12 @@ export const inputToOutputAmount = (inputAmount = Big(0), inputBalance = Big(0),
         return new Big(0);
 
     const fee = inputAmount.mul(feeRate);
-    return inputAmount
-        .sub(fee)
-        .mul(outputBalance)
-        .div(inputBalance.add(inputAmount).sub(fee))
+    return divOrZero(
+        inputAmount
+            .sub(fee)
+            .mul(outputBalance),
+        inputBalance.add(inputAmount).sub(fee)
+    );
 }
 
 // I want 10 tokens, how much do i have to pay for them?
@@ -41,10 +43,12 @@ const outputToInputAmount = (outputAmount = Big(0), inputBalance = Big(0), outpu
         console.log(outputBalance.toString(), outputAmount.toString(), 1 - feeRate);
     console.log(outputBalance.sub(outputAmount).mul(1 - feeRate).toString());
 
-    const amount = outputAmount
-        .mul(inputBalance)
-        .mul(1 - feeRate)
-        .div(outputBalance.sub(outputAmount).mul(1 - feeRate));
+    const amount = divOrZero(
+        outputAmount
+            .mul(inputBalance)
+            .mul(1 - feeRate),
+        outputBalance.sub(outputAmount).mul(1 - feeRate)
+    );
 
     return amount.gt(0) ? amount : new Big(0);
 }

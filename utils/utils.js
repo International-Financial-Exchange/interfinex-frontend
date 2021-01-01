@@ -61,6 +61,18 @@ export const appendDecimalZeroes = (bigNum = new Big(0), decimals = 18) => {
     return paddedNum;
 };
 
+export const hexToRgba = (rawHex, alpha = 1) => {
+    const hex = rawHex.slice(1);
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+
+    console.log("hex", hex)
+    console.log("rgba", `rgba(${[r, g, b].join()}, ${alpha})`);
+    return `rgba(${[r, g, b].join()}, ${alpha})`;
+}
+
 export const tokenAmountToBig = (amount, token) => new Big(formatUnits(amount, token.decimals));
 
 export const parseTokenAmount = (amount, token) => {

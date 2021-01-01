@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { IloContext } from "./ILOItem";
 import { useContext } from "react";
 import Text from "../../../core/Text";
-import { shade } from "../../../../utils/utils";
+import { hexToRgba, shade } from "../../../../utils/utils";
 import Skeleton from "react-loading-skeleton";
 import { useIloDepositHistory } from "../hooks";
 import InfiniteScroll from "react-infinite-scroller";
@@ -29,7 +29,7 @@ const StyledTable = styled.table`
 `;
 
 const Row = styled.tr`
-    background-color: ${({ theme, positive }) => shade(positive ? theme.colors.positive : theme.colors.negative, 0.9)};
+    background-color: ${({ theme, positive }) => hexToRgba(positive ? theme.colors.positive : theme.colors.negative, 0.1)};
     color: ${({ theme, positive }) => positive ? theme.colors.positive : theme.colors.negative};
     margin-top: ${PIXEL_SIZING.medium};
     border-radius: ${PIXEL_SIZING.miniscule};

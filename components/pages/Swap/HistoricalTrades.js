@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Text from "../../core/Text";
-import { humanizeTokenAmount, shade, tokenAmountToBig } from "../../../utils/utils";
+import { hexToRgba, humanizeTokenAmount, shade, tokenAmountToBig } from "../../../utils/utils";
 import { TextOption } from "../../core/TextOption";
 import { useState, useEffect, useContext, useMemo } from "react";
 import { getHistoricalTrades } from "./networkRequests";
@@ -38,7 +38,7 @@ const Table = styled.table`
 `;
 
 const TradeRowContainer = styled.div`
-    background-color: ${({ theme, isBuy }) => shade(isBuy ? theme.colors.positive : theme.colors.negative, 0.9)};
+    background-color: ${({ theme, isBuy }) => hexToRgba(isBuy ? theme.colors.positive : theme.colors.negative, 0.1)};
     border-radius: ${PIXEL_SIZING.microscopic};
     display: grid;
     color: ${({ theme, isBuy }) => isBuy ? theme.colors.positive : theme.colors.negative};
@@ -174,6 +174,7 @@ export const HistoricalTrades = () => {
                 <TextOption 
                     selected={selectedTab === TABS.yourTrades}
                     onClick={() => setSelectedTab(TABS.yourTrades)}
+                    style={{ width: "fit-content" }}
                 >
                     Your Trades
                 </TextOption>

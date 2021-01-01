@@ -11,7 +11,7 @@ import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
 import { humanizeTokenAmount, shade, tokenAmountToBig } from "../../../../../utils/utils";
 
 const Row = styled.tr`
-    background-color: ${({ theme, positive }) => shade(positive ? theme.colors.positive : theme.colors.negative, 0.9)};
+    background-color: ${({ theme, positive }) => hexToRgba(positive ? theme.colors.positive : theme.colors.negative, 0.1)};
     color: ${({ theme, positive }) => positive ? theme.colors.positive : theme.colors.negative};
     margin-top: ${PIXEL_SIZING.medium};
     border-radius: ${PIXEL_SIZING.miniscule};
