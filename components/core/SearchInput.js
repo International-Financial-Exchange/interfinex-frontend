@@ -3,6 +3,7 @@ import { Cross } from "./Cross";
 import { useState } from "react";
 import { Input } from "./Input";
 import { PIXEL_SIZING } from "../../utils/constants";
+import { SearchIcon } from "./SearchIcon";
 
 export const SearchInput = ({ style, ...props }) => {
     return (
@@ -23,10 +24,7 @@ export const SearchInput = ({ style, ...props }) => {
                             onClick={() => props.onChange({ target: { value: "" }})}
                         />
                     : 
-                        <img
-                            style={{ height: PIXEL_SIZING.medium, }}
-                            src={"/search-icon-light-theme.png"}
-                        />
+                        <SearchIcon/>
                 }
             </div>
 

@@ -46,7 +46,7 @@ export const PairQuickInfoCard = styled(Card)`
     display: grid; 
     grid-template-columns: 1fr auto; 
     align-items: center; 
-    column-gap: ${PIXEL_SIZING.microscopic};
+    column-gap: ${PIXEL_SIZING.small};
     height: fit-content;
 
     &:active {
@@ -55,7 +55,7 @@ export const PairQuickInfoCard = styled(Card)`
 
     &:hover {
         border: 1px solid ${({ theme }) => theme.colors.primary};
-        column-gap: ${PIXEL_SIZING.tiny};
+        column-gap: ${PIXEL_SIZING.medium};
         cursor: pointer;
     }
 `;
@@ -277,10 +277,8 @@ const PairSelect = () => {
                     </div>
                 </div>
 
-                <img
-                    style={{ height: PIXEL_SIZING.medium, transform: "rotate(270deg)" }}
-                    src={"/expand-arrow-light-theme.png"}
-                />
+                
+                <ExpandArrowIcon className={"expand-arrow"}/>
             </PairQuickInfoCard>
 
             <div style={{ position: "fixed", top: -13, left: 0 }} ref={selectContainer}>
@@ -389,7 +387,8 @@ import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { useDocument, useWindow } from "../../../utils/hooks";
 import { CircleNav } from "./CircleNav";
 import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
-import { AccountMenuItems } from "./AccountMenuItems";
+import { AccountMenuItems, ThemeToggle } from "./AccountMenuItems";
+import { ExpandArrowIcon } from "../../core/ExpandArrowIcon";
 
 const MENU_ITEMS =[
     // { label: "Dashboard", value: "dashboard" }, 
@@ -424,13 +423,16 @@ const ConnectWallet = props => {
     }, [window, document]);
 
     return (
-        <Button onClick={async () => {
-            web3Modal.clearCachedProvider();
-            const web3Provider = await web3Modal.connect();
-            const ethersProvider = new ethers.providers.Web3Provider(web3Provider);
-            setSigner(ethersProvider.getSigner());
-            setProvider(ethersProvider);
-        }}>
+        <Button 
+            style={{ textAlign: "center", }}
+            onClick={async () => {
+                web3Modal.clearCachedProvider();
+                const web3Provider = await web3Modal.connect();
+                const ethersProvider = new ethers.providers.Web3Provider(web3Provider);
+                setSigner(ethersProvider.getSigner());
+                setProvider(ethersProvider);
+            }}
+        >
             Connect Wallet
         </Button>
     );
@@ -476,7 +478,10 @@ export const AppNavBar = props => {
                 {
                     signer ?
                        <AccountMenuItems/>
-                       : <ConnectWallet/>
+                       : <div style={{ display: "flex", alignItems: "center" }}>
+                           <ThemeToggle/>
+                           <ConnectWallet/>
+                        </div>
                 }
             </div>
         </Container>

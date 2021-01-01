@@ -13,14 +13,27 @@ import { Modal } from "../Modal";
 const Container = styled.div`
     display: flex;
     align-items: center;
+
+    @media (max-width: 1100px) {
+        #account-eth-balance {
+            display: none;
+        }
+    }
+
+    @media (max-width: 900px) {
+        #nav-account-address {
+            display: none;
+        }
+    }
 `;
 
 export const AccountMenuItems = () => {
     return (
         <Container>
             <AccountEthBalance/>
-            <AccountAddress/>
+            <AccountAddress style={{ marginRight: PIXEL_SIZING.small }}/>
             <ThemeToggle/>
+            <NotificationsPreview/>
             <OptionsMenu/>
         </Container>
     );
@@ -144,7 +157,7 @@ const ThemeToggleContainer = styled.div`
     }
 `;
 
-const ThemeToggle = () => {
+export const ThemeToggle = () => {
     const { selectedTheme, setTheme } = useContext(ThemeContext);
 
     return (
@@ -171,6 +184,7 @@ const AccountEthBalance = () => {
 
     return (
         <div 
+            id={"account-eth-balance"}
             style={{ 
                 border: `1px solid ${theme.colors.highlight}`, 
                 padding: PIXEL_SIZING.small, 
@@ -188,28 +202,35 @@ const AccountAddressContainer = styled.div`
     border: 1px solid ${({ theme }) => theme.colors.highlight};
     height: fit-content;
     border-radius: ${PIXEL_SIZING.tiny} 20px 20px ${PIXEL_SIZING.tiny};
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     padding-left: ${PIXEL_SIZING.small};
     align-items: center;
     position: relative;
-    margin-right: ${PIXEL_SIZING.small};
     user-select: none;
+    max-width: 100%;
+    column-gap: ${PIXEL_SIZING.small};
 `;
 
-const AccountAddress = () => {
+const AccountAddress = ({ primary, ...props }) => {
     const { address } = useContext(AccountContext);
 
+    const addressToShow = !primary ? 
+        `${address?.slice(0,4)}...${address?.slice(address.length - 4)}` 
+        : address;
+
     return (
-        <AccountAddressContainer>
-            <div style={{ marginRight: PIXEL_SIZING.tiny }}>
-                {address?.slice(0,4)}...{address?.slice(address.length - 4)}
+        <AccountAddressContainer id={"nav-account-address"} {...props}>
+            <div style={{ width: "100%", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", }}>
+                {addressToShow}
             </div>
+
             <Avatar style={{ height: 42, width: 42 }}/>
         </AccountAddressContainer>
     );
 };
 
-const OptionsMenuContainer = styled.div`
+const DropdownIconContainer = styled.div`
     height: 42px;
     width: 42px;
     background-color: ${({ theme}) => theme.colors.highlight};
@@ -248,12 +269,12 @@ const OptionsMenu = () => {
 
     return (
         <>
-            <OptionsMenuContainer onClick={() => setShowDropDown(!showDropDown)} selected={showDropDown}>
+            <DropdownIconContainer onClick={() => setShowDropDown(!showDropDown)} selected={showDropDown}>
                 <Triangle 
                     style={{ transform: "rotate(180deg)", height: 18, marginTop: "1%", }} 
                     className={"options-menu-triangle"}
                 />
-            </OptionsMenuContainer>
+            </DropdownIconContainer>
 
             <Modal 
                 isOpen={showDropDown}
@@ -270,6 +291,60 @@ const OptionsMenu = () => {
         </>
     );
 };
+
+const NotificationBell = props => {
+    return (
+        <svg 
+            id="Layer_4" 
+            enable-background="new 0 0 24 24" 
+            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+            {...props}
+        >
+            <g>
+                <path 
+                    d="m21.379 16.913c-1.512-1.278-2.379-3.146-2.379-5.125v-2.788c0-3.519-2.614-6.432-6-6.92v-1.08c0-.553-.448-1-1-1s-1 .447-1 1v1.08c-3.387.488-6 3.401-6 6.92v2.788c0 1.979-.867 3.847-2.388 5.133-.389.333-.612.817-.612 1.329 0 .965.785 1.75 1.75 1.75h16.5c.965 0 1.75-.785 1.75-1.75 0-.512-.223-.996-.621-1.337z"
+                />
+                <path 
+                    d="m12 24c1.811 0 3.326-1.291 3.674-3h-7.348c.348 1.709 1.863 3 3.674 3z"
+                />
+            </g>
+        </svg>
+    );
+};
+
+const NotificationsPreview = () => {
+    const [showDropDown, setShowDropDown] = useState(false);
+
+    return (
+        <>
+            <DropdownIconContainer 
+                onClick={() => setShowDropDown(!showDropDown)} 
+                selected={showDropDown}
+                style={{ marginRight: PIXEL_SIZING.small }}
+            >
+                <NotificationBell 
+                    style={{ height: 18, marginTop: "1%", }} 
+                    className={"options-menu-triangle"}
+                />
+            </DropdownIconContainer>
+
+            <Modal 
+                isOpen={showDropDown}
+                topRight
+                onClose={() => setShowDropDown(false)}
+                showBackdrop={false}
+            >
+                <ModalCard style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.small }}>
+                    <DropdownTransitioner>
+                        <ExpandedOptionsMenu/>
+                    </DropdownTransitioner>
+                </ModalCard>
+            </Modal>
+        </>
+    );
+};
+
 
 const LogoutIcon = ({ className }) => {
     return (
@@ -291,34 +366,21 @@ const LogoutIcon = ({ className }) => {
 
 const ExpandedOptionsMenu = () => {
     const { setSigner } = useContext(EthersContext);
+    const { address } = useContext(AccountContext);
 
     return (
-        <SelectableDropdownItem 
-            Icon={<LogoutIcon className={"dropdown-transition-icon"}/>}
-            onClick={() => {
-                console.log("hello there")
-                setSigner();
-            }}
-        >
-            Disconnect Wallet
-        </SelectableDropdownItem>
+        <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
+            <AccountAddress primary/>
+
+            <SelectableDropdownItem 
+                Icon={<LogoutIcon className={"dropdown-transition-icon"}/>}
+                onClick={() => {
+                    console.log("hello there")
+                    setSigner();
+                }}
+            >
+                Disconnect Wallet
+            </SelectableDropdownItem>
+        </div>
     );
 };
-
-{/* <AccountQuickInfoCard padding>
-<Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-    {tokenAmountToBig(signerTokenBalance || 0, { decimals: 18 }).toFixed(4)} ETH
-</Text>
-</AccountQuickInfoCard>
-
-<Avatar/>
-
-<AccountQuickInfoCard padding>
-<Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1 }}>
-    {
-        signerAddress ?
-            `${signerAddress.slice(0,5)}...${signerAddress.slice(signerAddress.length - 5)}`
-            : <Skeleton width={CONTAINER_SIZING.small}/>
-    }
-</Text>
-</AccountQuickInfoCard> */}

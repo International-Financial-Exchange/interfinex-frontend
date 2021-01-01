@@ -175,7 +175,7 @@ const NotificationContainer = styled.div`
     padding: ${PIXEL_SIZING.small};
     transition: all 0.1s ease-out;
 
-    background-color: ${({ typeColor, }) => shade(typeColor, 0.85)};
+    background-color: ${({ typeColor, }) => hexToRgba(typeColor, 0.25)};
     border: 1px solid ${({ typeColor }) => typeColor};
     border-radius: ${PIXEL_SIZING.miniscule};
     color: ${({ theme }) => theme.colors.textPrimary};
