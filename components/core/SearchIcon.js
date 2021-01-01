@@ -7,7 +7,7 @@ export const SearchIcon = props => {
 
     return (
         <svg 
-            style={{ height: PIXEL_SIZING.medium, width: PIXEL_SIZING.medium }}
+            style={{ height: PIXEL_SIZING.small, width: PIXEL_SIZING.small }}
             version="1.1" 
             id="Capa_1" 
             xmlns="http://www.w3.org/2000/svg"

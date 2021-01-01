@@ -6,6 +6,7 @@ import Text from "./Text";
 import { EthersContext } from "../../context/Ethers";
 import ReactDOM from "react-dom";
 import { dropinAnimation, PIXEL_SIZING } from "../../utils/constants";
+import { ArrowDirection } from "./ArrowDirection";
 
 const ButtonContainer = styled.div`
     border-radius: 4px;
@@ -165,10 +166,7 @@ export const ArrowButton = props => {
     return (
         <StyledArrowButton {...props}>
             { props.children }
-            <img
-                height={18}
-                src={"/arrow-direction-light-theme.png"}
-            />
+            <ArrowDirection/>
         </StyledArrowButton>
     );
 };
