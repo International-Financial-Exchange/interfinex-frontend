@@ -68,7 +68,7 @@ const useNotifications = () => {
         });
     }, [notifications]);
 
-    const addNotification = ({ textContent, contentType, type, timeout = 1000 * 700, additionalDetails }) => {
+    const addNotification = ({ textContent, contentType, type, timeout = 1000 * 7, additionalDetails }) => {
         const id = uuidv4();
         const notification = { 
             textContent, 
