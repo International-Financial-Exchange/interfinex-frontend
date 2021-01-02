@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { TokenAndLogo } from "./TokenAndLogo";
 import { TextButton } from "./Button";
@@ -9,6 +9,9 @@ import Big from "big.js";
 
 export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
     const theme = useContext(ThemeContext);
+    const [_value, setValue] = useState();
+
+    const value = props.value?.gt(0) ? props.value : _value;
 
     return (
         <div style={style}>
@@ -34,8 +37,10 @@ export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
                     style={{ paddingRight: PIXEL_SIZING.huge }}
                     placeholder={"0.0"}
                     {...props}
+                    value={value}
                     onChange={e => {
-                        const num = new Big(e.target.value ?? 0);
+                        const num = new Big(e.target.value || 0);
+                        setValue(e.target.value);
                         props.onChange(num, e);
                     }}
                 />

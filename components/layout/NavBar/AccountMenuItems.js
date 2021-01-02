@@ -38,7 +38,7 @@ const Container = styled.div`
 export const AccountMenuItems = () => {
     return (
         <Container>
-            <AccountEthBalance/>
+            <AccountEthBalance id={"account-eth-balance"}/>
             <AccountAddress style={{ marginRight: PIXEL_SIZING.small }}/>
             <ThemeToggle/>
             <NotificationsPreview/>
@@ -186,20 +186,21 @@ export const ThemeToggle = () => {
     );
 };
 
-const AccountEthBalance = () => {
+const AccountEthBalance = props => {
     const { ethBalance } = useContext(AccountContext);
     const theme = useContext(ThemeContext);
 
     return (
         <div 
-            id={"account-eth-balance"}
             style={{ 
                 border: `1px solid ${theme.colors.highlight}`, 
                 padding: PIXEL_SIZING.small, 
                 marginRight: PIXEL_SIZING.small,
                 borderRadius: PIXEL_SIZING.tiny,
                 userSelect: "none",
+                width: "fit-content",
             }}
+            {...props}
         >
             {ethBalance.toFixed(4)} ETH
         </div>
@@ -373,6 +374,7 @@ const NotificationsPreview = () => {
                                 borderRadius: PIXEL_SIZING.small,
                                 padding: PIXEL_SIZING.microscopic,
                                 top: 0,
+                                color: "white",
                                 right: 0,
                                 minWidth: PIXEL_SIZING.medium,
                                 minHeight: PIXEL_SIZING.medium,
@@ -435,22 +437,20 @@ const ExpandedNotificationsPreview = () => {
                     switch (contentType) {
                         case NOTIFICATION_CONTENT_TYPES.transaction:
                             return (
-                                <a href={`https://etherscan.io/tx/${additionalDetails?.tx.hash}`}>
-                                    <TransactionNotificationItem>
-                                        <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            {
-                                                additionalDetails?.isLoading ?
-                                                    <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
-                                                    : type === NOTIFICATION_TYPES.success ?
-                                                        <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/>
-                                                        : <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/>
-                                            }
-                                            <LinkIcon className={"tx-link-icon"}/>
-                                        </div>
-                                        <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
-                                    </TransactionNotificationItem>
-                                </a>
+                                <TransactionNotificationItem onClick={() => window.open(`https://etherscan.io/tx/${additionalDetails?.tx.hash}`)}>
+                                    <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        {
+                                            additionalDetails?.isLoading ?
+                                                <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
+                                                : type === NOTIFICATION_TYPES.success ?
+                                                    <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/>
+                                                    : <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/>
+                                        }
+                                        <LinkIcon className={"tx-link-icon"}/>
+                                    </div>
+                                    <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
+                                </TransactionNotificationItem>
                             );
                         default:
                             console.warn("Unsupported notification content type: ", contentType);
@@ -479,15 +479,27 @@ const LogoutIcon = ({ className }) => {
             </g>
         </svg>
     );
-}
+};
+
+const ExpandedOptionsMenuContainer = styled.div`
+    display: grid;
+    row-gap: ${PIXEL_SIZING.small};
+
+    @media (min-width: 900px) {
+        #account-eth-balance-menu {
+            display: none;
+        }
+    }
+`;
 
 const ExpandedOptionsMenu = () => {
     const { setSigner } = useContext(EthersContext);
     const { address } = useContext(AccountContext);
 
     return (
-        <div style={{ display: "grid", rowGap: PIXEL_SIZING.small, }}>
+        <ExpandedOptionsMenuContainer>
             <AccountAddress primary/>
+            <AccountEthBalance id={"account-eth-balance-menu"}/>
 
             <SelectableDropdownItem 
                 Icon={<LogoutIcon className={"dropdown-transition-icon"}/>}
@@ -497,6 +509,6 @@ const ExpandedOptionsMenu = () => {
             >
                 Disconnect Wallet
             </SelectableDropdownItem>
-        </div>
+        </ExpandedOptionsMenuContainer>
     );
 };

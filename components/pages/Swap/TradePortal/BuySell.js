@@ -271,8 +271,8 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     <TokenAmountInput
                         token={assetToken}
                         type={"number"}
-                        isError={!hasSufficientBalance}
-                        errorMessage={"Insufficient balance"}
+                        isError={!hasSufficientBalance || exchangeAssetTokenBalance.lte(assetTokenAmount)}
+                        errorMessage={!hasSufficientBalance ?  "Insufficient balance" : "Not enough liquidity"}
                         onChange={num => setAssetTokenAmount(num)}
                         ref={input => input && input.focus()}
                         value={assetTokenAmount}
@@ -338,7 +338,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={!hasSufficientBalance || (isMargin && !hasSufficientFunding)}
+                    isDisabled={!hasSufficientBalance || (isMargin && !hasSufficientFunding) || exchangeAssetTokenBalance.lte(assetTokenAmount)}
                     onClick={() => {
                         if (isMargin) marginTrade();
                         else spotTrade();
