@@ -48,7 +48,7 @@ export const LiquidityPreview = () => {
 
             
             {
-                true &&
+                farmInfo &&
                     <InfoBubble
                         style={{ 
                             display: "grid", 

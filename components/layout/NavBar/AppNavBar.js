@@ -387,8 +387,9 @@ import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { useDocument, useWindow } from "../../../utils/hooks";
 import { CircleNav } from "./CircleNav";
 import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
-import { AccountMenuItems, ThemeToggle } from "./AccountMenuItems";
+import { AccountMenuItems, } from "./AccountMenuItems/AccountMenuItems";
 import { ExpandArrowIcon } from "../../core/ExpandArrowIcon";
+import { ThemeToggle } from "./AccountMenuItems/ThemeToggle";
 
 const MENU_ITEMS =[
     // { label: "Dashboard", value: "dashboard" }, 

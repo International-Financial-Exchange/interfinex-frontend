@@ -8,10 +8,8 @@ import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { SwapContext } from "../Swap";
 
 export const TotalLiquidity = () => {
-    const { assetToken, baseToken, ifexToken } = useContext(TokenPairContext);
-    const { account, isExchangeInfoLoading, exchangeAssetTokenBalance, exchangeBaseTokenBalance } = useContext(SwapContext);
-
-    const isLoading = isExchangeInfoLoading;
+    const { assetToken, baseToken, } = useContext(TokenPairContext);
+    const { isExchangeInfoLoading, exchangeAssetTokenBalance, exchangeBaseTokenBalance } = useContext(SwapContext);
 
     return (
         <Card style={{ height: "fit-content", width: "100%", padding: PIXEL_SIZING.medium }}>
@@ -19,7 +17,7 @@ export const TotalLiquidity = () => {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
                     <TokenAndLogo token={assetToken}/>
                     {
-                        isLoading ?
+                        isExchangeInfoLoading ?
                             <Skeleton width={CONTAINER_SIZING.miniscule}/>
                             : <Text secondary bold>{exchangeAssetTokenBalance.toFixed(4)} {assetToken.symbol}</Text>
                     }
@@ -28,7 +26,7 @@ export const TotalLiquidity = () => {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
                     <TokenAndLogo token={baseToken}/>
                     {
-                        isLoading ?
+                        isExchangeInfoLoading ?
                             <Skeleton width={CONTAINER_SIZING.miniscule}/>
                             : <Text secondary bold>{exchangeBaseTokenBalance.toFixed(4)} {baseToken.symbol}</Text>
                     }
