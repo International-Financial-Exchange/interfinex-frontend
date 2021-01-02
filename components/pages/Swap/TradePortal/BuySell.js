@@ -7,7 +7,7 @@ import { AccountContext } from "../../../../context/Account";
 import { EthersContext } from "../../../../context/Ethers";
 import { NotificationsContext } from "../../../../context/Notifications";
 import { TokenPairContext } from "../../../../context/TokenPair";
-import { FEE_RATE, PIXEL_SIZING } from "../../../../utils/constants";
+import { CONTAINER_SIZING, FEE_RATE, PIXEL_SIZING } from "../../../../utils/constants";
 import { divOrZero, parseTokenAmount, safeParseEther } from "../../../../utils/utils";
 import { Button, TextButton } from "../../../core/Button";
 import { ContentAndArrow } from "../../../core/ContentAndArrow";
@@ -20,6 +20,8 @@ import { TokenAndLogo } from "../../../core/TokenAndLogo";
 import { TokenSelectMenu } from "../../../layout/NavBar/AppNavBar";
 import { MarginContext, SwapContext } from "../Swap";
 import Big from "big.js";
+import { SwitchInput } from "../../../core/SwitchInput";
+import { HelpText } from "../../../core/HelpText";
 
 // I am paying 5 tokens, how much will i receive for them?
 export const inputToOutputAmount = (inputAmount = Big(0), inputBalance = Big(0), outputBalance = Big(0), feeRate) => {
@@ -56,7 +58,7 @@ const outputToInputAmount = (outputAmount = Big(0), inputBalance = Big(0), outpu
 export const BuySell = ({ isBuy, isMargin }) => {
     const { assetToken, baseToken, setAssetToken, setBaseToken, token0, token1 } = useContext(TokenPairContext);
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);
-    const { contracts: { SwapEthRouter, MarginEthRouter }} = useContext(EthersContext);
+    const { contracts: { SwapEthRouter, MarginEthRouter }, useIfex, setUseIfex } = useContext(EthersContext);
     const { 
         exchangeContract, 
         price, 
@@ -140,7 +142,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
                         ethers.constants.AddressZero, 
-                        false,
+                        useIfex,
                         { gasLimit: 225_000, value: sendToken.name === "Ethereum" ? safeParseEther(sendAmount.toString()) : 0 },
                     ),
                 });
@@ -168,7 +170,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
                         ethers.constants.AddressZero, 
-                        false,
+                        useIfex,
                     ),
                 });
             }
@@ -203,7 +205,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         parseTokenAmount(borrowAmount, sendToken), 
                         0,0,
                         0,
-                        false,
+                        useIfex,
                         { gasLimit: 500_000, value: safeParseEther(initialMargin.add(maintenanceMargin).toString()) },
                     ),
                 });
@@ -217,7 +219,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                         parseTokenAmount(receiveAmount.mul(1 - slippagePercentage), receiveToken),
                         parseTokenAmount(receiveAmount.mul(1 + slippagePercentage), receiveToken),
                         0,
-                        false,
+                        useIfex,
                         address,
                         { gasLimit: 500_000 },
                     ),
@@ -271,7 +273,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     <TokenAmountInput
                         token={assetToken}
                         type={"number"}
-                        isError={!hasSufficientBalance || exchangeAssetTokenBalance.lte(assetTokenAmount)}
+                        isError={!hasSufficientBalance || (isBuy && exchangeAssetTokenBalance.lte(assetTokenAmount))}
                         errorMessage={!hasSufficientBalance ?  "Insufficient balance" : "Not enough liquidity"}
                         onChange={num => setAssetTokenAmount(num)}
                         ref={input => input && input.focus()}
@@ -338,7 +340,7 @@ export const BuySell = ({ isBuy, isMargin }) => {
                     style={{ width: "100%", height: PIXEL_SIZING.larger }}
                     requiresWallet
                     isLoading={isLoading}
-                    isDisabled={!hasSufficientBalance || (isMargin && !hasSufficientFunding) || exchangeAssetTokenBalance.lte(assetTokenAmount)}
+                    isDisabled={!hasSufficientBalance || (isMargin && !hasSufficientFunding) || (isBuy && exchangeAssetTokenBalance.lte(assetTokenAmount))}
                     onClick={() => {
                         if (isMargin) marginTrade();
                         else spotTrade();
@@ -371,15 +373,35 @@ export const BuySell = ({ isBuy, isMargin }) => {
 
                 {
                     showAdvanced &&
-                        <InputAndLabel>
-                            <Text>Max Slippage</Text>
-                            <div>
-                                <SlippageSelect
-                                    value={slippageValue}
-                                    onChange={value => setSlippageValue(value)}
+                        <div style={{ display: "grid", rowGap: PIXEL_SIZING.medium, marginTop: PIXEL_SIZING.miniscule }}>
+                            <InputAndLabel>
+                                <Text>Max Slippage</Text>
+                                <div>
+                                    <SlippageSelect
+                                        value={slippageValue}
+                                        onChange={value => setSlippageValue(value)}
+                                    />
+                                </div>
+                            </InputAndLabel>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <Text style={{ marginRight: PIXEL_SIZING.tiny }}>Use Interfinex Bills for fee reduction</Text>
+                                    <HelpText>
+                                        <div style={{ width: CONTAINER_SIZING.medium }}>
+                                            <Text style={{ color: "white" }}>
+                                                Receive a 50% fee reduction by using IFEX. Note that this will increase the gas cost of transactions by ~$1-$5.
+                                            </Text>
+                                        </div>
+                                    </HelpText>
+                                </div>
+
+                                <SwitchInput
+                                    value={useIfex}
+                                    onChange={value => setUseIfex(value)}
                                 />
                             </div>
-                        </InputAndLabel>
+                        </div>
                 }
             </div>
     );

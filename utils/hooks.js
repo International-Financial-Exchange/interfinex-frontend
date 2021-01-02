@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AccountContext } from "../context/Account";
 import { EthersContext } from "../context/Ethers";
 import { hasAllowance } from "./utils";
@@ -125,4 +125,12 @@ export const useDocument = () => {
     }, []);
 
     return _document;
+};
+
+export const usePrevious = value => {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
 };

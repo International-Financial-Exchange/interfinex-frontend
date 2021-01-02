@@ -14,6 +14,7 @@ import YieldFarmAbi from "../public/contracts/abi/YieldFarm.json";
 import ILOFactoryAbi from "../public/contracts/abi/ILOFactory.json";
 import FixedPriceILOAbi from "../public/contracts/abi/FixedPriceILO.json";
 import DutchAuctionILOAbi from "../public/contracts/abi/DutchAuctionILO.json";
+import { useLocalStorage } from "../utils/hooks";
 
 const ABI = {
     DividendERC20: DividendERC20Abi,
@@ -38,11 +39,14 @@ export const EthersProvider = ({ children }) => {
     const [signer, setSigner] = useState();
     const [networkInfo, setNetworkInfo] = useState({ name: "ganache" });
     const [blockNumber, setBlockNumber] = useState();
+    const [useIfex, setUseIfex] = useLocalStorage("useIfex", false);
 
     const contracts = CONTRACTS[networkInfo.name] ?? CONTRACTS["ganache"];
     const getAbi = abiName => ABI[abiName];
 
     console.log("provider", provider);
+
+
 
     const { 
         IfexToken, 
@@ -109,6 +113,8 @@ export const EthersProvider = ({ children }) => {
                 TestnetTokens,
                 ETHEREUM_TOKEN,
                 blockNumber,
+                useIfex,
+                setUseIfex,
                 contracts: {
                     IfexToken,
                     SwapFactory,

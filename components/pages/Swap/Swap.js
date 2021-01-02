@@ -13,7 +13,6 @@ import { Card } from "../../core/Card";
 import { Input } from "../../core/Input";
 import { TextButton, Button } from "../../core/Button";
 import { CreateMarket } from "./CreateMarket";
-import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
 import styled from "styled-components";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
@@ -151,9 +150,9 @@ export const Swap = () => {
                 setAccount(old => ({
                     ...old,
                     liquidityTokenBalance,
-                    percentageOfPoolDeposited: liquidityTokenBalance / liquidityTokenTotalSupply,
-                    depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
-                    depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
+                    percentageOfPoolDeposited: liquidityTokenBalance.div(liquidityTokenTotalSupply),
+                    depositedAssetTokenAmount: exchangeAssetTokenBalance.mul(liquidityTokenBalance).div(liquidityTokenTotalSupply),
+                    depositedBaseTokenAmount: exchangeBaseTokenBalance.mul(liquidityTokenBalance).div(liquidityTokenTotalSupply)
                 }));
             });
         }
@@ -264,6 +263,7 @@ export const Swap = () => {
 
                                     <div style={{ marginTop: PIXEL_SIZING.large, }}>
                                         <TradeTab isSelected={!selectedTab || selectedTab === "trade"}/>
+                                        
                                         {
                                             isMarginEnabled &&
                                                 <>

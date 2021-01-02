@@ -48,18 +48,26 @@ const InfoBubbleContainer = styled.div`
     animation: ${dropinAnimation} 0.07s forwards;
 `;
 
-const InfoBubble = ({ children, parentRef, ...props }) => {
+export const HoverInfoBubble = ({ children, parentRef, ...props }) => {
     const { x, y, height, width } = parentRef.current?.getBoundingClientRect() ?? {};
 
     return (
         ReactDOM.createPortal(
-            <InfoBubbleContainer {...props} style={{ left: x, top: y + height + 8, width: props.style.width === "100%" ? width : "fit-content" }}>
+            <InfoBubbleContainer 
+                {...props} 
+                style={{ 
+                    ...props.style,
+                    left: props.style?.left ? x + props.style.left : x, 
+                    top: y + height + 8, 
+                    width: props.style?.width === "100%" ? width : "fit-content",
+                }}
+            >
                 {children}
             </InfoBubbleContainer>,
             document.getElementById("root"),
         )
     );
-}
+};
 
 export const Button = ({ children, primary, isLoading = false, requiresWallet, ...props }) => {
     const { signer } = useContext(EthersContext);
@@ -89,11 +97,11 @@ export const Button = ({ children, primary, isLoading = false, requiresWallet, .
 
             {
                 isHovered && requiresWallet && !signer &&
-                    <InfoBubble style={{ width: "100%" }} parentRef={buttonRef}>
+                    <HoverInfoBubble style={{ width: "100%" }} parentRef={buttonRef}>
                         <Text style={{ color: "white" }}>
                             Connect your wallet  
                         </Text>
-                    </InfoBubble>
+                    </HoverInfoBubble>
             }
         </ButtonContainer>
     );

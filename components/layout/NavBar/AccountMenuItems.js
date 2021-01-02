@@ -437,18 +437,27 @@ const ExpandedNotificationsPreview = () => {
                     switch (contentType) {
                         case NOTIFICATION_CONTENT_TYPES.transaction:
                             return (
-                                <TransactionNotificationItem onClick={() => window.open(`https://etherscan.io/tx/${additionalDetails?.tx.hash}`)}>
+                                <TransactionNotificationItem 
+                                    onClick={() => 
+                                        additionalDetails?.tx && window.open(`https://etherscan.io/tx/${additionalDetails?.tx.hash}`)
+                                    }
+                                >
                                     <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
                                     <div style={{ display: "flex", alignItems: "center" }}>
                                         {
-                                            additionalDetails?.isLoading ?
-                                                <BarSpinner width={PIXEL_SIZING.large} style={{ marginRight: PIXEL_SIZING.small, }}/>
-                                                : type === NOTIFICATION_TYPES.success ?
-                                                    <SuccessTickIcon style={{ marginRight: PIXEL_SIZING.small }}/>
-                                                    : <FailCrossIcon style={{ marginRight: PIXEL_SIZING.small }}/>
+                                            additionalDetails?.tx &&
+                                                <LinkIcon style={{ marginRight: PIXEL_SIZING.small }} className={"tx-link-icon"}/>
                                         }
-                                        <LinkIcon className={"tx-link-icon"}/>
+
+                                        {
+                                            additionalDetails?.isLoading ?
+                                                <BarSpinner width={PIXEL_SIZING.large}/>
+                                                : type === NOTIFICATION_TYPES.success ?
+                                                    <SuccessTickIcon/>
+                                                    : <FailCrossIcon/>
+                                        }
                                     </div>
+
                                     <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
                                 </TransactionNotificationItem>
                             );

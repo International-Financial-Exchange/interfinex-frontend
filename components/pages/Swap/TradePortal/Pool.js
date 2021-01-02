@@ -80,8 +80,8 @@ export const Pool = () => {
                     <TextButton
                         requiresWallet
                         onClick={() => {
-                            setBaseTokenAmount(parseFloat(account.depositedBaseTokenAmount));
-                            setAssetTokenAmount(parseFloat(account.depositedAssetTokenAmount));
+                            setBaseTokenAmount(account.depositedBaseTokenAmount);
+                            setAssetTokenAmount(account.depositedAssetTokenAmount);
                         }}
                     >
                         Max Withdraw
@@ -189,7 +189,7 @@ export const Pool = () => {
                                 await approveRouter(liquidityToken);
 
                                 await addTransactionNotification({
-                                    content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                                    content: `Withdraw ${assetTokenAmount.toFixed(4)} ${assetToken.symbol} and ${baseTokenAmount.toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                     transactionPromise: SwapEthRouter.burn_liquidity(
                                         sendToken.address,
                                         parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
@@ -202,7 +202,7 @@ export const Pool = () => {
         
                                 const liquidityTokenAmount =  account.liquidityTokenBalance.mul(baseTokenAmount).div(account.depositedBaseTokenAmount);
                                 await addTransactionNotification({
-                                    content: `Withdraw ${parseFloat(assetTokenAmount).toFixed(4)} ${assetToken.symbol} and ${parseFloat(baseTokenAmount).toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
+                                    content: `Withdraw ${assetTokenAmount.toFixed(4)} ${assetToken.symbol} and ${baseTokenAmount.toFixed(4)} ${baseToken.symbol} from the liquidity pool`,
                                     transactionPromise: exchangeContract.burn_liquidity(
                                         parseTokenAmount(liquidityTokenAmount, { decimals: 18 }),
                                         0,

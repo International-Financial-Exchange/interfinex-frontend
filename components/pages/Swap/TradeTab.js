@@ -2,11 +2,11 @@ import styled from "styled-components";
 import { TradeInfoChart } from "./TradeInfoChart";
 import { HistoricalTrades } from "./HistoricalTrades";
 import { TradePortal } from "./TradePortal/TradePortal";
-import { YourLiquidity } from "./YourLiquidity";
 import { MarginContext, SwapContext } from "./Swap";
 import { YourPositions } from "./Margin/YourPositions";
 import { useContext } from "react";
 import { PIXEL_SIZING } from "../../../utils/constants";
+import { LiquidityPreview } from "./LiquidityPreview/LiquidityPreview";
 
 const Container = styled.div`
     display: grid; 
@@ -39,7 +39,7 @@ export const TradeTab = ({ isSelected }) => {
                         isMarginEnabled &&
                             <YourPositions/>
                     }
-                    <YourLiquidity/>
+                    <LiquidityPreview/>
                 </div>
             </Container>
         </div>
