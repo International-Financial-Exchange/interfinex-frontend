@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import Skeleton from "react-loading-skeleton";
 import styled, { ThemeContext } from "styled-components";
 import { AccountContext } from "../../../context/Account";
 import { EthersContext } from "../../../context/Ethers";
@@ -229,7 +230,11 @@ const AccountAddress = ({ primary, ...props }) => {
     return (
         <AccountAddressContainer id={"nav-account-address"} {...props}>
             <div style={{ width: "100%", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", }}>
-                {addressToShow}
+                {
+                    addressToShow ?
+                        addressToShow
+                        : <Skeleton width={PIXEL_SIZING.huge} height={PIXEL_SIZING.medium}/>
+                }
             </div>
 
             <Avatar style={{ height: 42, width: 42 }}/>
