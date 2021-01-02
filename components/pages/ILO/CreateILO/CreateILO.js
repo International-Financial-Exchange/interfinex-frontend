@@ -19,7 +19,6 @@ import { ContentAndArrow } from "../../../core/ContentAndArrow";
 import { DateTimeInput } from "../../../core/DateTimeInput";
 import { TokenSelectInput } from "../../../core/TokenSelectInput";
 import { FixedPriceInput } from "./FixedPriceInput";
-import { xor } from "lodash";
 import { SubmitContext, useContractApproval } from "../../../../utils/hooks";
 import { DutchAuctionInput } from "./DutchAuctionInput";
 import { parseTokenAmount } from "../../../../utils/utils";

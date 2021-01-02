@@ -13,7 +13,6 @@ export const TokenAmountInput = ({ token, style, errorMessage, ...props }) => {
     const [_value, setValue] = useState();
     const previousPropsValue = usePrevious(props.value);
 
-    console.log("props", props.value?.toFixed());
     const value = !props?.value.eq(previousPropsValue || new Big(0)) ? props.value.toFixed() : _value;
 
     return (

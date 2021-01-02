@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import styled, { ThemeContext } from "styled-components";
 import { Cross } from "../components/core/Cross";
 import Text from "../components/core/Text";
-import { TextButton } from "../components/core/Button";
+import { ArrowButton, TextButton } from "../components/core/Button";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../utils/constants";
 import { hexToRgba, shade } from "../utils/utils";
 import { useLocalStorage } from "../utils/hooks";
@@ -57,14 +57,18 @@ const useNotifications = () => {
 
     useEffect(() => {
         notifications.forEach(notification => {
-            if (notification.additionalDetails?.isLoading && !listeners[notification.id]) {
+            if (
+                notification.contentType === NOTIFICATION_CONTENT_TYPES.transaction 
+                && notification.additionalDetails?.isLoading 
+                && !listeners[notification.id]
+            ) {
                 setListeners(old => ({ ...old, [notification.id]: true }));
                 addTransactionListener(notification);
             }
         });
     }, [notifications]);
 
-    const addNotification = ({ textContent, contentType, type, timeout = 1000 * 7, additionalDetails }) => {
+    const addNotification = ({ textContent, contentType, type, timeout = 1000 * 700, additionalDetails }) => {
         const id = uuidv4();
         const notification = { 
             textContent, 
@@ -77,13 +81,6 @@ const useNotifications = () => {
             id, 
             deleteNotification: () => setDisplayNotifications(existing => existing.filter(({ id: _id }) => _id !== id))
         };
-
-        if (contentType === NOTIFICATION_CONTENT_TYPES.transaction && type !== NOTIFICATION_TYPES.error) {
-            notification.additionalDetails = {
-                ...notification.additionalDetails,
-                isLoading: true,
-            };
-        }
 
         setDisplayNotifications(existing => existing.concat(notification));
         setNotifications(existing => existing.concat(notification));
@@ -99,6 +96,23 @@ const useNotifications = () => {
     ];
 };
 
+const Container = styled.div`
+    position: fixed;
+    bottom: ${PIXEL_SIZING.large};
+    left: ${PIXEL_SIZING.large};
+    display: grid;
+    row-gap: ${PIXEL_SIZING.small};
+
+    @media (max-width: 450px) {
+        bottom: unset;
+        top: 0;
+        width: 100%;
+        padding: ${PIXEL_SIZING.small};
+        left: 50%;
+        transform: translateX(-50%);
+    }
+`;
+
 export const NotificationsProvider = ({ children }) => {
     const [notifications, displayNotifications, setNotifications, addNotification, markAsRead] = useNotifications();
     const [layoutNotifications, setLayoutNotifications] = useState([]);
@@ -112,6 +126,7 @@ export const NotificationsProvider = ({ children }) => {
                 textContent: content,
                 additionalDetails: {
                     tx,
+                    isLoading: true,
                 }
             });
         } catch (e) {
@@ -155,7 +170,7 @@ export const NotificationsProvider = ({ children }) => {
         >
             { children }
 
-            <div style={{ position: "fixed", bottom: PIXEL_SIZING.large, left: PIXEL_SIZING.large, display: "grid", rowGap: PIXEL_SIZING.small }}>
+            <Container>
                 {
                     displayNotifications.map(notification => 
                         <Notification 
@@ -164,7 +179,7 @@ export const NotificationsProvider = ({ children }) => {
                         />
                     )
                 }
-            </div>
+            </Container>
         </NotificationsContext.Provider>
     );
 };
@@ -242,6 +257,10 @@ const NotificationContainer = styled.div`
     &:hover {
         transform: scale(1.1);
     }
+
+    @media (max-width: 450px) {
+        width: 100%;
+    }
 `;
 
 const Notification = ({ notification }) => {
@@ -294,11 +313,11 @@ const Notification = ({ notification }) => {
                                         {textContent}
                                     </Text>
 
-                                    <TextButton
+                                    <ArrowButton 
                                         onClick={() => window.open(`https://etherscan.io/tx/${additionalDetails.tx.hash}`)}
                                     >
-                                        Tx Id: {additionalDetails.tx.hash.slice(0, 28)}...
-                                    </TextButton>
+                                        View on etherscan
+                                    </ArrowButton>
                                 </div>
                             :
                                 <div style={{ display: "grid", rowGap: PIXEL_SIZING.tiny, width: "100%" }}>

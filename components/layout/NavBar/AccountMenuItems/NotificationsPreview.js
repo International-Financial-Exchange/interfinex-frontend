@@ -70,7 +70,7 @@ export const NotificationsPreview = () => {
             >
                 <NotificationBell 
                     style={{ height: 18, marginTop: "1%", }} 
-                    className={"options-menu-triangle"}
+                    className={"options-menu-icon"}
                 />
 
                 {

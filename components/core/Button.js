@@ -152,17 +152,22 @@ const StyledArrowButton = styled.div`
     position: relative;
     margin-right: 25px;
 
-    img {
+    .arrow-direction {
         position: absolute;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) rotate(180deg);
         transition: right 0.1s ease-out;
-        right: -25px;
+        right: -17px;
     }
     
     &:hover {
-        img {
-            right: -30px;
+        .arrow-direction {
+            right: -21px;
+
+            path {
+                fill: ${({ theme }) => theme.colors.secondary} !important;
+                stroke: ${({ theme }) => theme.colors.secondary} !important;
+            }
         }
 
         color: ${({ theme }) => theme.colors.secondary} !important;
@@ -174,7 +179,7 @@ export const ArrowButton = props => {
     return (
         <StyledArrowButton {...props}>
             { props.children }
-            <ArrowDirection/>
+            <ArrowDirection className={"arrow-direction"}/>
         </StyledArrowButton>
     );
 };

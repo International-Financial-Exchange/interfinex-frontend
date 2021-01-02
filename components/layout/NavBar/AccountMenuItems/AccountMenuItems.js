@@ -1,22 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import Skeleton from "react-loading-skeleton";
 import styled, { ThemeContext } from "styled-components";
-import { AccountContext } from "../../../../context/Account";
-import { EthersContext } from "../../../../context/Ethers";
-import { NotificationsContext, NOTIFICATION_CONTENT_TYPES, NOTIFICATION_TYPES } from "../../../../context/Notifications";
-import { THEME_OPTIONS } from "../../../../context/Theme";
-import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../utils/constants";
-import { Avatar } from "../../../core/Avatar";
-import { FailCrossIcon } from "../../../core/FailCrossIcon";
-import { LinkIcon } from "../../../core/LinkIcon";
-import { ModalCard } from "../../../core/ModalCard";
-import { BarSpinner, CircleSpinner } from "../../../core/Spinner";
-import { SuccessTickIcon } from "../../../core/SuccesTickIcon";
-import Text from "../../../core/Text";
-import { Triangle } from "../../../core/Triangle";
-import { DropdownItem } from "../../Dropdown";
-import { DropdownTransitioner, SelectableDropdownItem } from "../../DropdownTransitioner";
-import { Modal } from "../../Modal";
+import { PIXEL_SIZING } from "../../../../utils/constants";
 import { AccountAddress } from "./AccountAddress";
 import { AccountEthBalance } from "./AccountEthBalance";
 import { NotificationsPreview } from "./NotificationsPreview";
@@ -40,6 +23,7 @@ const Container = styled.div`
     }
 `;
 
+// Circle icon in the top right when wallet is connected
 export const DropdownIconContainer = styled.div`
     height: 42px;
     width: 42px;
@@ -60,14 +44,14 @@ export const DropdownIconContainer = styled.div`
         cursor: pointer;
         border: 1px solid ${({ theme }) => theme.colors.textPrimary};
 
-        .options-menu-triangle {
+        .options-menu-icon {
             path {
                 fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.textPrimary} !important;
             }
         }
     }
 
-    .options-menu-triangle {
+    .options-menu-icon {
         path {
             fill: ${({ theme, selected }) => selected ? theme.colors.primary : theme.colors.textSecondary} !important;
         }
