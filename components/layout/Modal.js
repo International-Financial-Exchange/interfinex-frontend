@@ -3,27 +3,40 @@ import ReactDOM from 'react-dom';
 import _ from "lodash";
 import { useDocument } from '../../utils/hooks';
 import { PIXEL_SIZING } from '../../utils/constants';
+import styled from "styled-components";
 
 const CloseModalContext = React.createContext();
 
 export const MODAL_ID = "MODAL";
 
+const TopRightContainer = styled.div`
+    position: absolute;
+    top: ${PIXEL_SIZING.huge};
+    right: ${PIXEL_SIZING.medium};
+
+    @media (max-width: 1000px) {
+        display: grid;
+        justify-items: right;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        padding: 0 ${PIXEL_SIZING.small};
+    }
+`;
+
+const CenterContainer = styled.div`
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+`
+
 export const Modal = ({ isOpen, onClose = _.noop, children, topRight, showBackdrop = true }) => {
     const document = useDocument();
 
-    const style = topRight ? 
-        {
-            position: "absolute",
-            top: PIXEL_SIZING.huge,
-            right: PIXEL_SIZING.medium,
-        }
-    : 
-        {
-            position: "absolute",
-            top: "50%", 
-            left: "50%", 
-            transform: "translate(-50%, -50%)",
-        };
+    const Container = topRight ? 
+        TopRightContainer
+        : CenterContainer;
 
     return (
         isOpen && document ? 
@@ -37,15 +50,14 @@ export const Modal = ({ isOpen, onClose = _.noop, children, topRight, showBackdr
                             onClose();
                         }}
                     >
-                        <div 
-                            style={style} 
+                        <Container 
                             onClick={e => {
                                 e.stopPropagation();
                                 e.preventDefault();
                             }}
                         >
                             {_.isFunction(children) ? children(onClose) : children}
-                        </div>
+                        </Container>
                     </div>
                 </CloseModalContext.Provider>,
                 document.getElementById("root")

@@ -320,13 +320,23 @@ const NotificationBell = props => {
     );
 };
 
+export const NotificationPreviewContainer = styled(ModalCard)`
+    width: ${CONTAINER_SIZING.medium};
+    max-height: ${CONTAINER_SIZING.large}; 
+    padding: ${PIXEL_SIZING.small}; 
+    overflow: auto;
+
+    @media (max-width: 1000px) {
+        width: 100%;
+    }
+`;
+
 const NotificationsPreview = () => {
     const [showDropDown, setShowDropDown] = useState(false);
     const theme = useContext(ThemeContext);
     const { notifications, markAsRead } = useContext(NotificationsContext);
 
     useEffect(() => {
-        console.log("show drop down", showDropDown);
         if (showDropDown) {
             markAsRead();
         }
@@ -379,11 +389,11 @@ const NotificationsPreview = () => {
                 onClose={() => setShowDropDown(false)}
                 showBackdrop={false}
             >
-                <ModalCard style={{ width: CONTAINER_SIZING.medium, padding: PIXEL_SIZING.small, maxHeight: CONTAINER_SIZING.large, overflow: "auto" }}>
+                <NotificationPreviewContainer>
                     <DropdownTransitioner>
                         <ExpandedNotificationsPreview/>
                     </DropdownTransitioner>
-                </ModalCard>
+                </NotificationPreviewContainer>
             </Modal>
         </>
     );
@@ -412,8 +422,6 @@ const TransactionNotificationItem = styled(DropdownItem)`
 
 const ExpandedNotificationsPreview = () => {
     const { notifications } = useContext(NotificationsContext);
-
-    console.log("notifications", notifications);
 
     return (
         <div>
@@ -473,7 +481,7 @@ const ExpandedOptionsMenu = () => {
     const { address } = useContext(AccountContext);
 
     return (
-        <div style={{ display: "grid", rowGap: PIXEL_SIZING.small }}>
+        <div style={{ display: "grid", rowGap: PIXEL_SIZING.small, }}>
             <AccountAddress primary/>
 
             <SelectableDropdownItem 

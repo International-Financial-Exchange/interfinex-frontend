@@ -271,7 +271,6 @@ const Notification = ({ notification }) => {
                             : theme.colors.primary
             }
             onMouseOver={() => {
-                console.log("clearing", timer);
                 clearTimeout(timer);
             }}
             onMouseLeave={() => {

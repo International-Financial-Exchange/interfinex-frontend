@@ -108,7 +108,6 @@ const useFundingHistory = ({ marginMarketContract }) => {
 export const FundingHistory = () => {
     const { MarginMarket, selectedToken } = useContext(FundingContext);
     const [fundingEvents, isLoading, getMoreFundingEvents, gotAllFundingEvents] = useFundingHistory({ marginMarketContract: MarginMarket.address });
-    console.log("funding", fundingEvents);
 
     return (
         <Container>
