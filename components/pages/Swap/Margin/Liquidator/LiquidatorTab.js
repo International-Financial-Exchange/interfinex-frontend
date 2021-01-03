@@ -12,7 +12,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import Skeleton from "react-loading-skeleton";
 import { NotificationsContext } from "../../../../../context/Notifications";
 import { CONTAINER_SIZING, FEE_RATE, PIXEL_SIZING } from "../../../../../utils/constants";
-import { humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
+import { divOrZero, humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
 
 const LiquidatorContext = createContext();
 
@@ -51,7 +51,8 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
                 originalBorrowedAmount, 
                 user 
             }) => {
-                const borrowedAmount = new Big(originalBorrowedAmount).mul(interestIndex.div(tokenAmountToBig(lastInterestIndex, { decimals: 18 })));
+                const borrowedAmount = new Big(originalBorrowedAmount)
+                    .mul(divOrZero(interestIndex, tokenAmountToBig(lastInterestIndex, { decimals: 18 })));
                 const positionSize = inputToOutputAmount(
                     new Big(collateralAmount), 
                     marginMarketAssetToken.address === assetToken.address ? exchangeBaseTokenBalance : exchangeAssetTokenBalance,
@@ -61,7 +62,7 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
 
                 console.log("borrowed", borrowedAmount.toString())
                 console.log("collateral", positionSize.toString())
-                const liquidationRatio = borrowedAmount.div(positionSize);
+                const liquidationRatio = divOrZero(borrowedAmount, positionSize);
 
                 return {
                     borrowedAmount,
@@ -212,7 +213,7 @@ export const LiquidatorTab = ({ isSelected }) => {
 };
 
 const StyledRow = styled.tr`
-    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.colors.boxShadow};
     border-radius: ${PIXEL_SIZING.miniscule};
 
     td {
@@ -246,9 +247,9 @@ const PositionRow = ({
                 style={{ 
                     color: liquidationRatio.gte(1) 
                         ? theme.colors.negative 
-                        : liquidationRatio.lte(0.85) ?
-                            theme.colors.secondary
-                            : theme.colors.positive, 
+                        : liquidationRatio.lte(0.5) ?
+                            theme.colors.positive
+                            : theme.colors.secondary,
                     fontWeight: "bold" 
                 }}
             >

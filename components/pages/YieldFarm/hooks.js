@@ -19,7 +19,7 @@ export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
             const rawFarmInfo = await YieldFarm.tokenToFarmInfo(liquidityToken.address);
             const yieldPerBlock = tokenAmountToBig(rawFarmInfo.yieldPerBlock, { decimals: 18 });
             const annualYield = yieldPerBlock.mul(2336000);
-            const annualAPR = divOrZero(annualYield, ifexBalance).mul(100).toFixed(2);
+            const annualAPR = divOrZero(annualYield, ifexBalance).mul(100);
             const farmInfo = {
                 lastBlockUpdate: rawFarmInfo.lastBlockUpdate.toString(),
                 tokenContract: rawFarmInfo.tokenContract,

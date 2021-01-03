@@ -63,21 +63,17 @@ export const LiquidityPreview = () => {
                             }
                         </div>
                         
-                        <div style={{ width: "75%", display: "grid", rowGap: PIXEL_SIZING.miniscule }}>
-                            <div style={{ display: "grid", gridTemplateColumns: "50% auto", }}>
-                                <div>Annual APR:</div> 
-                                <div style={{ color: theme.colors.positive, fontWeight: "bold" }}>
-                                    {" " + farmInfo?.annualAPR.toFixed(2)}%
-                                </div>
+                        <div style={{ width: "fit-content", display: "grid", rowGap: PIXEL_SIZING.miniscule, columnGap: PIXEL_SIZING.medium, gridTemplateColumns: "auto 1fr" }}>
+                            <div>Annual APR:</div> 
+                            <div style={{ color: theme.colors.positive, fontWeight: "bold" }}>
+                                {" " + farmInfo?.annualAPR.toFixed(2)}%
                             </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "50% auto" }}>
-                                <div>
-                                    Annual Yield:
-                                </div> 
-                                <div style={{ fontWeight: "bold" }}>
-                                    {" " + farmInfo?.annualYield.toFixed(2)} IFEX
-                                </div>
+                            <div>
+                                Annual Yield:
+                            </div> 
+                            <div style={{ fontWeight: "bold" }}>
+                                {" " + farmInfo?.annualYield.toFixed(2)} IFEX
                             </div>
                         </div>
 

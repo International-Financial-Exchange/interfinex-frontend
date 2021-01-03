@@ -139,7 +139,7 @@ const CastVotesPreview = ({ values = [], totalCount }) => {
                             <div 
                                 style={{ 
                                     height: "100%", 
-                                    width: `${divOrZero(count, totalCount.mul(100))}%`, 
+                                    width: `${divOrZero(count, totalCount).mul(100).toFixed(0)}%`, 
                                     backgroundColor: color || theme.colors.positive, 
                                     borderRadius: "inherit" 
                                 }}

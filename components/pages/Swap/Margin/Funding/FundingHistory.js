@@ -8,7 +8,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { Spinner } from "../../../../core/Spinner";
 import Skeleton from "react-loading-skeleton";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
-import { humanizeTokenAmount, shade, tokenAmountToBig } from "../../../../../utils/utils";
+import { hexToRgba, humanizeTokenAmount, shade, tokenAmountToBig } from "../../../../../utils/utils";
 
 const Row = styled.tr`
     background-color: ${({ theme, positive }) => hexToRgba(positive ? theme.colors.positive : theme.colors.negative, 0.1)};

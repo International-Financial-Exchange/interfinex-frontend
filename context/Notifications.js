@@ -83,7 +83,8 @@ const useNotifications = () => {
         };
 
         setDisplayNotifications(existing => existing.concat(notification));
-        setNotifications(existing => existing.concat(notification));
+        // Max notifications are 200
+        setNotifications(existing => existing.slice(existing.length - 200).concat(notification));
     };
 
 
