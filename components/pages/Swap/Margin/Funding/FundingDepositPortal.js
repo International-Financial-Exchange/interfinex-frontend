@@ -14,6 +14,7 @@ import Text from "../../../../core/Text";
 import { TokenAmountInput } from "../../../../core/TokenAmountInput";
 import { MarginContext } from "../../Swap";
 import { FundingContext } from "./FundingTab";
+import Big from "big.js";
 
 const Container = styled(Card)`
     border-radius: ${PIXEL_SIZING.tiny};
@@ -27,7 +28,7 @@ export const FundingDepositPortal = () => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
     const { selectedToken, liquidityToken: _liquidityToken, account: _account, stats, isLoading } = useContext(FundingContext);
     const { approveMarginMarket: _approveMarginMarket, marginMarkets, approveMarginRouter } = useContext(MarginContext);
-    const [tokenAmount, setTokenAmount] = useState();
+    const [tokenAmount, setTokenAmount] = useState(new Big(0));
     const [isDepositLoading, setIsDepositLoading] = useState();
     const [isWithdrawLoading, setIsWithdrawLoading] = useState();
     const { assetTokenBalance, baseTokenBalance, address } = useContext(AccountContext);

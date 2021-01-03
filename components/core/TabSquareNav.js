@@ -23,7 +23,7 @@ const TabSquare = styled.div`
     border-radius: ${PIXEL_SIZING.miniscule};
     z-index: 2;
     transition: all 0.1s ease-out;
-    box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.18);
+    box-shadow: ${({ theme }) => theme.colors.boxShadow};
 `;
 
 export const TabSquareNav = ({ items, selected, onChange, style, isHidden }) => {

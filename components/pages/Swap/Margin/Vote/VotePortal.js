@@ -18,7 +18,7 @@ import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../../../utils/constants";
 import { divOrZero, humanizeTokenAmount, parseTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
 
 const useVotes = ({ proposalId, MarginMarket, }) => {
-    const [votesCast, setVotesCast] = useState({ up: new Big(0), preserve: new Big(0), down: new Big(0) });
+    const [votesCast, setVotesCast] = useState({ up: new Big(0), preserve: new Big(0), down: new Big(0), total: new Big(0) });
     const [account, setAccount] = useState();
     const [currentValue, setCurrentValue] = useState();
     const [finishDate, setFinishDate] = useState();
@@ -108,7 +108,7 @@ const useVotes = ({ proposalId, MarginMarket, }) => {
 
 const Container = styled.div`
     border-radius: ${PIXEL_SIZING.miniscule};
-    box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.18);
+    box-shadow: ${({ theme }) => theme.colors.boxShadow};
     display: grid;
     row-gap: ${PIXEL_SIZING.small};
     width: ${CONTAINER_SIZING.medium};
@@ -124,7 +124,7 @@ const CastVotesPreview = ({ values = [], totalCount }) => {
             {
                 values.map(({ text, color, count }) =>
                     <div>
-                        <Text secondary>{text} ({count} votes)</Text>
+                        <Text secondary>{text} ({count.toFixed(2)} votes)</Text>
                         <div 
                             style={{ 
                                 position: "relative",
@@ -282,7 +282,7 @@ const VoteDetails = ({ castVotesValues, proposalId, onClose, finishDate, votesCa
     const theme = useContext(ThemeContext);
     const { ifexToken } = useContext(TokenPairContext);
     const { ifexTokenBalance } = useContext(AccountContext);
-    const [voteAmount, setVoteAmount] = useState();
+    const [voteAmount, setVoteAmount] = useState(new Big(0));
     const [isIncreaseLoading, setIsIncreaseLoading] = useState();
     const [isPreserveLoading, setIsPreserveLoading] = useState();
     const [isDecreaseLoading, setIsDecreaseLoading] = useState();

@@ -8,7 +8,7 @@ import {
     RedditIcon,
     TelegramIcon,
     TwitterIcon,
-  } from "react-share";
+} from "react-share";
 import { PIXEL_SIZING } from "../../utils/constants";
 
 const FooterContainer = styled(LayoutContainer)`

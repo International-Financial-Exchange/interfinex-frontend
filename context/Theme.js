@@ -22,7 +22,7 @@ export const THEMES = {
         warn: "#ff9900",
         grey: "#d4d4d4",
         blue: "#3182DD",
-        boxShadow: "10px 7px 55px -22px rgba(0,0,0,0.15)",
+        boxShadow: "0px 0px 15px -0px rgba(0,0,0,0.15)",
         primaryBoxShadow: "10px 7px 55px 10px rgba(0,0,0,0.15)",
     },
 
@@ -40,7 +40,7 @@ export const THEMES = {
         warn: "#ff9900",
         grey: "#d4d4d4",
         blue: "#3182DD",
-        boxShadow: "10px 7px 55px -22px rgba(0,0,0,1)",
+        boxShadow: "0px 0px 15px -0px rgba(0,0,0,1)",
         primaryBoxShadow: "10px 7px 55px 10px rgba(0,0,0,1)",
     },
 };
