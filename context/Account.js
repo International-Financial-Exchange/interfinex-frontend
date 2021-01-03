@@ -71,9 +71,6 @@ export const AccountProvider = ({ children }) => {
         }
     }, [provider, address, baseToken, assetToken, ifexToken]);
 
-    console.log("ACCOUNT balance", assetTokenBalance);
-
-
     return (
         <AccountContext.Provider 
             value={{ 
