@@ -26,7 +26,7 @@ export const YourLiquidity = ({ farmInfo, isFarmInfoLoading }) => {
     const [isClaimEarningsLoading, setIsClaimEarningsLoading] = useState(false);
     const { addTransactionNotification } = useContext(NotificationsContext);
     const [isDividendsLoading, setIsDividendsLoading] = useState();
-    const { blockNumber } = useContext(EthersContext);
+    const { contracts: { YieldFarm }, blockNumber, } = useContext(EthersContext);
 
     useEffect(() => {
         if (liquidityToken && address) {
@@ -94,19 +94,20 @@ export const YourLiquidity = ({ farmInfo, isFarmInfoLoading }) => {
                         requiresWallet
                         onClick={async () => {
                             setIsClaimEarningsLoading(true);
-                            
-                            if (farmInfo) {
-                                await YieldFarm.harvest(liquidityToken.address);
-                            }
 
-                            const transactionPromise = liquidityToken.contract.claimDividends({ gasLimit: 1000000 });
-                            addTransactionNotification({
-                                content: `Claim Interfinex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
-                                transactionPromise,
-                            });
-                            transactionPromise.finally(() =>
-                                setIsClaimEarningsLoading(false)
-                            );
+                            try {
+                                if (farmInfo) {
+                                    await YieldFarm.harvest(liquidityToken.address);
+                                }
+    
+                                const transactionPromise = liquidityToken.contract.claimDividends({ gasLimit: 1000000 });
+                                await addTransactionNotification({
+                                    content: `Claim Interfinex Bill token dividends from ${assetToken.name}-${baseToken.name} swap liquidity pool`,
+                                    transactionPromise,
+                                });
+                            } finally {
+                                setIsClaimEarningsLoading(false);
+                            }
                         }}
                         isLoading={isClaimEarningsLoading}
                     >
