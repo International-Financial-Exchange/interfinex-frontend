@@ -58,7 +58,7 @@ export const useYieldFarms = () => {
             }) => ({ 
                 tokenContract,
                 yieldPerBlock: tokenAmountToBig(yieldPerBlock, { decimals: 18 }),
-                annualYield: tokenAmountToBig(yieldPerBlock, { decimals: 18 }) * 2336000,
+                annualYield: tokenAmountToBig(yieldPerBlock, { decimals: 18 }).mul(2336000),
                 token0Address,
                 token1Address,
                 marketContract,

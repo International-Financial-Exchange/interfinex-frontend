@@ -35,7 +35,7 @@ const StyledTable = styled.table`
 `;
 
 const StyledRow = styled.tr`
-    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.colors.boxShadow};
     border-radius: ${PIXEL_SIZING.miniscule};
 
     td {

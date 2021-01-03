@@ -139,41 +139,51 @@ const ExpandedNotificationsPreview = () => {
     const { notifications } = useContext(NotificationsContext);
 
     return (
-        <div>
+        <div style={{ display: "grid", minHeight: CONTAINER_SIZING.tiny }}>
             {
-                notifications.sort((a, b) => b.timestamp - a.timestamp).map(({ textContent, timestamp, contentType, additionalDetails, type }) => {
-                    switch (contentType) {
-                        case NOTIFICATION_CONTENT_TYPES.transaction:
-                            return (
-                                <TransactionNotificationItem
-                                    onClick={() => 
-                                        additionalDetails?.tx && window.open(`https://etherscan.io/tx/${additionalDetails?.tx.hash}`)
-                                    }
-                                >
-                                    <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
-                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                        {
-                                            additionalDetails?.tx &&
-                                                <LinkIcon style={{ marginRight: PIXEL_SIZING.small }} className={"tx-link-icon"}/>
+                !notifications?.length ?
+                    <Text 
+                        secondary 
+                        style={{
+                            justifySelf: "center",
+                            alignSelf: "center"
+                        }}
+                    >
+                        No notifications to show
+                    </Text>
+                    : notifications.sort((a, b) => b.timestamp - a.timestamp).map(({ textContent, timestamp, contentType, additionalDetails, type }) => {
+                        switch (contentType) {
+                            case NOTIFICATION_CONTENT_TYPES.transaction:
+                                return (
+                                    <TransactionNotificationItem
+                                        onClick={() => 
+                                            additionalDetails?.tx && window.open(`https://etherscan.io/tx/${additionalDetails?.tx.hash}`)
                                         }
+                                    >
+                                        <Text secondary>{new Date(timestamp).toLocaleTimeString()}</Text>
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            {
+                                                additionalDetails?.tx &&
+                                                    <LinkIcon style={{ marginRight: PIXEL_SIZING.small }} className={"tx-link-icon"}/>
+                                            }
 
-                                        {
-                                            additionalDetails?.isLoading ?
-                                                <BarSpinner width={PIXEL_SIZING.large}/>
-                                                : type === NOTIFICATION_TYPES.success ?
-                                                    <SuccessTickIcon/>
-                                                    : <FailCrossIcon/>
-                                        }
-                                    </div>
+                                            {
+                                                additionalDetails?.isLoading ?
+                                                    <BarSpinner width={PIXEL_SIZING.large}/>
+                                                    : type === NOTIFICATION_TYPES.success ?
+                                                        <SuccessTickIcon/>
+                                                        : <FailCrossIcon/>
+                                            }
+                                        </div>
 
-                                    <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
-                                </TransactionNotificationItem>
-                            );
-                        default:
-                            console.warn("Unsupported notification content type: ", contentType);
-                            return null;
-                    }
-                })
+                                        <Text style={{ gridColumn: "1/3" }}>{textContent}</Text>
+                                    </TransactionNotificationItem>
+                                );
+                            default:
+                                console.warn("Unsupported notification content type: ", contentType);
+                                return null;
+                        }
+                    })
             }
         </div>
     );
