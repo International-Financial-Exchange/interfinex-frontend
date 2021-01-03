@@ -12,7 +12,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import Skeleton from "react-loading-skeleton";
 import { NotificationsContext } from "../../../../../context/Notifications";
 import { CONTAINER_SIZING, FEE_RATE, PIXEL_SIZING } from "../../../../../utils/constants";
-import { humanizeTokenAmount } from "../../../../../utils/utils";
+import { divOrZero, humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
 
 const LiquidatorContext = createContext();
 
@@ -36,7 +36,7 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
     const _getMorePositions = async () => {
         setIsLoading(true);
         try {
-            const interestIndex = _interestIndex ?? humanizeTokenAmount(
+            const interestIndex = _interestIndex ?? tokenAmountToBig(
                 await MarginMarket.interestIndex({ gasLimit: 1_000_000}), 
                 { decimals: 18 }
             );
@@ -51,21 +51,24 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
                 originalBorrowedAmount, 
                 user 
             }) => {
-                const borrowedAmount = originalBorrowedAmount * interestIndex / humanizeTokenAmount(lastInterestIndex, { decimals: 18 });
+                const borrowedAmount = new Big(originalBorrowedAmount)
+                    .mul(divOrZero(interestIndex, tokenAmountToBig(lastInterestIndex, { decimals: 18 })));
                 const positionSize = inputToOutputAmount(
-                    collateralAmount, 
+                    new Big(collateralAmount), 
                     marginMarketAssetToken.address === assetToken.address ? exchangeBaseTokenBalance : exchangeAssetTokenBalance,
                     marginMarketAssetToken.address === assetToken.address ? exchangeAssetTokenBalance : exchangeBaseTokenBalance,
                     FEE_RATE
                 );
-                const liquidationRatio = borrowedAmount / positionSize;
 
+                console.log("borrowed", borrowedAmount.toString())
+                console.log("collateral", positionSize.toString())
+                const liquidationRatio = divOrZero(borrowedAmount, positionSize);
 
                 return {
-                    borrowedAmount: Number.isNaN(borrowedAmount) ? 0 : borrowedAmount,
+                    borrowedAmount,
                     positionSize,
                     collateralAmount,
-                    liquidationRatio: Number.isNaN(borrowedAmount) ? 0 : liquidationRatio,
+                    liquidationRatio,
                     maintenanceMargin,
                     user,
                 }
@@ -75,7 +78,8 @@ const usePositions = (MarginMarket, marginMarketAssetToken) => {
             setOffset(old => old + newPositions.length);
             setGotAllPositions(newPositions.length === 0);
             setIsLoading(false);
-        } catch {
+        } catch (e) {
+            console.error(e)
             setTimeout(() => {
                 setIsLoading(false);
             }, 3000);
@@ -209,7 +213,7 @@ export const LiquidatorTab = ({ isSelected }) => {
 };
 
 const StyledRow = styled.tr`
-    box-shadow: 0 0 14px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.colors.boxShadow};
     border-radius: ${PIXEL_SIZING.miniscule};
 
     td {
@@ -241,15 +245,15 @@ const PositionRow = ({
         <StyledRow>
             <td 
                 style={{ 
-                    color: liquidationRatio >= 1 
+                    color: liquidationRatio.gte(1) 
                         ? theme.colors.negative 
-                        : liquidationRatio >= 0.85 ?
-                            theme.colors.secondary
-                            : theme.colors.positive, 
+                        : liquidationRatio.lte(0.5) ?
+                            theme.colors.positive
+                            : theme.colors.secondary,
                     fontWeight: "bold" 
                 }}
             >
-                {(liquidationRatio * 100).toFixed(4)}%
+                {liquidationRatio.mul(100).toFixed(4)}%
             </td>
             <td>{collateralAmount.toFixed(4)} {collateralToken.symbol}</td>
             <td>{maintenanceMargin.toFixed(4)} {selectedToken.symbol}</td>

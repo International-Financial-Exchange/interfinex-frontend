@@ -8,7 +8,7 @@ import {
     RedditIcon,
     TelegramIcon,
     TwitterIcon,
-  } from "react-share";
+} from "react-share";
 import { PIXEL_SIZING } from "../../utils/constants";
 
 const FooterContainer = styled(LayoutContainer)`
@@ -53,7 +53,7 @@ export const Footer = () => {
                         {
                             [
                                 { label: "Twitter", link: "https://twitter.com/Interfinex_io", icon: <TwitterIcon bgStyle={{ fill: "none" }} size={30}/> },
-                                { label: "Facebook", link: "https://www.facebook.com/Interfinex-103763214881679", icon: <FacebookIcon bgStyle={{ fill: "none" }} size={30}/> },
+                                // { label: "Facebook", link: "https://www.facebook.com/Interfinex-103763214881679", icon: <FacebookIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 { label: "Telegram", link: "https://t.me/interfinexio", icon: <TelegramIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 // { label: "Reddit", link: "https://twitter.com/Interfinex_io", icon: <RedditIcon bgStyle={{ fill: "none" }} size={30}/> },
                                 { label: "Medium", link: "https://medium.com/@interfinexio", icon: <img src={"/medium-logo.png"} style={{ height: 30, width: 30 }}/>},

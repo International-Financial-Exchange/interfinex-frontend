@@ -10,6 +10,7 @@ import { InputAndLabel } from "../../../core/InputAndLabel";
 import Text from "../../../core/Text";
 import { TokenAmountInput } from "../../../core/TokenAmountInput";
 import { TokenAndLogo } from "../../../core/TokenAndLogo";
+import Big from "big.js";
 
 export const FixedPriceInput = forwardRef((props, ref) => {
     const { isSubmitted } = useContext(SubmitContext);
@@ -17,19 +18,19 @@ export const FixedPriceInput = forwardRef((props, ref) => {
     const { assetToken = {}} = useContext(TokenPairContext);
     const { addTransactionNotification } = useContext(NotificationsContext);
 
-    const [assetTokenAmount, setAssetTokenAmount] = useState();
-    const [ethAmount, setEthAmount] = useState();
+    const [assetTokenAmount, setAssetTokenAmount] = useState(new Big(0));
+    const [ethAmount, setEthAmount] = useState(new Big(0));
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date(Date.now() + TIMEFRAMES["1d"]));
 
-    const tokensPerEth = assetTokenAmount / ethAmount;
+    const tokensPerEth = (assetTokenAmount.gt(0) && ethAmount.gt(0)) ? assetTokenAmount.div(ethAmount) : new Big(0);
 
     const validate = (name, description) => {
         const validations = {
             name: name && name.length <= 60,
             description: description && description.length <= 250,
-            ethAmount: ethAmount > 0,
-            assetTokenAmount: assetTokenAmount > 0,
+            ethAmount: ethAmount.gt(0),
+            assetTokenAmount: assetTokenAmount.gt(0),
             timerange: startDate.getTime() < endDate.getTime(),
         };
 
@@ -74,8 +75,8 @@ export const FixedPriceInput = forwardRef((props, ref) => {
                     <TokenAmountInput
                         token={ETHEREUM_TOKEN}
                         value={ethAmount}
-                        onChange={e => setEthAmount(e.target.value)}
-                        isError={isSubmitted && !ethAmount}
+                        onChange={num => setEthAmount(num)}
+                        isError={isSubmitted && ethAmount.lte(0)}
                         errorMessage={"ETH amount must be greater than 0"}
                     />
                 </InputAndLabel>
@@ -85,8 +86,8 @@ export const FixedPriceInput = forwardRef((props, ref) => {
                     <TokenAmountInput
                         token={assetToken}
                         value={assetTokenAmount}
-                        onChange={e => setAssetTokenAmount(e.target.value)}
-                        isError={isSubmitted && !assetTokenAmount}
+                        onChange={num => setAssetTokenAmount(num)}
+                        isError={isSubmitted && assetTokenAmount.lte(0)}
                         errorMessage={`${assetToken.symbol} amount must be greater than 0`}
                     />
                 </InputAndLabel>
@@ -98,7 +99,7 @@ export const FixedPriceInput = forwardRef((props, ref) => {
                 </TokenAndLogo>
                 <Text>=</Text>
                 <TokenAndLogo token={assetToken}>
-                    <Text>{Number.isNaN(tokensPerEth) ? 0 : tokensPerEth} {assetToken.symbol}</Text>
+                    <Text>{tokensPerEth.toFixed(6)} {assetToken.symbol}</Text>
                 </TokenAndLogo>
             </div>
 

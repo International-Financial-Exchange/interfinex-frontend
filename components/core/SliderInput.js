@@ -5,7 +5,7 @@ import { THEMES } from "../../context/Theme";
 
 const StyledSlider = withStyles({
     root: {
-        color: THEMES.light.primary,
+        color: "#2A9D8F",
     },
     thumb: {
         backgroundColor: "currentColor",

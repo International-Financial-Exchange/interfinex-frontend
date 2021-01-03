@@ -8,12 +8,12 @@ const materialTheme = createMuiTheme({
     overrides: {
         MuiPickersToolbar: {
             toolbar: {
-                backgroundColor: THEMES.light.primary,
+                backgroundColor: "#2A9D8F",
             },
         },
         MuiTabs: {
             scroller: {
-                backgroundColor: THEMES.light.primary,
+                backgroundColor: "#2A9D8F",
             },
 
             indicator: {
@@ -22,41 +22,41 @@ const materialTheme = createMuiTheme({
         },
         MuiPickersDay: {
             day: {
-                color: THEMES.light.primary,
+                color: "#2A9D8F",
             },
             daySelected: {
-                backgroundColor: THEMES.light.primary,
+                backgroundColor: "#2A9D8F",
             },
             dayDisabled: {
-                color: THEMES.light.primary,
+                color: "#2A9D8F",
             },
             current: {
-                color: THEMES.light.primary,
+                color: "#2A9D8F",
             },
         },
         MuiPickersModal: {
             dialogAction: {
-                color: THEMES.light.primary,
+                color: "#2A9D8F",
             },
         },
 
         MuiButton: {
             textPrimary: {
-                color: THEMES.light.primary,
+                color: "#2A9D8F",
             }
         },
 
         MuiPickersClock: {
             pin: {
-                backgroundColor: THEMES.light.primary,
+                backgroundColor: "#2A9D8F",
             },
         },
         MuiPickersClockPointer: {
             thumb: {
-                borderColor:THEMES.light.primary,
+                borderColor:"#2A9D8F",
             },
             pointer: {
-                backgroundColor: THEMES.light.primary,
+                backgroundColor: "#2A9D8F",
             }
         },
 
@@ -72,7 +72,7 @@ const materialTheme = createMuiTheme({
             },
             error: {
                 root: {
-                    color: THEMES.light.negative,
+                    color: "#f00f30",
                 }
             },
             root: {

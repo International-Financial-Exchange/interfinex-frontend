@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../context/Account";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
 import { getIloDepositHistory, getIloItem, getIloList, getUserIlos } from "./networkRequests";
 
 export const useIlo = ({ contractAddress, iloJson }) => {
@@ -106,16 +106,13 @@ export const useYourIloInvestment = ({ ILOContract, assetToken }) => {
 
     const updateInfo = async () => {
         setIsLoading(true);
-        console.log("updating");
-        console.log(ILOContract);
-        console.log(address)
+
         await Promise.all([
             ILOContract.etherDeposited(address, { gasLimit: 1_000_000 }),
             ILOContract.balanceOf(address, { gasLimit: 1_000_000 }),
         ]).then(([etherDeposited, tokensBought]) => {
-            console.log("invested", etherDeposited, tokensBought)
-            setAccountEthInvested(humanizeTokenAmount(etherDeposited, { decimals: 18 }));
-            setAccountTokensBought(humanizeTokenAmount(tokensBought, assetToken));
+            setAccountEthInvested(tokenAmountToBig(etherDeposited, { decimals: 18 }));
+            setAccountTokensBought(tokenAmountToBig(tokensBought, assetToken));
             setIsLoading(false);
         });
     };

@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../../../context/Account";
 import { EthersContext } from "../../../../../context/Ethers";
 import { TokenPairContext } from "../../../../../context/TokenPair";
-import { humanizeTokenAmount } from "../../../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../../../utils/utils";
+import Big from "big.js";
 
 export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marginMarkets }) => {
     const { assetToken, baseToken } = useContext(TokenPairContext);
@@ -18,7 +19,7 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marg
             [AssetTokenMarginMarket, assetToken], 
             [BaseTokenMarginMarket, baseToken]
         ].map(async ([MarginMarket, token]) => {
-            const rawStats = await Promise.all([
+            const [totalBorrowed, totalReserved, interestRate] = await Promise.all([
                 MarginMarket.totalBorrowed({ gasLimit: 1_000_000 }),
                 MarginMarket.totalReserved({ gasLimit: 1_000_000 }),
                 MarginMarket.interestRate({ gasLimit: 1_000_000 }),
@@ -27,10 +28,10 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marg
             setStats(oldState => { 
                 const newState = _.cloneDeep(oldState);
                 newState[MarginMarket.address] = { 
-                    totalBorrowed: humanizeTokenAmount(rawStats[0], token), 
-                    totalReserved: humanizeTokenAmount(rawStats[1], token), 
-                    totalValue: humanizeTokenAmount(rawStats[0], token) + humanizeTokenAmount(rawStats[1], token),
-                    interestRate: humanizeTokenAmount(rawStats[2], { decimals: 18 }),
+                    totalBorrowed: tokenAmountToBig(totalBorrowed, token), 
+                    totalReserved: tokenAmountToBig(totalReserved, token), 
+                    totalValue: tokenAmountToBig(totalBorrowed, token).add(tokenAmountToBig(totalReserved, token)),
+                    interestRate: tokenAmountToBig(interestRate, { decimals: 18 }),
                 };
                 return newState;
             });
@@ -50,26 +51,36 @@ export const useFunding = ({ AssetTokenMarginMarket, BaseTokenMarginMarket, marg
                 contract: assetLiquidityToken, 
                 address: assetLiquidityToken.address,
                 MarginMarket: AssetTokenMarginMarket,
-                totalSupply: humanizeTokenAmount(await assetLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
+                totalSupply: tokenAmountToBig(await assetLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
             },
             [baseToken.address]: { 
                 contract: baseLiquidityToken, 
                 address: baseLiquidityToken.address,
                 MarginMarket: BaseTokenMarginMarket,
-                totalSupply: humanizeTokenAmount(await baseLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
+                totalSupply: tokenAmountToBig(await baseLiquidityToken.totalSupply({ gasLimit: 1_000_000 }), { decimals: 18 })
             },
         });
     };
 
     const updateAccount = async () => {
         _.entries(liquidityToken).map(async ([assetTokenAddress, liquidityToken]) => {
-            const liquidityTokenBalance = humanizeTokenAmount(await liquidityToken.contract.balanceOf(address, { gasLimit: 1_000_000 }), { decimals: 18 });
-            const assetTokenDeposited = liquidityTokenBalance / liquidityToken.totalSupply * stats[liquidityToken.MarginMarket.address].totalValue;
+            const liquidityTokenBalance = tokenAmountToBig(
+                await liquidityToken.contract.balanceOf(address, { gasLimit: 1_000_000 }), 
+                { decimals: 18 }
+            );
+
+            const assetTokenDeposited = liquidityTokenBalance.gt(0) ?
+                liquidityTokenBalance
+                    .div(liquidityToken.totalSupply)
+                    .mul(stats[liquidityToken.MarginMarket.address].totalValue)
+            : 
+                new Big(0);
+            
             setAccount(oldState => {
                 const newState = _.cloneDeep(oldState);
                 newState[assetTokenAddress] = { 
                     liquidityTokenBalance, 
-                    assetTokenDeposited: Number.isNaN(assetTokenDeposited) ? 0 : assetTokenDeposited,
+                    assetTokenDeposited,
                 };
                 return newState;
             });

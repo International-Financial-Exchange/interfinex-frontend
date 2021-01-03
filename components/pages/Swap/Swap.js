@@ -12,9 +12,7 @@ import { Spinner } from "../../core/Spinner";
 import { Card } from "../../core/Card";
 import { Input } from "../../core/Input";
 import { TextButton, Button } from "../../core/Button";
-import { TokenAmountInput } from "../../core/TokenAmountInput";
 import { CreateMarket } from "./CreateMarket";
-import { YourLiquidity } from "./YourLiquidity";
 import { AccountContext } from "../../../context/Account";
 import styled from "styled-components";
 import { TokenAndLogo } from "../../core/TokenAndLogo";
@@ -27,8 +25,9 @@ import { FundingTab } from "./Margin/Funding/FundingTab";
 import { LiquidatorTab } from "./Margin/Liquidator/LiquidatorTab";
 import { VoteTab } from "./Margin/Vote/VoteTab";
 import { PIXEL_SIZING } from "../../../utils/constants";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
 import { useContractApproval } from "../../../utils/hooks";
+import Big from "big.js";
 
 export const SwapContext = createContext();
 export const MarginContext = createContext();
@@ -69,8 +68,8 @@ export const Swap = () => {
     const [marketExists, setMarketExists] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [exchangeContract, setExchangeContract] = useState();
-    const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState();
-    const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState();
+    const [exchangeAssetTokenBalance, setExchangeAssetTokenBalance] = useState(new Big(0));
+    const [exchangeBaseTokenBalance, setExchangeBaseTokenBalance] = useState(new Big(0));
     const [liquidityToken, setLiquidityToken] = useState();
     const [account, setAccount] = useState();
     const [isExchangeInfoLoading,setIsExchangeInfoLoading] = useState(true);
@@ -134,10 +133,8 @@ export const Swap = () => {
             assetToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 }),
             baseToken.contract.balanceOf(exchangeContract.address, { gasLimit: 800000 })
         ]).then(async ([assetTokenBalance, baseTokenBalance]) => {
-            return [humanizeTokenAmount(assetTokenBalance, assetToken), humanizeTokenAmount(baseTokenBalance, baseToken)];
+            return [tokenAmountToBig(assetTokenBalance, assetToken), tokenAmountToBig(baseTokenBalance, baseToken)];
         });
-
-        console.log("asset amount", exchangeAssetTokenBalance)
 
         setExchangeAssetTokenBalance(exchangeAssetTokenBalance);
         setExchangeBaseTokenBalance(exchangeBaseTokenBalance);
@@ -147,15 +144,15 @@ export const Swap = () => {
             
             // Update the liquidity for the user and the total liquidity
             await Promise.all([
-                liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => humanizeTokenAmount(totalSupply, { decimals: 18 })),
-                liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => humanizeTokenAmount(balance, { decimals: 18 }))
+                liquidityToken.contract.totalSupply({ gasLimit: 800000 }).then(totalSupply => tokenAmountToBig(totalSupply, { decimals: 18 })),
+                liquidityToken.contract.balanceOf(address, { gasLimit: 800000 }).then(balance => tokenAmountToBig(balance, { decimals: 18 }))
             ]).then(async ([liquidityTokenTotalSupply, liquidityTokenBalance]) => {
                 setAccount(old => ({
                     ...old,
                     liquidityTokenBalance,
-                    percentageOfPoolDeposited: liquidityTokenBalance / liquidityTokenTotalSupply,
-                    depositedAssetTokenAmount: exchangeAssetTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply,
-                    depositedBaseTokenAmount: exchangeBaseTokenBalance * liquidityTokenBalance / liquidityTokenTotalSupply
+                    percentageOfPoolDeposited: liquidityTokenBalance.div(liquidityTokenTotalSupply),
+                    depositedAssetTokenAmount: exchangeAssetTokenBalance.mul(liquidityTokenBalance).div(liquidityTokenTotalSupply),
+                    depositedBaseTokenAmount: exchangeBaseTokenBalance.mul(liquidityTokenBalance).div(liquidityTokenTotalSupply)
                 }));
             });
         }
@@ -202,7 +199,9 @@ export const Swap = () => {
                     approveExchange,
                     isMarginEnabled,
                     approveRouter,
-                    price: parseFloat(exchangeAssetTokenBalance ?? 0) / parseFloat(exchangeBaseTokenBalance ?? 0),
+                    assetTokensPerBaseToken: exchangeBaseTokenBalance.gt(0) ? 
+                        exchangeAssetTokenBalance.div(exchangeBaseTokenBalance || 1) 
+                        : new Big(0),
                     account,
                     liquidityToken,
                 }}
@@ -264,6 +263,7 @@ export const Swap = () => {
 
                                     <div style={{ marginTop: PIXEL_SIZING.large, }}>
                                         <TradeTab isSelected={!selectedTab || selectedTab === "trade"}/>
+                                        
                                         {
                                             isMarginEnabled &&
                                                 <>

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { PIXEL_SIZING } from "../../utils/constants";
+import { ExpandArrowIcon } from "./ExpandArrowIcon";
 
 const Container = styled.div`
     display: grid; 
@@ -12,11 +13,10 @@ const Container = styled.div`
     transition: all 0.1s ease-out;
     border: ${({ secondary, theme }) => secondary ? `1px solid ${theme.colors.highlight}` : ''};
 
-    .arrow {
+    .expand-arrow {
         transition: all 0.1s ease-out;
         position: absolute;
-        height: ${PIXEL_SIZING.medium};
-        transform: rotate(270deg);
+        height: ${PIXEL_SIZING.small};
         right: ${PIXEL_SIZING.medium};
     }
 
@@ -25,7 +25,7 @@ const Container = styled.div`
         background-color: ${({ theme, secondary }) => !secondary ? theme.colors.highlight : ''};
         border-color: ${({ theme, secondary }) => secondary ? theme.colors.primary : ''};
 
-        .arrow {
+        .expand-arrow {
             right: ${PIXEL_SIZING.small};
         }
     }
@@ -38,10 +38,7 @@ export const ContentAndArrow = ({ children, ...props }) => {
                 { children }
             </div>
 
-            <img
-                className={"arrow"}
-                src={"/expand-arrow-light-theme.png"}
-            />
+            <ExpandArrowIcon className={"expand-arrow"}/>
         </Container>
     );
 };

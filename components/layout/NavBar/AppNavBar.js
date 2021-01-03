@@ -46,7 +46,7 @@ export const PairQuickInfoCard = styled(Card)`
     display: grid; 
     grid-template-columns: 1fr auto; 
     align-items: center; 
-    column-gap: ${PIXEL_SIZING.microscopic};
+    column-gap: ${PIXEL_SIZING.small};
     height: fit-content;
 
     &:active {
@@ -55,7 +55,7 @@ export const PairQuickInfoCard = styled(Card)`
 
     &:hover {
         border: 1px solid ${({ theme }) => theme.colors.primary};
-        column-gap: ${PIXEL_SIZING.tiny};
+        column-gap: ${PIXEL_SIZING.medium};
         cursor: pointer;
     }
 `;
@@ -277,10 +277,8 @@ const PairSelect = () => {
                     </div>
                 </div>
 
-                <img
-                    style={{ height: PIXEL_SIZING.medium, transform: "rotate(270deg)" }}
-                    src={"/expand-arrow-light-theme.png"}
-                />
+                
+                <ExpandArrowIcon className={"expand-arrow"}/>
             </PairQuickInfoCard>
 
             <div style={{ position: "fixed", top: -13, left: 0 }} ref={selectContainer}>
@@ -388,7 +386,19 @@ import { TabNav } from "../../core/TabNav";
 import { CONTAINER_SIZING, PIXEL_SIZING } from "../../../utils/constants";
 import { useDocument, useWindow } from "../../../utils/hooks";
 import { CircleNav } from "./CircleNav";
-import { humanizeTokenAmount } from "../../../utils/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../../../utils/utils";
+import { AccountMenuItems, } from "./AccountMenuItems/AccountMenuItems";
+import { ExpandArrowIcon } from "../../core/ExpandArrowIcon";
+import { ThemeToggle } from "./AccountMenuItems/ThemeToggle";
+
+const MENU_ITEMS =[
+    // { label: "Dashboard", value: "dashboard" }, 
+    { label: "Swap", value: "swap", root: "swap" }, 
+    { label: "Yield Farm", value: "yieldfarm", root: "yieldfarm" },
+    { label: "ILO", value: "ilo/list", root: "ilo" },
+];
+
+
 
 const ConnectWallet = props => {
     const document = useDocument();
@@ -414,42 +424,28 @@ const ConnectWallet = props => {
     }, [window, document]);
 
     return (
-        <Button onClick={async () => {
-            web3Modal.clearCachedProvider();
-            const web3Provider = await web3Modal.connect();
-            const ethersProvider = new ethers.providers.Web3Provider(web3Provider);
-            setSigner(ethersProvider.getSigner());
-            setProvider(ethersProvider);
-        }}>
+        <Button 
+            style={{ textAlign: "center", }}
+            onClick={async () => {
+                web3Modal.clearCachedProvider();
+                const web3Provider = await web3Modal.connect();
+                const ethersProvider = new ethers.providers.Web3Provider(web3Provider);
+                setSigner(ethersProvider.getSigner());
+                setProvider(ethersProvider);
+            }}
+        >
             Connect Wallet
         </Button>
     );
 };
 
 
-
-const MENU_ITEMS =[
-    // { label: "Dashboard", value: "dashboard" }, 
-    { label: "Swap", value: "swap", root: "swap" }, 
-    { label: "Yield Farm", value: "yieldfarm", root: "yieldfarm" },
-    { label: "ILO", value: "ilo/list", root: "ilo" },
-];
-
 export const AppNavBar = props => {
     const router = useRouter();
     const { setProvider } = useContext(EthersContext);
     const { signer, setSigner } = useContext(EthersContext);
-    const [signerAddress, setSignerAddress] = useState();
-    const [signerTokenBalance, setSignerTokenBalance] = useState();
     const [showAccountDropdown, setShowAccountDropdown] = useState();
     const accountContainerRef = useRef();
-
-    useEffect(() => {
-        if (signer) {
-            signer?.getAddress().then(address => setSignerAddress(address));
-            signer?.getBalance().then(balance => setSignerTokenBalance(balance))
-        }
-    }, [signer]);
 
     return (
         <Container>
@@ -482,54 +478,11 @@ export const AppNavBar = props => {
             <div style={{ justifySelf: "right" }}>
                 {
                     signer ?
-                        <div 
-                            ref={accountContainerRef} 
-                            onClick={() => setShowAccountDropdown(true)}
-                            style={{ display: "grid", gridTemplateColumns: "auto 1fr", width: "fit-content", columnGap: PIXEL_SIZING.small }}
-                        >
-                            <AccountQuickInfoCard padding>
-                                <Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {humanizeTokenAmount(signerTokenBalance || 0, { decimals: 18 }).toFixed(4)} ETH
-                                </Text>
-                            </AccountQuickInfoCard>
-                            
-                            <AccountQuickInfoCard padding>
-                                <Text style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1 }}>
-                                    {
-                                        signerAddress ?
-                                            `${signerAddress.slice(0,5)}...${signerAddress.slice(signerAddress.length - 5)}`
-                                            : <Skeleton width={CONTAINER_SIZING.small}/>
-                                    }
-                                </Text>
-                            </AccountQuickInfoCard>
-
-                            {
-                                showAccountDropdown &&
-                                    <Dropdown left parentRef={accountContainerRef} onClose={() => setShowAccountDropdown(false)}>
-                                        <div style={{ padding: PIXEL_SIZING.medium, display: "grid", }}>
-                                            {
-                                                [
-                                                    { 
-                                                        label: "Disconnect Wallet", 
-                                                        onClick: () => {
-                                                            const defaultProvider = new ethers.providers.getDefaultProvider(ETH_NODE_URL);
-                                                            setProvider(defaultProvider);
-                                                            setSigner(null);
-                                                        }
-                                                    }
-                                                ].map(({ label, onClick }) =>
-                                                    <DropdownItem onClick={onClick}>
-                                                        <Text>
-                                                            {label}
-                                                        </Text>
-                                                    </DropdownItem>
-                                                )
-                                            }
-                                        </div>
-                                    </Dropdown>
-                            }
+                       <AccountMenuItems/>
+                       : <div style={{ display: "flex", alignItems: "center" }}>
+                           <ThemeToggle/>
+                           <ConnectWallet/>
                         </div>
-                        : <ConnectWallet/>
                 }
             </div>
         </Container>

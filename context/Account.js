@@ -4,8 +4,9 @@ import { TokenPairContext } from "./TokenPair";
 import ethers from "ethers";
 import { NotificationsContext, NOTIFICATION_TYPES } from "./Notifications";
 import Text from "../components/core/Text";
-import { humanizeTokenAmount } from "../utils/utils";
-import { formatEther } from "ethers/lib/utils";
+import { humanizeTokenAmount, tokenAmountToBig } from "../utils/utils";
+import { formatEther, formatUnits } from "ethers/lib/utils";
+import Big from "big.js";
 
 export const AccountContext = createContext();
 
@@ -14,10 +15,10 @@ export const AccountProvider = ({ children }) => {
     const { baseToken, assetToken, ifexToken } = useContext(TokenPairContext);
     const { addLayoutNotification } = useContext(NotificationsContext);
     const [address, setAddress] = useState();
-    const [baseTokenBalance, setBaseTokenBalance] = useState();
-    const [assetTokenBalance, setAssetTokenBalance] = useState();
-    const [ifexTokenBalance, setIfexTokenBalance] = useState();
-    const [ethBalance, setEthBalance] = useState();
+    const [baseTokenBalance, setBaseTokenBalance] = useState(new Big(0));
+    const [assetTokenBalance, setAssetTokenBalance] = useState(new Big(0));
+    const [ifexTokenBalance, setIfexTokenBalance] = useState(new Big(0));
+    const [ethBalance, setEthBalance] = useState(new Big(0));
     const [deleteWalletWarning, setDeleteWalletWarning] = useState();
 
     useEffect(() => {
@@ -42,33 +43,35 @@ export const AccountProvider = ({ children }) => {
         if (address && signer) {
             if (baseToken.name === "Ethereum") {
                 signer.getBalance().then(balance => 
-                    setBaseTokenBalance(parseFloat(formatEther(balance)))
+                    setBaseTokenBalance(tokenAmountToBig(balance, { decimals: 18 }))
                 )
             } else {
                 baseToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                    setBaseTokenBalance(humanizeTokenAmount(balance, baseToken))
+                    setBaseTokenBalance(tokenAmountToBig(balance, baseToken))
                 });
             }
 
             if (assetToken.name === "Ethereum") {
                 signer.getBalance().then(balance => 
-                    setAssetTokenBalance(parseFloat(formatEther(balance)))
+                    setAssetTokenBalance(tokenAmountToBig(balance, { decimals: 18 }))
                 )
             } else {
                 assetToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                    setAssetTokenBalance(humanizeTokenAmount(balance, assetToken))
+                    setAssetTokenBalance(tokenAmountToBig(balance, assetToken))
                 });
             }
 
             ifexToken.contract.balanceOf(address, { gasLimit: 1000000 }).then(balance => {
-                setIfexTokenBalance(humanizeTokenAmount(balance, ifexToken))
+                setIfexTokenBalance(tokenAmountToBig(balance, ifexToken))
             });
 
             signer.getBalance().then(balance => 
-                setEthBalance(parseFloat(formatEther(balance)))
+                setEthBalance(tokenAmountToBig(balance, { decimals: 18 }))
             )
         }
     }, [provider, address, baseToken, assetToken, ifexToken]);
+
+    console.log("ACCOUNT balance", assetTokenBalance);
 
 
     return (

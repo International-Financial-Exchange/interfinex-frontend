@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Text from "../../core/Text";
-import { humanizeTokenAmount, shade } from "../../../utils/utils";
+import { hexToRgba, humanizeTokenAmount, shade, tokenAmountToBig } from "../../../utils/utils";
 import { TextOption } from "../../core/TextOption";
 import { useState, useEffect, useContext, useMemo } from "react";
 import { getHistoricalTrades } from "./networkRequests";
@@ -38,7 +38,7 @@ const Table = styled.table`
 `;
 
 const TradeRowContainer = styled.div`
-    background-color: ${({ theme, isBuy }) => shade(isBuy ? theme.colors.positive : theme.colors.negative, 0.9)};
+    background-color: ${({ theme, isBuy }) => hexToRgba(isBuy ? theme.colors.positive : theme.colors.negative, 0.1)};
     border-radius: ${PIXEL_SIZING.microscopic};
     display: grid;
     color: ${({ theme, isBuy }) => isBuy ? theme.colors.positive : theme.colors.negative};
@@ -138,17 +138,14 @@ export const HistoricalTrades = () => {
 
         return trades
             ?.map(({ assetTokenAmount, baseTokenAmount, timestamp, user, txId, isBuy }) => {
-                console.log(token0, token1)
-                console.log(assetToken);
-
                 const isInverted = baseToken.address !== token0.address;
                 const [humanizedBaseTokenAmount, humanizedAssetTokenAmount] = [
-                    humanizeTokenAmount(baseTokenAmount, isInverted ? assetToken : baseToken), 
-                    humanizeTokenAmount(assetTokenAmount, isInverted ? baseToken : assetToken)
+                    tokenAmountToBig(baseTokenAmount, isInverted ? assetToken : baseToken), 
+                    tokenAmountToBig(assetTokenAmount, isInverted ? baseToken : assetToken)
                 ];
                 
                 return {
-                    price: isInverted ? humanizedAssetTokenAmount / humanizedBaseTokenAmount : humanizedBaseTokenAmount / humanizedAssetTokenAmount,
+                    price: isInverted ? humanizedAssetTokenAmount.div(humanizedBaseTokenAmount) : humanizedBaseTokenAmount.div(humanizedAssetTokenAmount),
                     volume: isInverted ? humanizedAssetTokenAmount : humanizedBaseTokenAmount,
                     timestamp: timestamp,
                     user,
@@ -177,6 +174,7 @@ export const HistoricalTrades = () => {
                 <TextOption 
                     selected={selectedTab === TABS.yourTrades}
                     onClick={() => setSelectedTab(TABS.yourTrades)}
+                    style={{ width: "fit-content" }}
                 >
                     Your Trades
                 </TextOption>

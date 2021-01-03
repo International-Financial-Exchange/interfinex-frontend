@@ -6,6 +6,7 @@ import Text from "./Text";
 import { EthersContext } from "../../context/Ethers";
 import ReactDOM from "react-dom";
 import { dropinAnimation, PIXEL_SIZING } from "../../utils/constants";
+import { ArrowDirection } from "./ArrowDirection";
 
 const ButtonContainer = styled.div`
     border-radius: 4px;
@@ -17,7 +18,7 @@ const ButtonContainer = styled.div`
             theme.colors.negative
             : theme.colors.primary 
     };
-    color: ${({ theme }) => theme.colors.invert};
+    color: white;
     width: fit-content;
     display: grid;
     align-items: center;
@@ -47,18 +48,26 @@ const InfoBubbleContainer = styled.div`
     animation: ${dropinAnimation} 0.07s forwards;
 `;
 
-const InfoBubble = ({ children, parentRef, ...props }) => {
+export const HoverInfoBubble = ({ children, parentRef, ...props }) => {
     const { x, y, height, width } = parentRef.current?.getBoundingClientRect() ?? {};
 
     return (
         ReactDOM.createPortal(
-            <InfoBubbleContainer {...props} style={{ left: x, top: y + height + 8, width: props.style.width === "100%" ? width : "fit-content" }}>
+            <InfoBubbleContainer 
+                {...props} 
+                style={{ 
+                    ...props.style,
+                    left: props.style?.left ? x + props.style.left : x, 
+                    top: y + height + 8, 
+                    width: props.style?.width === "100%" ? width : "fit-content",
+                }}
+            >
                 {children}
             </InfoBubbleContainer>,
             document.getElementById("root"),
         )
     );
-}
+};
 
 export const Button = ({ children, primary, isLoading = false, requiresWallet, ...props }) => {
     const { signer } = useContext(EthersContext);
@@ -88,11 +97,11 @@ export const Button = ({ children, primary, isLoading = false, requiresWallet, .
 
             {
                 isHovered && requiresWallet && !signer &&
-                    <InfoBubble style={{ width: "100%" }} parentRef={buttonRef}>
+                    <HoverInfoBubble style={{ width: "100%" }} parentRef={buttonRef}>
                         <Text style={{ color: "white" }}>
                             Connect your wallet  
                         </Text>
-                    </InfoBubble>
+                    </HoverInfoBubble>
             }
         </ButtonContainer>
     );
@@ -143,17 +152,22 @@ const StyledArrowButton = styled.div`
     position: relative;
     margin-right: 25px;
 
-    img {
+    .arrow-direction {
         position: absolute;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) rotate(180deg);
         transition: right 0.1s ease-out;
-        right: -25px;
+        right: -17px;
     }
     
     &:hover {
-        img {
-            right: -30px;
+        .arrow-direction {
+            right: -21px;
+
+            path {
+                fill: ${({ theme }) => theme.colors.secondary} !important;
+                stroke: ${({ theme }) => theme.colors.secondary} !important;
+            }
         }
 
         color: ${({ theme }) => theme.colors.secondary} !important;
@@ -165,10 +179,7 @@ export const ArrowButton = props => {
     return (
         <StyledArrowButton {...props}>
             { props.children }
-            <img
-                height={18}
-                src={"/arrow-direction-light-theme.png"}
-            />
+            <ArrowDirection className={"arrow-direction"}/>
         </StyledArrowButton>
     );
 };
@@ -194,6 +205,7 @@ export const AddButton = ({ children, ...props }) => {
                 borderRadius: 1000, 
                 width: "fit-content", 
                 padding: 0,
+                overflow: "hidden",
                 ...props.style, 
             }}
         >
