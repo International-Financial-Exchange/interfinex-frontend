@@ -2,7 +2,7 @@
     "ganache": {
         "Token0": {
             "name": "Token0",
-            "address": "0x9B2EfA0E45034ab6A7701e121837baE65d9A92A3",
+            "address": "0x1b9a88A4bcFae6Be48637b74e49eA844Ec8F0CbF",
             "artifactName": "ERC20"
         },
         "Token1": {
@@ -126,12 +126,12 @@
     "kovan": {
         "TemplateDividendERC20": {
             "name": "TemplateDividendERC20",
-            "address": "0x6D712CB50297b97b79dE784d10F487C00d7f8c2C",
+            "address": "0xC6c5Ab5039373b0CBa7d0116d9ba7fb9831C3f42",
             "artifactName": "DividendERC20"
         },
         "IfexToken": {
             "name": "IfexToken",
-            "address": "0x04F339eC4D75Cf2833069e6e61b60eF56461CD7C",
+            "address": "0x4ea0Be853219be8C9cE27200Bdeee36881612FF2",
             "artifactName": "DividendERC20"
         },
         "WrappedEther": {
@@ -171,22 +171,22 @@
         },
         "Token0": {
             "name": "Token0",
-            "address": "0x696358bBb1a743052E0E87BeD78AAd9d18f0e1F4",
+            "address": "0x9155497EAE31D432C0b13dBCc0615a37f55a2c87",
             "artifactName": "ERC20"
         },
         "Token1": {
             "name": "Token1",
-            "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
+            "address": "0xc1EeD9232A0A44c2463ACB83698c162966FBc78d",
             "artifactName": "ERC20"
         },
         "Token2": {
             "name": "Token2",
-            "address": "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
+            "address": "0x447786d977Ea11Ad0600E193b2d07A06EfB53e5F",
             "artifactName": "ERC20"
         },
         "Token3": {
             "name": "Token3",
-            "address": "0x0724F18B2aA7D6413D3fDcF6c0c27458a8170Dd9",
+            "address": "0x245e77E56b1514D77910c9303e4b44dDb44B788c",
             "artifactName": "ERC20"
         },
         "TemplateFixedPriceILO": {
