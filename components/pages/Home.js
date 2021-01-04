@@ -9,14 +9,14 @@ import { PIXEL_SIZING } from '../../utils/constants';
 
 export default function Home() {
     return (
-        <Layout showNotifications={false}>
+        <Layout showNotifications={false} style={{ height: "100%" }}>
             <div 
                 style={{ 
                     display: "grid", 
                     justifyItems: "center", 
                     position: "absolute",
                     width: "fit-content",
-                    top: "50%",
+                    top: "50vh",
                     left: "50%",
                     transform: "translate(-50%, -50%)"
                 }}
