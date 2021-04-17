@@ -16,7 +16,7 @@ export const useYieldFarmInfo = (liquidityToken, SwapContext) => {
         if (liquidityToken) {
             const ifexBalance = assetToken.address === ifexToken.address ? exchangeAssetTokenBalance : exchangeBaseTokenBalance;
 
-            const rawFarmInfo = await YieldFarm.tokenToFarmInfo(liquidityToken.address);
+            const rawFarmInfo = await YieldFarm.tokenToFarmInfo(liquidityToken.address, { gasLimit: 1_000_000 });
             const yieldPerBlock = tokenAmountToBig(rawFarmInfo.yieldPerBlock, { decimals: 18 });
             const annualYield = yieldPerBlock.mul(2336000);
             const annualAPR = divOrZero(annualYield, ifexBalance).mul(100);

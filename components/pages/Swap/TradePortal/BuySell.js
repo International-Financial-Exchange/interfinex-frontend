@@ -86,7 +86,6 @@ export const BuySell = ({ isBuy, isMargin }) => {
     const maxLeverage = (1 / (parameters?.minInitialMarginRate ?? 0.5)).toFixed(1);
     const leverage = _leverage ?? maxLeverage / 2;
     
-    console.log("error here", [assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance].map(e => e.toString()))
     const inverseAmount = outputToInputAmount(assetTokenAmount, exchangeBaseTokenBalance, exchangeAssetTokenBalance, FEE_RATE);
 
     const initialMargin = isBuy ? 
